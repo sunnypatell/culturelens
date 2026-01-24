@@ -30,6 +30,15 @@ cp .env.example .env.local
 
 Fill in your `.env.local` with the API keys (ask Sunny for the values).
 
+#### ElevenLabs Setup
+
+The voice agent supports two connection modes:
+
+- **Public agent** (default): Set `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` — the client connects directly, no signed URL needed.
+- **Private agent**: Set `ELEVENLABS_API_KEY` + `ELEVENLABS_AGENT_ID` — the backend generates a signed URL. API key must have **Agents Write** (`convai_write`) permission.
+
+Docs: [ElevenLabs React SDK](https://elevenlabs.io/docs/agents-platform/libraries/react) | [Agent Authentication](https://elevenlabs.io/docs/conversational-ai/customization/authentication)
+
 ### Run
 
 ```bash
@@ -48,18 +57,33 @@ npm run build
 
 ```
 app/
-├── page.tsx                         # Main dashboard (5-view router)
-├── layout.tsx                       # Root layout + metadata
-└── api/elevenlabs/signed-url/       # ElevenLabs signed URL endpoint
+├── page.tsx                          # Main dashboard (5-view router)
+├── layout.tsx                        # Root layout + metadata
+└── api/
+    ├── elevenlabs/
+    │   ├── signed-url/route.ts       # Signed URL for private agents
+    │   └── tts/route.ts              # Text-to-speech for debrief audio (TODO)
+    └── sessions/
+        ├── route.ts                  # Session CRUD (TODO)
+        └── [id]/
+            ├── upload/route.ts       # Audio upload (TODO)
+            └── analyze/route.ts      # Analysis pipeline (TODO)
 
 components/
-├── dashboard/                       # Dashboard views (home, record, library, insights, settings)
-├── audio/                           # Waveform visualization
-├── ui/                              # Reusable UI primitives (shadcn)
-└── voice-agent.tsx                  # ElevenLabs voice agent integration
+├── dashboard/                        # Dashboard views (home, record, library, insights, settings)
+├── audio/                            # Waveform visualization
+├── ui/                               # Reusable UI primitives (shadcn)
+└── voice-agent.tsx                   # ElevenLabs voice agent (public + signed URL modes)
 
 lib/
-└── utils.ts                         # Utility functions
+├── types.ts                          # Shared TypeScript types (Session, Segment, Metrics, Insight, Debrief)
+├── audio-recorder.ts                 # MediaRecorder wrapper (TODO)
+├── transcription.ts                  # Audio → transcript segments (TODO)
+├── metrics.ts                        # Deterministic communication metrics (TODO)
+├── linguistic-markers.ts             # Regex pattern extraction (TODO)
+├── cultural-lens.ts                  # LLM cultural hypothesis engine (TODO)
+├── debrief-generator.ts              # Debrief script + TTS (TODO)
+└── utils.ts                          # Utility functions
 ```
 
 ## Team
