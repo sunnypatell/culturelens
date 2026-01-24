@@ -2,6 +2,32 @@
 
 import { useConversation } from "@elevenlabs/react";
 import { useState, useCallback, useEffect } from "react";
+import { createDocument } from "@/lib/firebase-utils";
+import { Timestamp } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
+// Test Firebase connection
+useEffect(() => {
+  console.log('Firebase config check:');
+  console.log('API Key:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Set' : 'Not set');
+  console.log('Project ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
+
+  const testFirebase = async () => {
+    try {
+      console.log('Testing Firebase connection...');
+      const docRef = await addDoc(collection(db, 'Test'), {
+        message: 'Firebase test',
+        timestamp: Timestamp.now(),
+      });
+      console.log('Firebase test successful, document ID:', docRef.id);
+    } catch (error) {
+      console.error('Firebase test failed:', error);
+    }
+  };
+
+  testFirebase();
+}, []);
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -48,13 +74,18 @@ export function VoiceAgent() {
   const [sessionId] = useState(() => `session-${Date.now()}`);
 
   const conversation = useConversation({
-    onConnect: () => setStatus("connected"),
+    onConnect: () => {
+      console.log('Voice agent connected');
+      setStatus("connected");
+    },
     onDisconnect: () => {
+      console.log('Voice agent disconnected, saving transcript');
       setStatus("idle");
       // Save final transcript when disconnecting
       saveTranscript();
     },
     onError: (e) => {
+      console.error('Voice agent error:', e);
       setError(
         typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error")
       );
@@ -63,6 +94,7 @@ export function VoiceAgent() {
     onMessage: (message) => {
       // Capture conversation messages
       const messageText = typeof message === 'string' ? message : JSON.stringify(message);
+      console.log('Received message:', messageText);
       setTranscript(prev => [...prev, `[${new Date().toISOString()}] ${messageText}`]);
     },
   });
@@ -75,33 +107,28 @@ export function VoiceAgent() {
   });
 
   const saveTranscript = useCallback(async () => {
-    if (transcript.length === 0) return;
+    console.log('saveTranscript called, transcript length:', transcript.length);
+    if (transcript.length === 0) {
+      console.log('No transcript to save');
+      return;
+    }
 
     try {
       const transcriptText = transcript.join('\n\n');
-      await fetch('/api/transcripts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          transcript: transcriptText,
-          timestamp: Date.now(),
-        }),
+      console.log('Saving transcript to Firebase:', transcriptText.substring(0, 100) + '...');
+
+      // Use Firestore API directly to have full control over the document structure
+      const docRef = await addDoc(collection(db, 'Chat'), {
+        insight: [], // Array of strings, will be filled by Gemini
+        timestamp: Timestamp.now(),
+        transcript: transcriptText,
       });
+
+      console.log('Transcript saved successfully with ID:', docRef.id);
     } catch (error) {
       console.error('Failed to save transcript:', error);
     }
-  }, [transcript, sessionId]);
-
-  // Save transcript every 30 seconds during conversation
-  useEffect(() => {
-    if (status === "connected" && transcript.length > 0) {
-      const interval = setInterval(saveTranscript, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [status, transcript.length, saveTranscript]);
+  }, [transcript]);
 
   const connect = useCallback(async () => {
     setError(null);
