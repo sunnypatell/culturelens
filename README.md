@@ -26,7 +26,7 @@ Setup instructions will be added once the project is scaffolded.
 |------|--------|------|
 | Sunny Patel | [@sunnypatell](https://github.com/sunnypatell) | TBD |
 | Daniyal Lilani | [@DaniyalLilani](https://github.com/daniyallilani) | TBD |
-| TBD | | |
+| Aryan Kashefi-Aazam | [@Aryan-KA](https://github.com/Aryan-KA) | |
 | TBD | | |
 
 ## License
