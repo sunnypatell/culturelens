@@ -1,33 +1,7 @@
 "use client";
 
 import { useConversation } from "@elevenlabs/react";
-import { useState, useCallback, useEffect } from "react";
-import { createDocument } from "@/lib/firebase-utils";
-import { Timestamp } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-// Test Firebase connection
-useEffect(() => {
-  console.log('Firebase config check:');
-  console.log('API Key:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Set' : 'Not set');
-  console.log('Project ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
-
-  const testFirebase = async () => {
-    try {
-      console.log('Testing Firebase connection...');
-      const docRef = await addDoc(collection(db, 'Test'), {
-        message: 'Firebase test',
-        timestamp: Timestamp.now(),
-      });
-      console.log('Firebase test successful, document ID:', docRef.id);
-    } catch (error) {
-      console.error('Firebase test failed:', error);
-    }
-  };
-
-  testFirebase();
-}, []);
+import { useState, useCallback, useEffect, useRef } from "react";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -72,6 +46,12 @@ export function VoiceAgent() {
   const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
   const [transcript, setTranscript] = useState<string[]>([]);
   const [sessionId] = useState(() => `session-${Date.now()}`);
+  const transcriptRef = useRef<string[]>([]);
+
+  // Keep the ref in sync with the state
+  useEffect(() => {
+    transcriptRef.current = transcript;
+  }, [transcript]);
 
   const conversation = useConversation({
     onConnect: () => {
@@ -80,6 +60,7 @@ export function VoiceAgent() {
     },
     onDisconnect: () => {
       console.log('Voice agent disconnected, saving transcript');
+      console.log('Transcript length:', transcriptRef.current.length);
       setStatus("idle");
       // Save final transcript when disconnecting
       saveTranscript();
@@ -107,28 +88,41 @@ export function VoiceAgent() {
   });
 
   const saveTranscript = useCallback(async () => {
-    console.log('saveTranscript called, transcript length:', transcript.length);
-    if (transcript.length === 0) {
+    const currentTranscript = transcriptRef.current;
+    console.log('saveTranscript called, transcript length:', currentTranscript.length);
+    if (currentTranscript.length === 0) {
       console.log('No transcript to save');
       return;
     }
 
     try {
-      const transcriptText = transcript.join('\n\n');
-      console.log('Saving transcript to Firebase:', transcriptText.substring(0, 100) + '...');
+      const transcriptText = currentTranscript.join('\n\n');
+      console.log('Saving transcript via API:', transcriptText.substring(0, 100) + '...');
 
-      // Use Firestore API directly to have full control over the document structure
-      const docRef = await addDoc(collection(db, 'Chat'), {
-        insight: [], // Array of strings, will be filled by Gemini
-        timestamp: Timestamp.now(),
-        transcript: transcriptText,
+      // Use our API endpoint instead of direct Firestore calls
+      const response = await fetch('/api/transcripts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: sessionId,
+          transcript: transcriptText,
+          timestamp: new Date().toISOString(),
+          segments: [], // Could be populated if we have segment data
+        }),
       });
 
-      console.log('Transcript saved successfully with ID:', docRef.id);
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Transcript saved successfully:', result);
     } catch (error) {
       console.error('Failed to save transcript:', error);
     }
-  }, [transcript]);
+  }, [sessionId]);
 
   const connect = useCallback(async () => {
     setError(null);
