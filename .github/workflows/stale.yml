@@ -1,0 +1,26 @@
+name: Stale Issues & PRs
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: "This issue has been inactive for 5 days. It will be closed in 2 days if there's no further activity."
+          stale-pr-message: "This PR has been inactive for 3 days. It will be closed in 2 days if there's no further activity."
+          days-before-issue-stale: 5
+          days-before-pr-stale: 3
+          days-before-issue-close: 2
+          days-before-pr-close: 2
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
+          exempt-issue-labels: "priority: high,status: blocked"
+          exempt-pr-labels: "priority: high,status: blocked"

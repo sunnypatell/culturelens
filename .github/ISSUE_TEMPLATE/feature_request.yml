@@ -1,0 +1,48 @@
+name: Feature Request
+description: Propose a new feature or enhancement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What and Why
+      description: Describe the feature and why it matters
+      placeholder: As a user, I want to... so that...
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed Approach
+      description: How would you implement this? (optional)
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: How do we know this is done?
+      value: |
+        - [ ]
+        - [ ]
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Frontend
+        - Backend
+        - Firebase
+        - Infra
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Be honest about what we can ship in time
+      options:
+        - High — Must have
+        - Medium — Should have
+        - Low — Nice to have
+    validations:
+      required: true

@@ -1,0 +1,42 @@
+name: Task
+description: General work item
+title: "task: "
+labels: ["task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be done
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Break it down into steps
+      value: |
+        - [ ]
+        - [ ]
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Frontend
+        - Backend
+        - Firebase
+        - Infra
+        - Docs
+    validations:
+      required: true
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Estimated Effort
+      options:
+        - "Small (< 1hr)"
+        - "Medium (1-3hr)"
+        - "Large (3hr+)"
+    validations:
+      required: true

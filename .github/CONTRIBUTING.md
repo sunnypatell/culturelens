@@ -1,24 +1,24 @@
-# contributing
+# Contributing
 
-quick guide for the team to keep things clean during the hackathon.
+Quick guide for the team to keep things clean during the hackathon.
 
-## branch naming
+## Branch Naming
 
 ```
 type/short-description
 ```
 
-examples:
+Examples:
 - `feat/auth-login-page`
 - `fix/firebase-connection`
 - `refactor/api-routes`
 - `chore/eslint-config`
 
-types: `feat`, `fix`, `refactor`, `chore`, `docs`
+Types: `feat`, `fix`, `refactor`, `chore`, `docs`
 
-## commit messages
+## Commit Messages
 
-we use [conventional commits](https://www.conventionalcommits.org/), lowercase:
+We use [Conventional Commits](https://www.conventionalcommits.org/), lowercase:
 
 ```
 type(scope): description
@@ -27,28 +27,28 @@ type(scope): description
 - another point if needed
 ```
 
-examples:
+Examples:
 - `feat(auth): added firebase google sign-in`
 - `fix(api): resolved null pointer on user fetch`
 - `chore(deps): updated next.js to 14.x`
 
-rules:
-- lowercase everything (except code references like `UserAuth`, `API_KEY`)
-- imperative mood ("added", "removed" not "add", "remove")
-- keep the first line under 72 characters
-- use `!` for breaking changes: `feat(api)!: changed response format`
+Rules:
+- Lowercase everything (except code references like `UserAuth`, `API_KEY`)
+- Imperative mood ("added", "removed" not "add", "remove")
+- Keep the first line under 72 characters
+- Use `!` for breaking changes: `feat(api)!: changed response format`
 
-## PR process
+## PR Process
 
-1. create a branch from `main` using the naming convention above
-2. make your changes, commit with conventional commits
-3. push and open a PR — fill out the template
-4. tag at least one teammate for review
-5. squash merge into `main` once approved
+1. Create a branch from `main` using the naming convention above
+2. Make your changes, commit with conventional commits
+3. Push and open a PR — fill out the template
+4. Tag at least one teammate for review
+5. Squash merge into `main` once approved
 
-## quick rules
+## Quick Rules
 
-- **never** push directly to `main`
-- pull `main` before creating a new branch
-- keep PRs small and focused (one feature/fix per PR)
-- if something is blocked, comment on the issue and move on
+- **Never** push directly to `main`
+- Pull `main` before creating a new branch
+- Keep PRs small and focused (one feature/fix per PR)
+- If something is blocked, comment on the issue and move on

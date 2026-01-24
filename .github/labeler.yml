@@ -1,0 +1,41 @@
+"area: frontend":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/app/**"
+          - "src/components/**"
+          - "src/styles/**"
+          - "public/**"
+          - "*.css"
+          - "*.tsx"
+          - "*.jsx"
+
+"area: backend":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/api/**"
+          - "src/server/**"
+          - "src/lib/api/**"
+
+"area: firebase":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "firebase/**"
+          - "firestore.rules"
+          - "storage.rules"
+          - "**/firebase*.ts"
+
+"area: infra":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+          - "*.config.*"
+          - "package.json"
+          - "tsconfig.json"
+          - "Dockerfile"
+          - "docker-compose.*"
+
+"docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**"

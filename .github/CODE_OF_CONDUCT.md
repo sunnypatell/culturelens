@@ -1,38 +1,38 @@
-# code of conduct
+# Code of Conduct
 
-## our pledge
+## Our Pledge
 
-we as members, contributors, and leaders pledge to make participation in our
+We as members, contributors, and leaders pledge to make participation in our
 project and community a harassment-free experience for everyone, regardless of
 age, body size, visible or invisible disability, ethnicity, sex characteristics,
 gender identity and expression, level of experience, education, socio-economic
 status, nationality, personal appearance, race, caste, color, religion, or
 sexual identity and orientation.
 
-## our standards
+## Our Standards
 
-examples of behavior that contributes to a positive environment:
+Examples of behavior that contributes to a positive environment:
 
-- using welcoming and inclusive language
-- being respectful of differing viewpoints and experiences
-- gracefully accepting constructive criticism
-- focusing on what is best for the team
-- showing empathy towards other team members
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints and experiences
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the team
+- Showing empathy towards other team members
 
-examples of unacceptable behavior:
+Examples of unacceptable behavior:
 
-- trolling, insulting/derogatory comments, and personal or political attacks
-- public or private harassment
-- publishing others' private information without explicit permission
-- other conduct which could reasonably be considered inappropriate
+- Trolling, insulting/derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information without explicit permission
+- Other conduct which could reasonably be considered inappropriate
 
-## enforcement
+## Enforcement
 
-instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project team. all complaints will be reviewed and investigated
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported to the project team. All complaints will be reviewed and investigated
 and will result in a response that is deemed necessary and appropriate to the
 circumstances.
 
-## attribution
+## Attribution
 
-this code of conduct is adapted from the [contributor covenant](https://www.contributor-covenant.org), version 2.1.
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1.

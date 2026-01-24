@@ -1,21 +1,21 @@
-## what changed
+## What Changed
 
 <!-- 1-3 bullet points describing the change -->
 
 -
 
-## type
+## Type
 
-- [ ] feat — new feature
-- [ ] fix — bug fix
-- [ ] refactor — code restructure (no behavior change)
-- [ ] chore — config, deps, tooling
-- [ ] docs — documentation only
+- [ ] `feat` — New feature
+- [ ] `fix` — Bug fix
+- [ ] `refactor` — Code restructure (no behavior change)
+- [ ] `chore` — Config, deps, tooling
+- [ ] `docs` — Documentation only
 
-## screenshot / recording
+## Screenshot / Recording
 
-<!-- drop a screenshot if it's a UI change, otherwise delete this section -->
+<!-- Drop a screenshot if it's a UI change, otherwise delete this section -->
 
-## notes for reviewer
+## Notes for Reviewer
 
-<!-- anything the reviewer should know? edge cases? concerns? -->
+<!-- Anything the reviewer should know? Edge cases? Concerns? -->

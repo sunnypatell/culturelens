@@ -1,34 +1,34 @@
-# hackhive-2026
+# HackHive 2026
 
-> project description TBD
+> Project description TBD
 
-built at [MLH HackHive 2026](https://mlh.io) | ontario tech university
+Built at [MLH HackHive 2026](https://mlh.io) | Ontario Tech University
 
-## tech stack
+## Tech Stack
 
-- **frontend:** next.js / react / typescript (scaffolded with [v0.dev](https://v0.dev))
-- **backend:** TBD
-- **database & auth:** firebase (firestore + firebase auth)
-- **deployment:** vercel (frontend) / TBD (backend)
+- **Frontend:** Next.js / React / TypeScript (scaffolded with [v0.dev](https://v0.dev))
+- **Backend:** TBD
+- **Database & Auth:** Firebase (Firestore + Firebase Auth)
+- **Deployment:** Vercel (frontend) / TBD (backend)
 
-## getting started
+## Getting Started
 
 ```bash
 git clone https://github.com/sunnypatell/hackhive-2026.git
 cd hackhive-2026
 ```
 
-setup instructions will be added once the project is scaffolded.
+Setup instructions will be added once the project is scaffolded.
 
-## team
+## Team
 
-| name | github | role |
+| Name | GitHub | Role |
 |------|--------|------|
-| sunny patel | [@sunnypatell](https://github.com/sunnypatell) | TBD |
+| Sunny Patel | [@sunnypatell](https://github.com/sunnypatell) | TBD |
 | TBD | | |
 | TBD | | |
 | TBD | | |
 
-## license
+## License
 
 [MIT](LICENSE)
