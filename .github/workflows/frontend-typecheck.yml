@@ -1,0 +1,30 @@
+name: frontend typecheck
+
+on:
+  pull_request:
+    paths:
+      - "**.ts"
+      - "**.tsx"
+      - "package.json"
+      - "tsconfig.json"
+  push:
+    branches:
+      - main
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: install dependencies
+        run: npm ci
+
+      - name: run typescript compiler
+        run: npm run typecheck

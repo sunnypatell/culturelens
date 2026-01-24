@@ -4,8 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:backend": "cd backend && source venv/bin/activate && uvicorn app.main:app --reload --port 8000",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint:frontend": "eslint . --ext .ts,.tsx",
+    "lint:backend": "cd backend && source venv/bin/activate && ruff check .",
+    "format:frontend": "prettier --write .",
+    "format:backend": "cd backend && source venv/bin/activate && ruff format .",
+    "format:check": "prettier --check .",
+    "test:backend": "cd backend && source venv/bin/activate && pytest -v",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@elevenlabs/react": "^0.13.0",
@@ -61,11 +69,17 @@
     "zod": "3.25.76"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.0.10",
     "postcss": "^8.5",
+    "prettier": "^3.8.1",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"

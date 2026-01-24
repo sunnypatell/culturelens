@@ -9,7 +9,7 @@
 //   4. Cultural hypotheses (20s): 1-2 "In some communication styles..." observations
 //   5. Close (10s): "Would you like to revisit specific moments?"
 
-import { Metrics, Insight, Debrief } from './types'
+import { Metrics, Insight, Debrief } from "./types";
 
 /**
  * Generates a structured debrief script from analysis results.
@@ -21,7 +21,7 @@ import { Metrics, Insight, Debrief } from './types'
 export function generateDebriefScript(
   metrics: Metrics,
   insights: Insight[]
-): Omit<Debrief, 'audioUrl' | 'durationMs'> {
+): Omit<Debrief, "audioUrl" | "durationMs"> {
   // TODO: implement script generation
   //
   // Use template-driven approach:
@@ -32,7 +32,9 @@ export function generateDebriefScript(
   //
   // Can use LLM for polish, but template ensures consistent structure
 
-  throw new Error('generateDebriefScript not implemented — see lib/debrief-generator.ts')
+  throw new Error(
+    "generateDebriefScript not implemented — see lib/debrief-generator.ts"
+  );
 }
 
 /**
@@ -50,5 +52,7 @@ export async function generateDebriefAudio(
   // POST to /api/elevenlabs/tts with { text: script, voiceId: ... }
   // Return the audio URL and estimated duration
 
-  throw new Error('generateDebriefAudio not implemented — see lib/debrief-generator.ts')
+  throw new Error(
+    "generateDebriefAudio not implemented — see lib/debrief-generator.ts"
+  );
 }

@@ -2,22 +2,22 @@
 // Detects communication patterns using keyword/regex matching.
 // No API calls needed — pure text analysis.
 
-import { Segment } from './types'
+import { Segment } from "./types";
 
 export type MarkerCategory =
-  | 'hedging'        // "maybe", "kind of", "I guess", "sort of"
-  | 'blame'          // "you always", "you never", "it's your fault"
-  | 'repair'         // "that's not what I meant", "let me rephrase"
-  | 'validation'     // "I hear you", "that makes sense"
-  | 'faceSaving'     // "it's fine", "don't worry about it"
-  | 'directives'     // "you need to", "you should", "stop"
+  | "hedging" // "maybe", "kind of", "I guess", "sort of"
+  | "blame" // "you always", "you never", "it's your fault"
+  | "repair" // "that's not what I meant", "let me rephrase"
+  | "validation" // "I hear you", "that makes sense"
+  | "faceSaving" // "it's fine", "don't worry about it"
+  | "directives"; // "you need to", "you should", "stop"
 
 export type LinguisticMarker = {
-  category: MarkerCategory
-  segment: Segment
-  matchedPhrase: string
-  position: { start: number; end: number }
-}
+  category: MarkerCategory;
+  segment: Segment;
+  matchedPhrase: string;
+  position: { start: number; end: number };
+};
 
 /**
  * Scans transcript segments for linguistic patterns.
@@ -38,5 +38,7 @@ export function extractMarkers(segments: Segment[]): LinguisticMarker[] {
   //
   // Scan each segment's text, collect matches with positions
 
-  throw new Error('extractMarkers not implemented — see lib/linguistic-markers.ts')
+  throw new Error(
+    "extractMarkers not implemented — see lib/linguistic-markers.ts"
+  );
 }

@@ -9,6 +9,7 @@ type/short-description
 ```
 
 Examples:
+
 - `feat/auth-login-page`
 - `fix/firebase-connection`
 - `refactor/api-routes`
@@ -28,11 +29,13 @@ type(scope): description
 ```
 
 Examples:
+
 - `feat(auth): added firebase google sign-in`
 - `fix(api): resolved null pointer on user fetch`
 - `chore(deps): updated next.js to 14.x`
 
 Rules:
+
 - Lowercase everything (except code references like `UserAuth`, `API_KEY`)
 - Imperative mood ("added", "removed" not "add", "remove")
 - Keep the first line under 72 characters

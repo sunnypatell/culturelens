@@ -1,29 +1,33 @@
-'use client'
+"use client";
 
-import { useConversation } from '@elevenlabs/react'
-import { useState, useCallback } from 'react'
+import { useConversation } from "@elevenlabs/react";
+import { useState, useCallback } from "react";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
 // Docs: https://elevenlabs.io/docs/agents-platform/libraries/react
-const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID
+const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
 
 export function VoiceAgent() {
-  const [status, setStatus] = useState<'idle' | 'connecting' | 'connected'>('idle')
-  const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<"idle" | "connecting" | "connected">(
+    "idle"
+  );
+  const [error, setError] = useState<string | null>(null);
 
   const conversation = useConversation({
-    onConnect: () => setStatus('connected'),
-    onDisconnect: () => setStatus('idle'),
+    onConnect: () => setStatus("connected"),
+    onDisconnect: () => setStatus("idle"),
     onError: (e) => {
-      setError(typeof e === 'string' ? e : (e as Error)?.message ?? 'Unknown error')
-      setStatus('idle')
+      setError(
+        typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error")
+      );
+      setStatus("idle");
     },
-  })
+  });
 
   const connect = useCallback(async () => {
-    setError(null)
-    setStatus('connecting')
+    setError(null);
+    setStatus("connecting");
 
     try {
       // Public agent — connect directly with agentId (no backend call needed)
@@ -32,35 +36,35 @@ export function VoiceAgent() {
       if (AGENT_ID) {
         await conversation.startSession({
           agentId: AGENT_ID,
-          connectionType: 'websocket',
-        })
-        return
+          connectionType: "websocket",
+        });
+        return;
       }
 
       // Fallback: private agent — get signed URL from backend
       // Requires ELEVENLABS_API_KEY with "Agents Write" permission
-      const res = await fetch('/api/elevenlabs/signed-url')
+      const res = await fetch("/api/elevenlabs/signed-url");
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData?.error || `API returned ${res.status}`)
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.error || `API returned ${res.status}`);
       }
 
-      const data = await res.json()
+      const data = await res.json();
       if (!data?.signed_url) {
-        throw new Error('No signed_url returned from server')
+        throw new Error("No signed_url returned from server");
       }
 
-      await conversation.startSession({ signedUrl: data.signed_url })
+      await conversation.startSession({ signedUrl: data.signed_url });
     } catch (e) {
-      setStatus('idle')
-      setError(e instanceof Error ? e.message : 'Failed to connect')
+      setStatus("idle");
+      setError(e instanceof Error ? e.message : "Failed to connect");
     }
-  }, [conversation])
+  }, [conversation]);
 
   const disconnect = useCallback(async () => {
-    setError(null)
-    await conversation.endSession()
-  }, [conversation])
+    setError(null);
+    await conversation.endSession();
+  }, [conversation]);
 
   return (
     <div className="space-y-3">
@@ -68,32 +72,34 @@ export function VoiceAgent() {
         <button
           className="border px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={connect}
-          disabled={status !== 'idle'}
+          disabled={status !== "idle"}
         >
-          {status === 'connecting' ? 'Connecting…' : 'Connect to Agent'}
+          {status === "connecting" ? "Connecting…" : "Connect to Agent"}
         </button>
 
         <button
           className="border px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={disconnect}
-          disabled={status !== 'connected'}
+          disabled={status !== "connected"}
         >
           Disconnect
         </button>
 
         <span className="text-sm opacity-70">
-          {status === 'connected' && '● Connected'}
-          {status === 'connecting' && '○ Connecting...'}
-          {status === 'idle' && '○ Not connected'}
+          {status === "connected" && "● Connected"}
+          {status === "connecting" && "○ Connecting..."}
+          {status === "idle" && "○ Not connected"}
         </span>
       </div>
 
-      {status === 'connected' && (
+      {status === "connected" && (
         <div className="text-sm text-muted-foreground flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           Agent is listening — speak naturally
           {conversation.isSpeaking && (
-            <span className="ml-2 text-primary font-medium">Agent is speaking...</span>
+            <span className="ml-2 text-primary font-medium">
+              Agent is speaking...
+            </span>
           )}
         </div>
       )}
@@ -104,11 +110,11 @@ export function VoiceAgent() {
         </div>
       )}
 
-      {status === 'idle' && (
+      {status === "idle" && (
         <p className="text-xs text-muted-foreground">
           The browser will ask for microphone permission when you connect.
         </p>
       )}
     </div>
-  )
+  );
 }

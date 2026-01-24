@@ -13,11 +13,11 @@
  *   // upload blob to /api/sessions/[id]/upload
  */
 export async function createRecorder(): Promise<{
-  start: () => void
-  stop: () => Promise<Blob>
-  pause: () => void
-  resume: () => void
-  isRecording: () => boolean
+  start: () => void;
+  stop: () => Promise<Blob>;
+  pause: () => void;
+  resume: () => void;
+  isRecording: () => boolean;
 }> {
   // TODO: implement MediaRecorder wrapper
   //
@@ -33,5 +33,5 @@ export async function createRecorder(): Promise<{
   //   - audio/mp4
   //   - audio/wav (fallback, large files)
 
-  throw new Error('createRecorder not implemented — see lib/audio-recorder.ts')
+  throw new Error("createRecorder not implemented — see lib/audio-recorder.ts");
 }

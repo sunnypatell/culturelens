@@ -7,8 +7,8 @@
 //
 // TODO: requires OPENAI_API_KEY (for GPT-4o) or similar LLM API
 
-import { Metrics, Insight, Segment } from './types'
-import { LinguisticMarker } from './linguistic-markers'
+import { Metrics, Insight, Segment } from "./types";
+import { LinguisticMarker } from "./linguistic-markers";
 
 /**
  * Generates culturally-aware hypotheses about observed patterns.
@@ -42,5 +42,7 @@ export async function generateCulturalInsights(
   //
   // Parse and validate LLM response against Insight schema
 
-  throw new Error('generateCulturalInsights not implemented — see lib/cultural-lens.ts')
+  throw new Error(
+    "generateCulturalInsights not implemented — see lib/cultural-lens.ts"
+  );
 }

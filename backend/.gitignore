@@ -1,0 +1,33 @@
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# environment
+.env
+.env.local
+
+# ide
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macos
+.DS_Store

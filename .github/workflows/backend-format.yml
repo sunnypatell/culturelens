@@ -1,0 +1,32 @@
+name: backend format
+
+on:
+  pull_request:
+    paths:
+      - "backend/**.py"
+      - "backend/pyproject.toml"
+  push:
+    branches:
+      - main
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: "backend/requirements-dev.txt"
+
+      - name: install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: check formatting
+        run: ruff format . --check

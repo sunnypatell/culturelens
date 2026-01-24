@@ -1,30 +1,44 @@
-'use client'
+"use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 interface TermsOfServiceModalProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
-export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps) {
+export function TermsOfServiceModal({
+  open,
+  onClose,
+}: TermsOfServiceModalProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Terms of Service & Privacy Policy</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">
+            Terms of Service & Privacy Policy
+          </DialogTitle>
         </DialogHeader>
-        
+
         <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-6 text-sm">
             {/* Introduction */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Introduction</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Introduction
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
-                CultureLens is a consent-based conversation mirror designed to promote self-awareness and understanding 
-                through audio-based insights. This service is provided as a reflection tool, not a diagnostic or therapeutic service.
+                CultureLens is a consent-based conversation mirror designed to
+                promote self-awareness and understanding through audio-based
+                insights. This service is provided as a reflection tool, not a
+                diagnostic or therapeutic service.
               </p>
             </section>
 
@@ -32,31 +46,51 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Consent and Recording */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Consent and Recording</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Consent and Recording
+              </h3>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">1. Dual Consent Requirement</h4>
-                  <p>All participants in a conversation must provide explicit consent before recording begins. CultureLens enforces:</p>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    1. Dual Consent Requirement
+                  </h4>
+                  <p>
+                    All participants in a conversation must provide explicit
+                    consent before recording begins. CultureLens enforces:
+                  </p>
                   <ul className="list-disc pl-6 mt-2 space-y-1">
                     <li>Explicit opt-in for all conversation participants</li>
                     <li>Clear notification when recording is active</li>
-                    <li>Ability to revoke consent and delete recordings at any time</li>
+                    <li>
+                      Ability to revoke consent and delete recordings at any
+                      time
+                    </li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">2. Recording Notice</h4>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    2. Recording Notice
+                  </h4>
                   <p>Users must:</p>
                   <ul className="list-disc pl-6 mt-2 space-y-1">
                     <li>Inform all parties that recording is occurring</li>
-                    <li>Obtain verbal or written consent from all participants</li>
+                    <li>
+                      Obtain verbal or written consent from all participants
+                    </li>
                     <li>Comply with local recording laws and regulations</li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">3. Data Ownership</h4>
-                  <p>You retain full ownership of your recordings. We process audio only to generate insights and do not use your data for any other purpose.</p>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    3. Data Ownership
+                  </h4>
+                  <p>
+                    You retain full ownership of your recordings. We process
+                    audio only to generate insights and do not use your data for
+                    any other purpose.
+                  </p>
                 </div>
               </div>
             </section>
@@ -65,10 +99,14 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Analysis and Insights */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Analysis and Insights</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Analysis and Insights
+              </h3>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Nature of Insights</h4>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    Nature of Insights
+                  </h4>
                   <p>CultureLens provides:</p>
                   <ul className="list-disc pl-6 mt-2 space-y-1">
                     <li>Pattern recognition in communication styles</li>
@@ -79,15 +117,21 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Not a Substitute for Professional Help</h4>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    Not a Substitute for Professional Help
+                  </h4>
                   <p className="font-medium text-foreground">
                     CultureLens is NOT:
                   </p>
                   <ul className="list-disc pl-6 mt-2 space-y-1">
                     <li>A diagnostic tool for mental health conditions</li>
                     <li>A replacement for therapy or counseling</li>
-                    <li>Medical advice or professional psychological assessment</li>
-                    <li>A tool for surveillance, monitoring, or control of others</li>
+                    <li>
+                      Medical advice or professional psychological assessment
+                    </li>
+                    <li>
+                      A tool for surveillance, monitoring, or control of others
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -97,7 +141,9 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Cultural Sensitivity */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Cultural Sensitivity</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Cultural Sensitivity
+              </h3>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <p>Our cultural context analysis:</p>
                 <ul className="list-disc pl-6 mt-2 space-y-1">
@@ -113,10 +159,14 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Data Privacy */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Data Privacy & Security</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Data Privacy & Security
+              </h3>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">What We Collect</h4>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    What We Collect
+                  </h4>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>Audio recordings (with your consent)</li>
                     <li>Transcripts and analysis results</li>
@@ -126,7 +176,9 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">How We Protect Your Data</h4>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    How We Protect Your Data
+                  </h4>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>End-to-end encryption for audio files</li>
                     <li>Secure storage with access controls</li>
@@ -136,7 +188,9 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">Your Rights</h4>
+                  <h4 className="font-semibold text-foreground mb-2">
+                    Your Rights
+                  </h4>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>Access your data at any time</li>
                     <li>Delete recordings and insights permanently</li>
@@ -151,15 +205,21 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Prohibited Uses */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Prohibited Uses</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Prohibited Uses
+              </h3>
               <div className="space-y-2 text-muted-foreground leading-relaxed">
-                <p className="font-medium text-foreground">You may NOT use CultureLens to:</p>
+                <p className="font-medium text-foreground">
+                  You may NOT use CultureLens to:
+                </p>
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Record anyone without their knowledge or consent</li>
                   <li>Monitor, surveil, or control other individuals</li>
                   <li>Violate privacy laws or regulations</li>
                   <li>Collect data for discriminatory purposes</li>
-                  <li>Make decisions about employment, credit, or legal matters</li>
+                  <li>
+                    Make decisions about employment, credit, or legal matters
+                  </li>
                 </ul>
               </div>
             </section>
@@ -168,15 +228,19 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Limitation of Liability */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Limitation of Liability</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Limitation of Liability
+              </h3>
               <div className="text-muted-foreground leading-relaxed space-y-2">
                 <p>
-                  CultureLens is provided "as is" for educational and self-reflection purposes. We make no guarantees about 
-                  the accuracy, completeness, or reliability of insights generated.
+                  CultureLens is provided "as is" for educational and
+                  self-reflection purposes. We make no guarantees about the
+                  accuracy, completeness, or reliability of insights generated.
                 </p>
                 <p>
-                  You acknowledge that insights are AI-generated observations and should be considered as one perspective 
-                  among many in understanding communication patterns.
+                  You acknowledge that insights are AI-generated observations
+                  and should be considered as one perspective among many in
+                  understanding communication patterns.
                 </p>
               </div>
             </section>
@@ -185,10 +249,13 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Updates to Terms */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Updates to Terms</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Updates to Terms
+              </h3>
               <p className="text-muted-foreground leading-relaxed">
-                We may update these terms as CultureLens evolves. Users will be notified of significant changes and 
-                must accept updated terms to continue using the service.
+                We may update these terms as CultureLens evolves. Users will be
+                notified of significant changes and must accept updated terms to
+                continue using the service.
               </p>
             </section>
 
@@ -196,12 +263,19 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             {/* Contact */}
             <section>
-              <h3 className="text-lg font-semibold text-foreground mb-3">Contact & Support</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">
+                Contact & Support
+              </h3>
               <div className="text-muted-foreground leading-relaxed space-y-2">
-                <p>For questions about these terms, data privacy, or to exercise your rights:</p>
+                <p>
+                  For questions about these terms, data privacy, or to exercise
+                  your rights:
+                </p>
                 <p className="font-medium text-foreground">
-                  HackHive 2026 Team<br />
-                  Ontario Tech University<br />
+                  HackHive 2026 Team
+                  <br />
+                  Ontario Tech University
+                  <br />
                   contact@culturelens.app
                 </p>
               </div>
@@ -211,13 +285,20 @@ export function TermsOfServiceModal({ open, onClose }: TermsOfServiceModalProps)
 
             <section className="bg-muted/50 p-4 rounded-lg">
               <p className="text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">Last Updated:</span> January 2026<br />
-                <span className="font-semibold text-foreground">Version:</span> 1.0 (HackHive 2026 Edition)
+                <span className="font-semibold text-foreground">
+                  Last Updated:
+                </span>{" "}
+                January 2026
+                <br />
+                <span className="font-semibold text-foreground">
+                  Version:
+                </span>{" "}
+                1.0 (HackHive 2026 Edition)
               </p>
             </section>
           </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

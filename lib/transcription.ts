@@ -6,7 +6,7 @@
 //   - Deepgram (requires DEEPGRAM_API_KEY, has built-in diarization)
 //   - AssemblyAI (requires ASSEMBLYAI_API_KEY, has built-in diarization)
 
-import { Segment } from './types'
+import { Segment } from "./types";
 
 /**
  * Transcribes an audio blob into timestamped segments with speaker labels.
@@ -19,5 +19,5 @@ export async function transcribeAudio(audioBlob: Blob): Promise<Segment[]> {
   // 2. Send to transcription service
   // 3. Parse response into Segment[] format
   // 4. Apply speaker diarization (if not built into the service)
-  throw new Error('transcribeAudio not implemented — see lib/transcription.ts')
+  throw new Error("transcribeAudio not implemented — see lib/transcription.ts");
 }

@@ -2,7 +2,7 @@
 // Computes communication metrics from transcript segments.
 // This is pure computation (no API calls needed).
 
-import { Segment, Metrics } from './types'
+import { Segment, Metrics } from "./types";
 
 /**
  * Computes communication metrics from transcript segments.
@@ -21,5 +21,5 @@ export function computeMetrics(segments: Segment[]): Metrics {
   // Silence events: gaps > 1200ms between consecutive segments
   // Escalation: track volume/speed trends or LLM sentiment score over time
 
-  throw new Error('computeMetrics not implemented — see lib/metrics.ts')
+  throw new Error("computeMetrics not implemented — see lib/metrics.ts");
 }
