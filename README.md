@@ -1,4 +1,4 @@
-# HackHive 2026
+# CultureLens
 
 > Project description TBD
 
@@ -16,9 +16,9 @@ Built at [MLH HackHive 2026](https://mlh.io) | Ontario Tech University
 ```bash
 git clone https://github.com/sunnypatell/hackhive-2026.git
 cd hackhive-2026
+npm install
+npm run dev
 ```
-
-Setup instructions will be added once the project is scaffolded.
 
 ## Team
 
@@ -26,7 +26,7 @@ Setup instructions will be added once the project is scaffolded.
 |------|--------|------|
 | Sunny Patel | [@sunnypatell](https://github.com/sunnypatell) | TBD |
 | Daniyal Lilani | [@DaniyalLilani](https://github.com/daniyallilani) | TBD |
-| Aryan Kashefi-Aazam | [@Aryan-KA](https://github.com/Aryan-KA) | |
+| Aryan Kashefi-Aazam | [@Aryan-KA](https://github.com/Aryan-KA) | TBD |
 | TBD | | |
 
 ## License
