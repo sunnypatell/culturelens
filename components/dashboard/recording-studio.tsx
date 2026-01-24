@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Slider } from '@/components/ui/slider'
 import { AdvancedWaveform } from '@/components/audio/advanced-waveform'
+import { VoiceAgent } from '@/components/voice-agent'
 import { cn } from '@/lib/utils'
 
-type RecordingState = 'setup' | 'consent' | 'recording' | 'paused' | 'processing'
+type RecordingState = 'setup' | 'consent' | 'recording' | 'paused' | 'processing' | 'results'
 
 export function RecordingStudio() {
   const [state, setState] = useState<RecordingState>('setup')
@@ -74,9 +75,8 @@ export function RecordingStudio() {
   const stopRecording = () => {
     setState('processing')
     setTimeout(() => {
-      setState('setup')
-      setDuration(0)
-    }, 2000)
+      setState('results')
+    }, 3000)
   }
 
   const toggleCulturalContext = (context: string) => {
@@ -327,6 +327,67 @@ export function RecordingStudio() {
             <p className="text-muted-foreground">Preparing your audio for analysis...</p>
           </div>
         </Card>
+      </div>
+    )
+  }
+
+  if (state === 'results') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 p-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h1 className="text-4xl font-bold text-foreground">Session Complete</h1>
+            <p className="text-lg text-muted-foreground">
+              Your recording has been processed. Use the voice agent below to hear your culturally-aware debrief.
+            </p>
+          </div>
+
+          {/* Session Summary */}
+          <Card className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Session Summary</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Duration</p>
+                <p className="text-xl font-bold text-foreground">{formatTime(duration)}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Participants</p>
+                <p className="text-xl font-bold text-foreground">2</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Analysis</p>
+                <p className="text-xl font-bold text-foreground capitalize">{analysisMethod}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Sensitivity</p>
+                <p className="text-xl font-bold text-foreground">{sensitivityLevel[0]}%</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Voice Agent Debrief */}
+          <Card className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Audio Debrief</h2>
+                <p className="text-sm text-muted-foreground">
+                  Connect to the CultureLens voice agent to receive a neutral, culturally-aware audio reflection of your conversation patterns.
+                </p>
+              </div>
+              <VoiceAgent />
+              <p className="text-xs text-muted-foreground italic">
+                CultureLens provides reflection, not advice or therapy. Interpretations are hypotheses, not facts.
+              </p>
+            </div>
+          </Card>
+
+          {/* Actions */}
+          <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+            <Button variant="outline" onClick={() => { setState('setup'); setDuration(0) }}>
+              New Session
+            </Button>
+          </div>
+        </div>
       </div>
     )
   }
