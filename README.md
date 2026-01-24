@@ -13,39 +13,12 @@ built at [MLH HackHive 2026](https://mlh.io) | ontario tech university
 
 ## getting started
 
-### prerequisites
-
-- node.js 18+
-- npm or pnpm
-- firebase CLI (`npm i -g firebase-tools`)
-
-### setup
-
-1. clone the repo
-   ```bash
-   git clone https://github.com/sunnypatell/hackhive-2026.git
-   cd hackhive-2026
-   ```
-2. install dependencies
-   ```bash
-   npm install
-   ```
-3. copy `.env.example` to `.env.local` and fill in firebase config
-   ```bash
-   cp .env.example .env.local
-   ```
-4. start the dev server
-   ```bash
-   npm run dev
-   ```
-
-## project structure
-
-<!-- to be filled once architecture takes shape -->
-
+```bash
+git clone https://github.com/sunnypatell/hackhive-2026.git
+cd hackhive-2026
 ```
-TBD
-```
+
+setup instructions will be added once the project is scaffolded.
 
 ## team
 
