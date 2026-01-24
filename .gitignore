@@ -45,6 +45,12 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# generated audio files
+public/audio/
+
+# generated transcript files
+transcripts/
+
 # debug logs
 npm-debug.log*
 yarn-debug.log*
