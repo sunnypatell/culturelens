@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 type RecordingState =
   | "setup"
-  | "consent"
+  | "agent"
   | "recording"
   | "paused"
   | "processing"
@@ -27,9 +27,12 @@ export function RecordingStudio() {
   const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  // Consent settings
-  const [bothConsent, setBothConsent] = useState(false);
-  const [recordConsent, setRecordConsent] = useState(false);
+  // Session settings
+  const [sessionTitle, setSessionTitle] = useState("");
+  const [numberOfParticipants, setNumberOfParticipants] = useState("2 people");
+  const [sessionType, setSessionType] = useState("Personal Conversation");
+
+  // Analysis settings
   const [analysisMethod, setAnalysisMethod] = useState("standard");
   const [culturalContext, setCulturalContext] = useState<string[]>([]);
   const [sensitivityLevel, setSensitivityLevel] = useState([70]);
@@ -136,6 +139,8 @@ export function RecordingStudio() {
                   type="text"
                   placeholder="e.g., Team Meeting, Client Call, Brainstorming Session"
                   className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={sessionTitle}
+                  onChange={(e) => setSessionTitle(e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,6 +154,8 @@ export function RecordingStudio() {
                   <select
                     id="participants"
                     className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    value={numberOfParticipants}
+                    onChange={(e) => setNumberOfParticipants(e.target.value)}
                   >
                     <option>2 people</option>
                     <option>3 people</option>
@@ -166,78 +173,14 @@ export function RecordingStudio() {
                   <select
                     id="session-type"
                     className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    value={sessionType}
+                    onChange={(e) => setSessionType(e.target.value)}
                   >
-                    <option>Professional Meeting</option>
                     <option>Personal Conversation</option>
-                    <option>Educational Discussion</option>
-                    <option>Collaborative Work</option>
+                    <option>Professional Meeting</option>
+                    <option>Interview</option>
                   </select>
                 </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Privacy & Consent */}
-          <Card
-            className={cn(
-              "p-8",
-              mounted &&
-                "animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200"
-            )}
-          >
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Privacy & Consent
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Both participants must provide explicit consent
-                </p>
-              </div>
-              <Badge
-                variant={bothConsent && recordConsent ? "default" : "secondary"}
-              >
-                {bothConsent && recordConsent ? "Ready" : "Pending"}
-              </Badge>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/50">
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="both-consent"
-                    className="text-base font-medium"
-                  >
-                    All Participants Have Consented
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Everyone in this conversation has agreed to be recorded
-                  </p>
-                </div>
-                <Switch
-                  id="both-consent"
-                  checked={bothConsent}
-                  onCheckedChange={setBothConsent}
-                />
-              </div>
-
-              <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/50">
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="record-consent"
-                    className="text-base font-medium"
-                  >
-                    Consent to Record & Analyze
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    I consent to audio recording and AI-powered analysis
-                  </p>
-                </div>
-                <Switch
-                  id="record-consent"
-                  checked={recordConsent}
-                  onCheckedChange={setRecordConsent}
-                />
               </div>
             </div>
           </Card>
@@ -247,7 +190,7 @@ export function RecordingStudio() {
             className={cn(
               "p-8",
               mounted &&
-                "animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300"
+                "animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200"
             )}
           >
             <h2 className="text-2xl font-bold text-foreground mb-6">
@@ -383,7 +326,7 @@ export function RecordingStudio() {
             className={cn(
               "flex items-center justify-between",
               mounted &&
-                "animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400"
+                "animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300"
             )}
           >
             <Button variant="outline" size="lg">
@@ -391,11 +334,10 @@ export function RecordingStudio() {
             </Button>
             <Button
               size="lg"
-              disabled={!bothConsent || !recordConsent}
-              onClick={() => setState("consent")}
+              onClick={() => setState("agent")}
               className="px-8"
             >
-              Continue to Recording
+              Start Session
             </Button>
           </div>
         </div>
@@ -403,71 +345,36 @@ export function RecordingStudio() {
     );
   }
 
-  if (state === "consent") {
+  if (state === "agent") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-8">
-        <Card className="max-w-2xl w-full p-12 space-y-8 animate-in fade-in zoom-in duration-500">
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <svg
-                className="w-10 h-10 text-primary"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M9 12l2 2 4-4" />
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Ready to Begin
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 p-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h1 className="text-4xl font-bold text-foreground">
+              Voice Agent Session
             </h1>
             <p className="text-lg text-muted-foreground">
-              Before we start recording, please ensure all participants are
-              ready and aware that the session is about to begin.
+              Interact with your ElevenLabs agent for culturally-aware communication analysis.
             </p>
           </div>
 
-          <div className="space-y-4 p-6 rounded-lg bg-secondary/50">
-            <h3 className="font-semibold text-foreground">Quick Reminder:</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">•</span>
-                <span>All participants have provided explicit consent</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">•</span>
-                <span>
-                  Audio will be recorded and analyzed for communication patterns
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">•</span>
-                <span>You can pause or stop the recording at any time</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">•</span>
-                <span>
-                  All data is processed with cultural sensitivity and respect
-                </span>
-              </li>
-            </ul>
-          </div>
+          {/* Voice Agent */}
+          <Card className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            <div className="space-y-4">
+              <VoiceAgent />
+            </div>
+          </Card>
 
-          <div className="flex gap-4">
+          {/* Actions */}
+          <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
             <Button
               variant="outline"
-              className="flex-1 bg-transparent"
               onClick={() => setState("setup")}
             >
               Back to Setup
             </Button>
-            <Button className="flex-1" onClick={startRecording}>
-              Start Recording
-            </Button>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useConversation } from "@elevenlabs/react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -43,15 +43,27 @@ export function VoiceAgent() {
   );
   const [error, setError] = useState<string | null>(null);
   const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id); // Default to Rachel
+  const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
+  const [transcript, setTranscript] = useState<string[]>([]);
+  const [sessionId] = useState(() => `session-${Date.now()}`);
 
   const conversation = useConversation({
     onConnect: () => setStatus("connected"),
-    onDisconnect: () => setStatus("idle"),
+    onDisconnect: () => {
+      setStatus("idle");
+      // Save final transcript when disconnecting
+      saveTranscript();
+    },
     onError: (e) => {
       setError(
         typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error")
       );
       setStatus("idle");
+    },
+    onMessage: (message) => {
+      // Capture conversation messages
+      const messageText = typeof message === 'string' ? message : JSON.stringify(message);
+      setTranscript(prev => [...prev, `[${new Date().toISOString()}] ${messageText}`]);
     },
   });
 
@@ -61,6 +73,35 @@ export function VoiceAgent() {
     style: 0.4,
     use_speaker_boost: true,
   });
+
+  const saveTranscript = useCallback(async () => {
+    if (transcript.length === 0) return;
+
+    try {
+      const transcriptText = transcript.join('\n\n');
+      await fetch('/api/transcripts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          transcript: transcriptText,
+          timestamp: Date.now(),
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to save transcript:', error);
+    }
+  }, [transcript, sessionId]);
+
+  // Save transcript every 30 seconds during conversation
+  useEffect(() => {
+    if (status === "connected" && transcript.length > 0) {
+      const interval = setInterval(saveTranscript, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [status, transcript.length, saveTranscript]);
 
   const connect = useCallback(async () => {
     setError(null);
@@ -72,17 +113,22 @@ export function VoiceAgent() {
       // Override voice settings for natural conversation
       // Docs: https://elevenlabs.io/docs/agents-platform/libraries/react#startSession
       if (AGENT_ID) {
-        await conversation.startSession({
+        const sessionConfig: any = {
           agentId: AGENT_ID,
           connectionType: "websocket",
-          // Override with selected voice and natural settings
-          overrides: {
+        };
+
+        // Only override voice if not using agent's preset voice
+        if (!useAgentVoice) {
+          sessionConfig.overrides = {
             tts: {
               voiceId: selectedVoice,
               ...getVoiceSettings(),
             },
-          },
-        });
+          };
+        }
+
+        await conversation.startSession(sessionConfig);
         return;
       }
 
@@ -115,38 +161,67 @@ export function VoiceAgent() {
     <div className="space-y-4">
       {/* Voice Selection */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
-          Select Voice
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          {VOICES.map((voice) => (
-            <button
-              key={voice.id}
-              onClick={() => setSelectedVoice(voice.id)}
-              disabled={status !== "idle"}
-              className={`p-3 rounded-lg border text-left transition-all ${
-                selectedVoice === voice.id
-                  ? "border-primary bg-primary/10 ring-2 ring-primary/20"
-                  : "border-border hover:border-primary/50"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="font-medium text-sm">{voice.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {voice.gender}
-                  </div>
-                </div>
-                {selectedVoice === voice.id && (
-                  <div className="w-2 h-2 rounded-full bg-primary mt-1" />
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {voice.description}
-              </div>
-            </button>
-          ))}
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-foreground">
+            Voice Settings
+          </label>
         </div>
+
+        {/* Voice Mode Toggle */}
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="use-agent-voice"
+            checked={useAgentVoice}
+            onChange={(e) => setUseAgentVoice(e.target.checked)}
+            disabled={status !== "idle"}
+            className="rounded"
+          />
+          <label
+            htmlFor="use-agent-voice"
+            className="text-sm text-muted-foreground cursor-pointer"
+          >
+            Use agent's preset voice
+          </label>
+        </div>
+
+        {/* Custom Voice Selection */}
+        {!useAgentVoice && (
+          <>
+            <label className="text-sm font-medium text-foreground">
+              Select Custom Voice
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {VOICES.map((voice) => (
+                <button
+                  key={voice.id}
+                  onClick={() => setSelectedVoice(voice.id)}
+                  disabled={status !== "idle"}
+                  className={`p-3 rounded-lg border text-left transition-all ${
+                    selectedVoice === voice.id
+                      ? "border-primary bg-primary/10 ring-2 ring-primary/20"
+                      : "border-border hover:border-primary/50"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{voice.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {voice.gender}
+                      </div>
+                    </div>
+                    {selectedVoice === voice.id && (
+                      <div className="w-2 h-2 rounded-full bg-primary mt-1" />
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {voice.description}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Connection Controls */}
@@ -183,6 +258,30 @@ export function VoiceAgent() {
               Agent is speaking...
             </span>
           )}
+        </div>
+      )}
+
+      {/* Transcript Display */}
+      {transcript.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              Conversation Transcript
+            </label>
+            <button
+              onClick={saveTranscript}
+              className="text-xs px-2 py-1 bg-primary/10 hover:bg-primary/20 rounded text-primary"
+            >
+              Save to File
+            </button>
+          </div>
+          <div className="max-h-40 overflow-y-auto bg-muted/50 rounded-lg p-3 text-xs font-mono">
+            {transcript.map((line, index) => (
+              <div key={index} className="mb-1 text-muted-foreground">
+                {line}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
