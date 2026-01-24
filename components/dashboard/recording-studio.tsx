@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,11 +22,13 @@ type RecordingState =
   | "results";
 
 export function RecordingStudio() {
+  const router = useRouter();
   const [state, setState] = useState<RecordingState>("setup");
   const [duration, setDuration] = useState(0);
   const [waveformData, setWaveformData] = useState<number[]>(Array(60).fill(0));
   const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
 
   // Session settings
   const [sessionTitle, setSessionTitle] = useState("");
@@ -361,17 +364,21 @@ export function RecordingStudio() {
           {/* Voice Agent */}
           <Card className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             <div className="space-y-4">
-              <VoiceAgent />
+              <VoiceAgent onSessionId={setAgentSessionId} />
             </div>
           </Card>
 
           {/* Actions */}
-          <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-            <Button
-              variant="outline"
-              onClick={() => setState("setup")}
-            >
+          <div className="flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <Button variant="outline" onClick={() => setState("setup")}>
               Back to Setup
+            </Button>
+            <Button
+              onClick={() => router.push(`/results${agentSessionId ? `?sessionId=${agentSessionId}` : ""}`)}
+              disabled={!agentSessionId}
+              className="px-6"
+            >
+              View Analysis Results
             </Button>
           </div>
         </div>

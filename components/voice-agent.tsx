@@ -36,8 +36,11 @@ const VOICES = [
     description: "Energetic, engaging",
   },
 ];
+type VoiceAgentProps = {
+  onSessionId?: (sessionId: string) => void;
+};
 
-export function VoiceAgent() {
+export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
   const [status, setStatus] = useState<"idle" | "connecting" | "connected">(
     "idle"
   );
@@ -46,6 +49,10 @@ export function VoiceAgent() {
   const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
   const [transcript, setTranscript] = useState<string[]>([]);
   const [sessionId] = useState(() => `session-${Date.now()}`);
+
+  useEffect(() => {
+    onSessionId?.(sessionId);
+  }, [onSessionId, sessionId]);
 
   const conversation = useConversation({
     onConnect: () => setStatus("connected"),
