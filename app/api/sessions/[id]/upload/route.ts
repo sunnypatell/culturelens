@@ -2,23 +2,64 @@
 // POST /api/sessions/[id]/upload — receive recorded audio blob
 
 import { NextResponse } from "next/server";
+import { uploadFile } from "@/lib/firebase-server-utils";
+import { updateDocument, getDocument } from "@/lib/firebase-server-utils";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  // TODO: implement audio upload
-  //
-  // 1. Validate session exists and status is 'recording'
-  // 2. Read audio blob from request (multipart/form-data or raw body)
-  // 3. Store temporarily (filesystem, memory, or cloud storage)
-  // 4. Update session status to 'uploading' → 'processing'
-  // 5. Return success with file metadata
+    // Check if session exists
+    const session = await getDocument("sessions", id) as any;
+    if (!session) {
+      return NextResponse.json(
+        { error: "Session not found" },
+        { status: 404 }
+      );
+    }
 
-  return NextResponse.json(
-    { error: `POST /api/sessions/${id}/upload not implemented yet` },
-    { status: 501 }
-  );
+    if (session.status !== "recording") {
+      return NextResponse.json(
+        { error: "Session is not in recording state" },
+        { status: 400 }
+      );
+    }
+
+    const formData = await request.formData();
+    const audioFile = formData.get("audio") as File;
+
+    if (!audioFile) {
+      return NextResponse.json(
+        { error: "No audio file provided" },
+        { status: 400 }
+      );
+    }
+
+    // Upload to Firebase Storage
+    const storagePath = `audio/${id}/${audioFile.name}`;
+    const { downloadURL } = await uploadFile(audioFile, storagePath);
+
+    // Update session status and add audio URL
+    await updateDocument("sessions", id, {
+      status: "processing",
+      audioUrl: downloadURL,
+      audioPath: storagePath,
+    });
+
+    return NextResponse.json({
+      success: true,
+      sessionId: id,
+      audioUrl: downloadURL,
+      message: "Audio uploaded successfully",
+    });
+  } catch (error) {
+    console.error("Audio upload error:", error);
+    return NextResponse.json(
+      { error: "Failed to upload audio" },
+      { status: 500 }
+    );
+  }
 }

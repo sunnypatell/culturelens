@@ -1,7 +1,7 @@
 "use client";
 
 import { useConversation } from "@elevenlabs/react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -49,19 +49,31 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
   const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
   const [transcript, setTranscript] = useState<string[]>([]);
   const [sessionId] = useState(() => `session-${Date.now()}`);
+  const transcriptRef = useRef<string[]>([]);
+
+  // Keep the ref in sync with the state
+  useEffect(() => {
+    transcriptRef.current = transcript;
+  }, [transcript]);
 
   useEffect(() => {
     onSessionId?.(sessionId);
   }, [onSessionId, sessionId]);
 
   const conversation = useConversation({
-    onConnect: () => setStatus("connected"),
+    onConnect: () => {
+      console.log('Voice agent connected');
+      setStatus("connected");
+    },
     onDisconnect: () => {
+      console.log('Voice agent disconnected, saving transcript');
+      console.log('Transcript length:', transcriptRef.current.length);
       setStatus("idle");
       // Save final transcript when disconnecting
       saveTranscript();
     },
     onError: (e) => {
+      console.error('Voice agent error:', e);
       setError(
         typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error")
       );
@@ -70,6 +82,7 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
     onMessage: (message) => {
       // Capture conversation messages
       const messageText = typeof message === 'string' ? message : JSON.stringify(message);
+      console.log('Received message:', messageText);
       setTranscript(prev => [...prev, `[${new Date().toISOString()}] ${messageText}`]);
     },
   });
@@ -82,33 +95,41 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
   });
 
   const saveTranscript = useCallback(async () => {
-    if (transcript.length === 0) return;
+    const currentTranscript = transcriptRef.current;
+    console.log('saveTranscript called, transcript length:', currentTranscript.length);
+    if (currentTranscript.length === 0) {
+      console.log('No transcript to save');
+      return;
+    }
 
     try {
-      const transcriptText = transcript.join('\n\n');
-      await fetch('/api/transcripts', {
+      const transcriptText = currentTranscript.join('\n\n');
+      console.log('Saving transcript via API:', transcriptText.substring(0, 100) + '...');
+
+      // Use our API endpoint instead of direct Firestore calls
+      const response = await fetch('/api/transcripts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          sessionId,
+          sessionId: sessionId,
           transcript: transcriptText,
-          timestamp: Date.now(),
+          timestamp: new Date().toISOString(),
+          segments: [], // Could be populated if we have segment data
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Transcript saved successfully:', result);
     } catch (error) {
       console.error('Failed to save transcript:', error);
     }
-  }, [transcript, sessionId]);
-
-  // Save transcript every 30 seconds during conversation
-  useEffect(() => {
-    if (status === "connected" && transcript.length > 0) {
-      const interval = setInterval(saveTranscript, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [status, transcript.length, saveTranscript]);
+  }, [sessionId]);
 
   const connect = useCallback(async () => {
     setError(null);

@@ -4,32 +4,63 @@
 
 import { NextResponse } from "next/server";
 import { Session } from "@/lib/types";
-
-// TODO: replace with Firebase or persistent storage
-const sessions: Map<string, Session> = new Map();
+import { createDocument, getDocuments, orderByField } from "@/lib/firebase-server-utils";
 
 export async function POST(request: Request) {
-  // TODO: implement session creation
-  //
-  // 1. Parse request body (consent flags, settings)
-  // 2. Generate unique session ID
-  // 3. Store session with status: 'recording'
-  // 4. Return session object
+  try {
+    const body = await request.json();
+    const { consent, settings } = body;
 
-  return NextResponse.json(
-    { error: "POST /api/sessions not implemented yet" },
-    { status: 501 }
-  );
+    if (!consent || !settings) {
+      return NextResponse.json(
+        { error: "Missing consent or settings" },
+        { status: 400 }
+      );
+    }
+
+    // Validate dual consent
+    if (!(consent.personA && consent.personB)) {
+      return NextResponse.json(
+        { error: "Both participants must consent" },
+        { status: 400 }
+      );
+    }
+
+    // Generate unique session ID
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    const session: Session = {
+      id: sessionId,
+      createdAt: new Date().toISOString(),
+      consent,
+      settings,
+      status: "recording",
+    };
+
+    // Store in Firestore
+    await createDocument("sessions", session);
+
+    return NextResponse.json(session, { status: 201 });
+  } catch (error) {
+    console.error("Session creation error:", error);
+    return NextResponse.json(
+      { error: "Failed to create session" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET() {
-  // TODO: implement session listing
-  //
-  // 1. Return all sessions (or paginated)
-  // 2. Filter by status if query param provided
+  try {
+    // Get all sessions from Firestore, ordered by createdAt desc
+    const sessions = await getDocuments("sessions", [orderByField("createdAt", "desc")]);
 
-  return NextResponse.json(
-    { error: "GET /api/sessions not implemented yet" },
-    { status: 501 }
-  );
+    return NextResponse.json(sessions);
+  } catch (error) {
+    console.error("Session listing error:", error);
+    return NextResponse.json(
+      { error: "Failed to list sessions" },
+      { status: 500 }
+    );
+  }
 }
