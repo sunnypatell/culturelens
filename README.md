@@ -70,6 +70,9 @@ The voice agent supports two connection modes:
 - **Public agent** (default): Set `NEXT_PUBLIC_ELEVENLABS_AGENT_ID` — the client connects directly, no signed URL needed.
 - **Private agent**: Set `ELEVENLABS_API_KEY` + `ELEVENLABS_AGENT_ID` — the backend generates a signed URL. API key must have **Agents Write** (`convai_write`) permission.
 
+**Agent Configuration:**
+To configure the agent's personality and conversation style, see [`AGENT_PROMPT.md`](AGENT_PROMPT.md) for the system prompt and [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md) for setup instructions.
+
 Docs: [ElevenLabs React SDK](https://elevenlabs.io/docs/agents-platform/libraries/react) | [Agent Authentication](https://elevenlabs.io/docs/conversational-ai/customization/authentication)
 
 ### Run Development Servers
