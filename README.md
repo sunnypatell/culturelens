@@ -25,7 +25,7 @@ Setup instructions will be added once the project is scaffolded.
 | Name | GitHub | Role |
 |------|--------|------|
 | Sunny Patel | [@sunnypatell](https://github.com/sunnypatell) | TBD |
-| TBD | | |
+| Daniyal Lilani |@DaniyalLilani(https://github.com/daniyallilani) | TBD |
 | TBD | | |
 | TBD | | |
 
