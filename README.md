@@ -71,7 +71,11 @@ The voice agent supports two connection modes:
 - **Private agent**: Set `ELEVENLABS_API_KEY` + `ELEVENLABS_AGENT_ID` — the backend generates a signed URL. API key must have **Agents Write** (`convai_write`) permission.
 
 **Agent Configuration:**
-To configure the agent's personality and conversation style, see [`AGENT_PROMPT.md`](AGENT_PROMPT.md) for the system prompt and [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md) for setup instructions.
+
+- **Quick Start**: [`docs/VOICE_SETTINGS_CHEATSHEET.md`](docs/VOICE_SETTINGS_CHEATSHEET.md) - Copy-paste settings (1 min)
+- **Voice Setup**: [`docs/VOICE_SETUP_QUICKSTART.md`](docs/VOICE_SETUP_QUICKSTART.md) - Make agent sound natural (2 min)
+- **System Prompt**: [`AGENT_PROMPT.md`](AGENT_PROMPT.md) - Conversation personality
+- **Full Guide**: [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md) - Detailed setup
 
 Docs: [ElevenLabs React SDK](https://elevenlabs.io/docs/agents-platform/libraries/react) | [Agent Authentication](https://elevenlabs.io/docs/conversational-ai/customization/authentication)
 
