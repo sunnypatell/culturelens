@@ -72,8 +72,9 @@ The voice agent supports two connection modes:
 
 **Agent Configuration:**
 
+- **Voice Selection**: Built-in! Select from 4 natural voices directly in the app (Rachel, Drew, Clyde, Elli)
 - **Quick Start**: [`docs/VOICE_SETTINGS_CHEATSHEET.md`](docs/VOICE_SETTINGS_CHEATSHEET.md) - Copy-paste settings (1 min)
-- **Voice Setup**: [`docs/VOICE_SETUP_QUICKSTART.md`](docs/VOICE_SETUP_QUICKSTART.md) - Make agent sound natural (2 min)
+- **Voice Details**: [`docs/VOICE_SELECTION.md`](docs/VOICE_SELECTION.md) - How in-app voice selection works
 - **System Prompt**: [`AGENT_PROMPT.md`](AGENT_PROMPT.md) - Conversation personality
 - **Full Guide**: [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md) - Detailed setup
 
