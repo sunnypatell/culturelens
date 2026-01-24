@@ -22,8 +22,8 @@ Built at [MLH HackHive 2026](https://mlh.io) | Ontario Tech University
 ### Setup
 
 ```bash
-git clone https://github.com/sunnypatell/hackhive-2026.git
-cd hackhive-2026
+git clone https://github.com/sunnypatell/culturelens.git
+cd culturelens
 npm install
 cp .env.example .env.local
 ```
