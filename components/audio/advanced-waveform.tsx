@@ -36,77 +36,79 @@ export function AdvancedWaveform({
 
       ctx.clearRect(0, 0, width, height);
 
-      if (!isRecording || isPaused) {
-        // Idle state - gentle wave
-        const newBars = bars.map((_, i) => {
-          const idle = Math.sin(timeRef.current * 0.02 + i * 0.2) * 0.15 + 0.15;
-          return idle;
-        });
-        setBars(newBars);
-      } else {
-        // Recording state - dynamic bars
-        const newBars = bars.map((_, i) => {
-          if (amplitudeData && amplitudeData[i] !== undefined) {
-            return amplitudeData[i];
+      // Update bars using functional setState to avoid dependency on bars
+      setBars((prevBars) => {
+        const newBars = prevBars.map((_, i) => {
+          if (!isRecording || isPaused) {
+            // Idle state - gentle wave
+            const idle =
+              Math.sin(timeRef.current * 0.02 + i * 0.2) * 0.15 + 0.15;
+            return idle;
+          } else {
+            // Recording state - dynamic bars
+            if (amplitudeData && amplitudeData[i] !== undefined) {
+              return amplitudeData[i];
+            }
+            // Simulate realistic voice amplitude
+            const wave = Math.sin(timeRef.current * 0.05 + i * 0.3) * 0.3;
+            const noise = Math.random() * 0.4;
+            const peak = Math.sin(timeRef.current * 0.02) * 0.3;
+            return Math.max(0.1, Math.min(1, 0.4 + wave + noise + peak));
           }
-          // Simulate realistic voice amplitude
-          const wave = Math.sin(timeRef.current * 0.05 + i * 0.3) * 0.3;
-          const noise = Math.random() * 0.4;
-          const peak = Math.sin(timeRef.current * 0.02) * 0.3;
-          return Math.max(0.1, Math.min(1, 0.4 + wave + noise + peak));
         });
-        setBars(newBars);
-      }
 
-      // Draw bars with gradient
-      const barWidth = width / bars.length;
-      const centerY = height / 2;
+        // Draw bars with gradient
+        const barWidth = width / newBars.length;
+        const centerY = height / 2;
 
-      bars.forEach((amplitude, i) => {
-        const x = i * barWidth;
-        const barHeight = amplitude * height * 0.8;
+        newBars.forEach((amplitude, i) => {
+          const x = i * barWidth;
+          const barHeight = amplitude * height * 0.8;
 
-        // Create gradient for each bar
-        const gradient = ctx.createLinearGradient(
-          x,
-          centerY - barHeight / 2,
-          x,
-          centerY + barHeight / 2
-        );
+          // Create gradient for each bar
+          const gradient = ctx.createLinearGradient(
+            x,
+            centerY - barHeight / 2,
+            x,
+            centerY + barHeight / 2
+          );
 
-        if (isRecording && !isPaused) {
-          // Active recording - vibrant colors
-          gradient.addColorStop(0, "rgba(99, 102, 241, 0.9)");
-          gradient.addColorStop(0.5, "rgba(139, 92, 246, 0.95)");
-          gradient.addColorStop(1, "rgba(59, 130, 246, 0.9)");
-        } else {
-          // Idle - muted colors
-          gradient.addColorStop(0, "rgba(148, 163, 184, 0.4)");
-          gradient.addColorStop(0.5, "rgba(148, 163, 184, 0.5)");
-          gradient.addColorStop(1, "rgba(148, 163, 184, 0.4)");
-        }
+          if (isRecording && !isPaused) {
+            // Active recording - vibrant colors
+            gradient.addColorStop(0, "rgba(99, 102, 241, 0.9)");
+            gradient.addColorStop(0.5, "rgba(139, 92, 246, 0.95)");
+            gradient.addColorStop(1, "rgba(59, 130, 246, 0.9)");
+          } else {
+            // Idle - muted colors
+            gradient.addColorStop(0, "rgba(148, 163, 184, 0.4)");
+            gradient.addColorStop(0.5, "rgba(148, 163, 184, 0.5)");
+            gradient.addColorStop(1, "rgba(148, 163, 184, 0.4)");
+          }
 
-        ctx.fillStyle = gradient;
+          ctx.fillStyle = gradient;
 
-        // Draw bar with rounded caps
-        const radius = barWidth * 0.3;
-        ctx.beginPath();
-        ctx.roundRect(
-          x + barWidth * 0.1,
-          centerY - barHeight / 2,
-          barWidth * 0.8,
-          barHeight,
-          radius
-        );
-        ctx.fill();
-
-        // Add glow effect when recording
-        if (isRecording && !isPaused && amplitude > 0.6) {
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = "rgba(99, 102, 241, 0.6)";
+          // Draw bar with rounded caps
+          const radius = barWidth * 0.3;
+          ctx.beginPath();
+          ctx.roundRect(
+            x + barWidth * 0.1,
+            centerY - barHeight / 2,
+            barWidth * 0.8,
+            barHeight,
+            radius
+          );
           ctx.fill();
-          ctx.shadowBlur = 0;
-        }
+
+          // Add glow effect when recording
+          if (isRecording && !isPaused && amplitude > 0.6) {
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "rgba(99, 102, 241, 0.6)";
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+        });
+
+        return newBars;
       });
 
       timeRef.current++;
@@ -120,7 +122,7 @@ export function AdvancedWaveform({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isRecording, isPaused, bars, amplitudeData]);
+  }, [isRecording, isPaused, amplitudeData]);
 
   return (
     <div className="relative w-full h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800">
