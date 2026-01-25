@@ -197,6 +197,38 @@ export async function POST(
     const turnCountA = segments.filter((s) => s.speaker === "A").length;
     const turnCountB = segments.filter((s) => s.speaker === "B").length;
 
+    // detect interruptions (speaker changes with gap < 500ms)
+    let interruptionCountA = 0;
+    let interruptionCountB = 0;
+    const overlapEvents: Metrics["overlapEvents"] = [];
+
+    for (let i = 1; i < segments.length; i++) {
+      const prev = segments[i - 1];
+      const curr = segments[i];
+
+      if (
+        prev.speaker !== curr.speaker &&
+        (curr.speaker === "A" || curr.speaker === "B")
+      ) {
+        const gap = curr.startMs - prev.endMs;
+
+        if (gap < 500) {
+          // interruption detected
+          if (curr.speaker === "A") {
+            interruptionCountA++;
+          } else {
+            interruptionCountB++;
+          }
+
+          overlapEvents.push({
+            atMs: curr.startMs,
+            by: curr.speaker,
+            snippet: curr.text.substring(0, 50),
+          });
+        }
+      }
+    }
+
     const metrics: Metrics = {
       talkTimeMs: { A: talkTimeA, B: talkTimeB },
       turnCount: { A: turnCountA, B: turnCountB },
@@ -204,8 +236,8 @@ export async function POST(
         A: turnCountA > 0 ? talkTimeA / turnCountA : 0,
         B: turnCountB > 0 ? talkTimeB / turnCountB : 0,
       },
-      interruptionCount: { A: 0, B: 0 }, // TODO: detect interruptions
-      overlapEvents: [],
+      interruptionCount: { A: interruptionCountA, B: interruptionCountB },
+      overlapEvents,
       silenceEvents: [],
       escalation: [],
     };
@@ -237,23 +269,61 @@ export async function POST(
       });
     }
 
+    // interruption pattern insight
+    const totalInterruptions = interruptionCountA + interruptionCountB;
+    if (totalInterruptions > 3) {
+      const dominant =
+        interruptionCountA > interruptionCountB ? "A" : "B";
+      insights.push({
+        id: "interruptions",
+        category: "turnTaking",
+        title: "frequent interruptions detected",
+        summary: `${totalInterruptions} interruptions detected. participant ${dominant} interrupted ${dominant === "A" ? interruptionCountA : interruptionCountB} times.`,
+        confidence: "medium",
+        evidence: overlapEvents.slice(0, 3).map((evt) => ({
+          startMs: evt.atMs,
+          endMs: evt.atMs + 1000,
+          quote: evt.snippet,
+        })),
+        whyThisWasFlagged:
+          totalInterruptions > 10
+            ? "high interruption rate may indicate competitive communication or cultural differences in turn-taking norms"
+            : "moderate interruption rate detected, may indicate engaged discussion or cultural communication style",
+      });
+    }
+
     // generate debrief text
     const debriefText = `conversation analysis complete.
 
-participated: ${turnCountA + turnCountB} total turns
-speaking time: participant A spoke for ${Math.round(talkTimeA / 1000)} seconds (${Math.round(balanceRatio * 100)}%), participant B spoke for ${Math.round(talkTimeB / 1000)} seconds (${Math.round((1 - balanceRatio) * 100)}%)
+participation metrics:
+- total turns: ${turnCountA + turnCountB} (participant A: ${turnCountA}, participant B: ${turnCountB})
+- speaking time: participant A spoke for ${Math.round(talkTimeA / 1000)}s (${Math.round(balanceRatio * 100)}%), participant B spoke for ${Math.round(talkTimeB / 1000)}s (${Math.round((1 - balanceRatio) * 100)}%)
+- average turn length: participant A ${Math.round((turnCountA > 0 ? talkTimeA / turnCountA : 0) / 1000)}s, participant B ${Math.round((turnCountB > 0 ? talkTimeB / turnCountB : 0) / 1000)}s
+${totalInterruptions > 0 ? `- interruptions: ${totalInterruptions} detected (participant A: ${interruptionCountA}, participant B: ${interruptionCountB})` : ""}
 
-${insights.length > 0 ? `key insights:\n${insights.map((i) => `- ${i.title}: ${i.summary}`).join("\n")}` : "no significant patterns detected"}`;
+${insights.length > 0 ? `key insights:\n${insights.map((i) => `- ${i.title}: ${i.summary}`).join("\n")}` : "no significant patterns detected in this conversation."}
+
+this analysis provides a starting point for understanding communication dynamics. consider cultural context and relationship dynamics when interpreting these patterns.`;
 
     const debrief: Debrief = {
       text: debriefText,
-      audioUrl: "", // TODO: generate audio via elevenlabs
+      audioUrl: "",
       durationMs: 0,
       sections: [
         {
           title: "overview",
           startChar: 0,
-          endChar: debriefText.indexOf("\n\n"),
+          endChar: debriefText.indexOf("participation"),
+        },
+        {
+          title: "metrics",
+          startChar: debriefText.indexOf("participation"),
+          endChar: debriefText.indexOf("key insights"),
+        },
+        {
+          title: "insights",
+          startChar: debriefText.indexOf("key insights"),
+          endChar: debriefText.length,
         },
       ],
     };
