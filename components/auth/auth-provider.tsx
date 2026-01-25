@@ -3,12 +3,14 @@
 /**
  * authentication context provider
  * provides auth state and methods to all components
+ * handles automatic account linking for multiple auth providers
  */
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import * as authClient from "@/lib/auth-client";
+import { createOrUpdateUserProfile } from "@/lib/account-linking";
 
 interface AuthContextType {
   user: User | null;
@@ -48,7 +50,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log(`[AUTH_PROVIDER] Auth state changed:`, {
+        isAuthenticated: !!user,
+        uid: user?.uid,
+        email: user?.email,
+        providers: user?.providerData.map((p) => p.providerId),
+      });
+
+      if (user) {
+        // create or update user profile in Firestore
+        try {
+          await createOrUpdateUserProfile(user);
+          console.log(`[AUTH_PROVIDER] User profile synchronized`);
+        } catch (error) {
+          console.error(
+            `[AUTH_PROVIDER] Failed to sync user profile:`,
+            error
+          );
+        }
+      }
+
       setUser(user);
       setLoading(false);
     });
@@ -61,17 +83,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     displayName?: string
   ) => {
+    console.log(`[AUTH_PROVIDER] Sign up started:`, { email, displayName });
     const user = await authClient.signUp(email, password, displayName);
+    console.log(`[AUTH_PROVIDER] Sign up successful:`, user.uid);
     return user;
   };
 
   const handleSignIn = async (email: string, password: string) => {
+    console.log(`[AUTH_PROVIDER] Sign in started:`, { email });
     const user = await authClient.signIn(email, password);
+    console.log(`[AUTH_PROVIDER] Sign in successful:`, user.uid);
     return user;
   };
 
   const handleSignInWithGoogle = async () => {
+    console.log(`[AUTH_PROVIDER] Google sign in started`);
     const user = await authClient.signInWithGoogle();
+    console.log(`[AUTH_PROVIDER] Google sign in successful:`, {
+      uid: user.uid,
+      email: user.email,
+    });
     return user;
   };
 
