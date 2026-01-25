@@ -71,14 +71,9 @@ function transformToCommunicationPatterns(
   const patterns: CommunicationPattern[] = [];
 
   // turn-taking balance from metrics
-  const totalTalkTime =
-    metrics.talkTimeMs.A + metrics.talkTimeMs.B;
-  const percentA = Math.round(
-    (metrics.talkTimeMs.A / totalTalkTime) * 100
-  );
-  const percentB = Math.round(
-    (metrics.talkTimeMs.B / totalTalkTime) * 100
-  );
+  const totalTalkTime = metrics.talkTimeMs.A + metrics.talkTimeMs.B;
+  const percentA = Math.round((metrics.talkTimeMs.A / totalTalkTime) * 100);
+  const percentB = Math.round((metrics.talkTimeMs.B / totalTalkTime) * 100);
 
   patterns.push({
     id: 1,
@@ -146,9 +141,7 @@ function transformToCommunicationPatterns(
 /**
  * transforms API insights into cultural context observations
  */
-function transformToCulturalContext(
-  insights: Insight[]
-): CulturalContext[] {
+function transformToCulturalContext(insights: Insight[]): CulturalContext[] {
   const culturalInsights = insights.filter(
     (i) => i.category === "culturalLens" || i.category === "directness"
   );
@@ -168,7 +161,7 @@ function transformToCulturalContext(
  */
 function transformToKeyMoments(
   insights: Insight[],
-  segments: AnalysisResult["segments"]
+  _segments: AnalysisResult["segments"]
 ): KeyMoment[] {
   return insights
     .filter((i) => i.evidence.length > 0)
@@ -267,7 +260,8 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(
-            errorData.error?.message || `Failed to fetch insights: ${response.status}`
+            errorData.error?.message ||
+              `Failed to fetch insights: ${response.status}`
           );
         }
 
@@ -289,9 +283,7 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
           analysisResult.segments
         );
 
-        const sessionMetadata = formatSessionMetadata(
-          analysisResult.session
-        );
+        const sessionMetadata = formatSessionMetadata(analysisResult.session);
 
         setData({
           communicationPatterns,
@@ -306,7 +298,8 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
         setData((prev) => ({
           ...prev,
           loading: false,
-          error: error instanceof Error ? error.message : "Failed to load insights",
+          error:
+            error instanceof Error ? error.message : "Failed to load insights",
         }));
       }
     }

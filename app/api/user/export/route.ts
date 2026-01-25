@@ -33,7 +33,9 @@ export async function POST(request: Request) {
     // fetch all user data
     const [profile, sessions] = await Promise.all([
       getDocument(COLLECTIONS.USERS, userId),
-      getDocuments(COLLECTIONS.SESSIONS, [whereEqual("userId", decodedToken.uid)]),
+      getDocuments(COLLECTIONS.SESSIONS, [
+        whereEqual("userId", decodedToken.uid),
+      ]),
     ]);
 
     const exportData = {

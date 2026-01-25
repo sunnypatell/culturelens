@@ -78,7 +78,8 @@ export function useSessions(): UseSessionsResult {
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(
-            errorData.error?.message || `failed to fetch sessions: ${response.status}`
+            errorData.error?.message ||
+              `failed to fetch sessions: ${response.status}`
           );
         }
 
@@ -89,7 +90,9 @@ export function useSessions(): UseSessionsResult {
         setSessions(result.data);
       } catch (err) {
         console.error("[useSessions] Error fetching sessions:", err);
-        setError(err instanceof Error ? err.message : "failed to load sessions");
+        setError(
+          err instanceof Error ? err.message : "failed to load sessions"
+        );
         setSessions(null);
       } finally {
         setLoading(false);

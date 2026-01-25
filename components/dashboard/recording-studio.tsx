@@ -37,7 +37,7 @@ export function RecordingStudio() {
   const [mounted, setMounted] = useState(false);
   const [creating, setCreating] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
+  const [_agentSessionId, _setAgentSessionId] = useState<string | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   // Session settings
@@ -428,7 +428,7 @@ export function RecordingStudio() {
             <div className="space-y-4">
               <VoiceAgent
                 sessionId={currentSessionId || undefined}
-                onSessionId={setAgentSessionId}
+                onSessionId={_setAgentSessionId}
               />
             </div>
           </Card>

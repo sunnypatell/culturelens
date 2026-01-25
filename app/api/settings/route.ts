@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     const userId = generateUserIdFromUid(decodedToken.uid);
 
     try {
-      const user = await getDocument(COLLECTIONS.USERS, userId) as any;
+      const user = (await getDocument(COLLECTIONS.USERS, userId)) as any;
 
       return apiSuccess(user?.settings || {});
     } catch (error) {

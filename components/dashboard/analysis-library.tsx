@@ -32,7 +32,10 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
     fetchSessions();
   }, [getIdToken]);
 
-  const handleToggleFavorite = async (sessionId: string, e: React.MouseEvent) => {
+  const handleToggleFavorite = async (
+    sessionId: string,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
 
     try {
@@ -65,7 +68,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
       toast.success(
         data.data.isFavorite ? "added to favorites" : "removed from favorites"
       );
-    } catch (error) {
+    } catch {
       toast.error("failed to update favorite");
     }
   };

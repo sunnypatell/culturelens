@@ -44,10 +44,7 @@ export async function PATCH(request: Request) {
       const existingUser = await getDocument(COLLECTIONS.USERS, userId);
 
       if (!existingUser) {
-        throw new DatabaseError(
-          "profile update",
-          "user profile not found"
-        );
+        throw new DatabaseError("profile update", "user profile not found");
       }
 
       // update firestore profile

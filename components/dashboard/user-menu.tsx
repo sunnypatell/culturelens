@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 export function UserMenu({ children }: { children: React.ReactNode }) {

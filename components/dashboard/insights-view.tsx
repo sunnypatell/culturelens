@@ -16,7 +16,10 @@ interface InsightsViewProps {
   onNavigate?: (view: string) => void;
 }
 
-export function InsightsView({ sessionId = null, onNavigate }: InsightsViewProps) {
+export function InsightsView({
+  sessionId = null,
+  onNavigate,
+}: InsightsViewProps) {
   const [mounted, setMounted] = useState(false);
   const [_selectedInsight, _setSelectedInsight] = useState<number | null>(null);
   const [expandedInsight, setExpandedInsight] = useState<number | null>(null);
@@ -53,9 +56,13 @@ export function InsightsView({ sessionId = null, onNavigate }: InsightsViewProps
     return (
       <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
         <Card className="p-8 max-w-md">
-          <h2 className="text-2xl font-bold text-destructive mb-4">error loading insights</h2>
+          <h2 className="text-2xl font-bold text-destructive mb-4">
+            error loading insights
+          </h2>
           <p className="text-muted-foreground mb-6">{error}</p>
-          <Button onClick={() => onNavigate?.("library")}>back to library</Button>
+          <Button onClick={() => onNavigate?.("library")}>
+            back to library
+          </Button>
         </Card>
       </div>
     );

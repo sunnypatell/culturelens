@@ -85,9 +85,7 @@ export function useInsightsTrends(): UseInsightsTrendsResult {
         insights: data.totalInsights,
         avgDuration:
           data.sessionsWithDuration > 0
-            ? Math.round(
-                data.totalDuration / data.sessionsWithDuration / 60000
-              ) // convert to minutes
+            ? Math.round(data.totalDuration / data.sessionsWithDuration / 60000) // convert to minutes
             : 0,
       }))
       .sort((a, b) => {

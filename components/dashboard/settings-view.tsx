@@ -419,6 +419,13 @@ export function SettingsView() {
                   </div>
                 </RadioGroup>
               </div>
+
+              <div className="flex justify-end pt-4">
+                <Button onClick={handleSaveSettings} disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Settings
+                </Button>
+              </div>
             </div>
           </div>
         </Card>

@@ -51,7 +51,10 @@ type VoiceAgentProps = {
   onSessionId?: (sessionId: string) => void;
 };
 
-export function VoiceAgent({ sessionId: providedSessionId, onSessionId }: VoiceAgentProps) {
+export function VoiceAgent({
+  sessionId: providedSessionId,
+  onSessionId,
+}: VoiceAgentProps) {
   const { getIdToken } = useAuth();
   const [status, setStatus] = useState<"idle" | "connecting" | "connected">(
     "idle"
@@ -60,7 +63,9 @@ export function VoiceAgent({ sessionId: providedSessionId, onSessionId }: VoiceA
   const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id); // Default to Rachel
   const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
   const [transcript, setTranscript] = useState<string[]>([]);
-  const [sessionId] = useState(() => providedSessionId || `session-${Date.now()}`);
+  const [sessionId] = useState(
+    () => providedSessionId || `session-${Date.now()}`
+  );
   const transcriptRef = useRef<string[]>([]);
 
   // Keep the ref in sync with the state
@@ -155,7 +160,9 @@ export function VoiceAgent({ sessionId: providedSessionId, onSessionId }: VoiceA
         throw new Error(`status update failed: ${statusResponse.status}`);
       }
 
-      console.log(`[VoiceAgent] Transcript saved and session ${sessionId} marked as processing`);
+      console.log(
+        `[VoiceAgent] Transcript saved and session ${sessionId} marked as processing`
+      );
     } catch (error) {
       console.error("[VoiceAgent] Failed to save transcript:", error);
       // silently fail - transcript saving is not critical to user experience
