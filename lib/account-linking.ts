@@ -57,7 +57,14 @@ export async function createOrUpdateUserProfile(
     });
 
     if (!response.ok) {
-      throw new Error("failed to sync user profile");
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`[ACCOUNT_LINKING] API error:`, {
+        status: response.status,
+        error: errorData,
+      });
+      throw new Error(
+        errorData?.error?.message || "failed to sync user profile"
+      );
     }
 
     const result = await response.json();

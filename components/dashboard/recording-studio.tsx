@@ -460,8 +460,7 @@ export function RecordingStudio({
               Voice Agent Session
             </h1>
             <p className="text-lg text-muted-foreground">
-              Interact with your ElevenLabs agent for
-              communication analysis.
+              Interact with your ElevenLabs agent for communication analysis.
             </p>
           </div>
 
@@ -481,12 +480,11 @@ export function RecordingStudio({
               Back to Setup
             </Button>
             <Button
-  onClick={() => router.push("/mock-results")}
-  className="px-6"
->
-  View Analysis Results
-</Button>
-
+              onClick={() => router.push("/mock-results")}
+              className="px-6"
+            >
+              View Analysis Results
+            </Button>
           </div>
         </div>
       </div>
@@ -676,15 +674,16 @@ export function RecordingStudio({
                   Neutral Debrief
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Connect to the CultureLens voice agent to receive a neutral, workplace-focused
-                  audio reflection of communication patterns and potential
-                  next steps.
+                  Connect to the CultureLens voice agent to receive a neutral,
+                  workplace-focused audio reflection of communication patterns
+                  and potential next steps.
                 </p>
               </div>
               <VoiceAgent sessionId={currentSessionId || undefined} />
               <p className="text-xs text-muted-foreground italic">
-                CultureLens provides reflection and pattern recognition, not legal or HR advice.
-                All observations are suggestions for improvement, not conclusions.
+                CultureLens provides reflection and pattern recognition, not
+                legal or HR advice. All observations are suggestions for
+                improvement, not conclusions.
               </p>
             </div>
           </Card>

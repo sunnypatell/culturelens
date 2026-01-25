@@ -4,7 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { MOCK_KEY_INSIGHTS, MOCK_TRANSCRIPT, getMockSessionTitle } from "../../lib/api/mockanalysis";
+import {
+  MOCK_KEY_INSIGHTS,
+  MOCK_TRANSCRIPT,
+  getMockSessionTitle,
+} from "../../lib/api/mockanalysis";
 
 export default function MockResultsPage() {
   const router = useRouter();
@@ -43,12 +47,18 @@ export default function MockResultsPage() {
           {MOCK_KEY_INSIGHTS.map((insight) => (
             <Card key={insight.title} className="p-6 space-y-4">
               <div className="space-y-1">
-                <h2 className="text-xl font-bold text-foreground">{insight.title}</h2>
-                <p className="text-sm text-muted-foreground">{insight.summary}</p>
+                <h2 className="text-xl font-bold text-foreground">
+                  {insight.title}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {insight.summary}
+                </p>
               </div>
 
               <div className="space-y-2">
-                <div className="text-sm font-medium text-foreground">Evidence</div>
+                <div className="text-sm font-medium text-foreground">
+                  Evidence
+                </div>
                 <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
                   {insight.evidence.map((q) => (
                     <li key={q}>{q}</li>
@@ -57,22 +67,33 @@ export default function MockResultsPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="text-sm font-medium text-foreground">Why it matters</div>
-                <p className="text-sm text-muted-foreground">{insight.whyItMatters}</p>
+                <div className="text-sm font-medium text-foreground">
+                  Why it matters
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {insight.whyItMatters}
+                </p>
               </div>
 
               <div className="space-y-2">
-                <div className="text-sm font-medium text-foreground">Try next</div>
-                <p className="text-sm text-muted-foreground">{insight.suggestion}</p>
+                <div className="text-sm font-medium text-foreground">
+                  Try next
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {insight.suggestion}
+                </p>
               </div>
             </Card>
           ))}
         </div>
 
         <Card className="p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-3">Source Transcript</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-3">
+            Source Transcript
+          </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Included so judges can see the insights are grounded in the conversation.
+            Included so judges can see the insights are grounded in the
+            conversation.
           </p>
           <pre className="whitespace-pre-wrap text-sm bg-background/60 border rounded-xl p-4 overflow-auto">
             {MOCK_TRANSCRIPT}

@@ -35,10 +35,10 @@ export function TermsOfServiceModal({
                 Introduction
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                CultureLens is a neutral workplace mediation assistant that captures
-                conversations and generates action-oriented insights. This service is
-                provided for internal conflict resolution and team alignment, not legal
-                counsel or HR documentation.
+                CultureLens is a neutral workplace mediation assistant that
+                captures conversations and generates action-oriented insights.
+                This service is provided for internal conflict resolution and
+                team alignment, not legal counsel or HR documentation.
               </p>
             </section>
 

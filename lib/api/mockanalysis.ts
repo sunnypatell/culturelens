@@ -52,7 +52,7 @@ export const MOCK_KEY_INSIGHTS: MockInsight[] = [
     whyItMatters:
       "When one person hears character judgment and the other hears process breakdown, trust drops fast and the conversation escalates.",
     suggestion:
-      "Separate accountability (what happened) from attribution (why it happened). Agree on the missing inputs + a clear escalation path next time."
+      "Separate accountability (what happened) from attribution (why it happened). Agree on the missing inputs + a clear escalation path next time.",
   },
   {
     title: "Escalation trigger: language that implies character flaws",
@@ -66,7 +66,7 @@ export const MOCK_KEY_INSIGHTS: MockInsight[] = [
     whyItMatters:
       "Once the conversation becomes about identity/competence, it becomes much harder to negotiate concrete next steps.",
     suggestion:
-      "Swap accusatory labels for observable facts: what was expected, what was received, when, and what the impact was."
+      "Swap accusatory labels for observable facts: what was expected, what was received, when, and what the impact was.",
   },
   {
     title: "Expectation mismatch: update cadence and ownership were unclear",
@@ -80,7 +80,7 @@ export const MOCK_KEY_INSIGHTS: MockInsight[] = [
     whyItMatters:
       "Unspoken expectations create ‘gotcha’ moments: one person feels blindsided, the other feels unfairly attacked.",
     suggestion:
-      "Agree on a simple comms contract for high-risk clients: update frequency, what counts as a blocker, and who to notify."
+      "Agree on a simple comms contract for high-risk clients: update frequency, what counts as a blocker, and who to notify.",
   },
 ];
 

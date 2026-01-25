@@ -19,7 +19,7 @@ import {
   Sparkles,
   TrendingUp,
   ArrowRight,
-  MicIcon
+  MicIcon,
 } from "lucide-react";
 
 interface DashboardHomeProps {
@@ -218,7 +218,7 @@ export function DashboardHome({
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Animated gradient background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/5" />
+      <div className="fixed inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/5 pointer-events-none" />
 
       {/* Floating orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -277,8 +277,8 @@ export function DashboardHome({
               Resolve workplace friction faster.
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
-              Spot patterns in tough conversations, guide teams back to alignment, 
-              and document action plans—privately and neutrally.
+              Spot patterns in tough conversations, guide teams back to
+              alignment, and document action plans—privately and neutrally.
             </p>
           </div>
         </motion.div>
