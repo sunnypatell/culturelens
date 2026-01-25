@@ -8,12 +8,15 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
 import { useUserStats } from "@/lib/hooks/useUserStats";
+import { useAuth } from "@/components/auth/auth-provider";
+import { toast } from "sonner";
 
 interface AnalysisLibraryProps {
-  onViewInsights: () => void;
+  onViewInsights: (sessionId: string) => void;
 }
 
 export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
+  const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "recent" | "favorites">(
@@ -27,11 +30,59 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
   useEffect(() => {
     setMounted(true);
     fetchSessions();
-  }, []);
+  }, [getIdToken]);
+
+  const handleToggleFavorite = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      const token = await getIdToken();
+      if (!token) {
+        toast.error("not authenticated");
+        return;
+      }
+
+      const response = await fetch(`/api/sessions/${sessionId}/favorite`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("failed to update favorite");
+      }
+
+      const data = await response.json();
+
+      // update local state
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === sessionId ? { ...s, isFavorite: data.data.isFavorite } : s
+        )
+      );
+
+      toast.success(
+        data.data.isFavorite ? "added to favorites" : "removed from favorites"
+      );
+    } catch (error) {
+      toast.error("failed to update favorite");
+    }
+  };
 
   const fetchSessions = async () => {
     try {
-      const response = await fetch("/api/sessions");
+      const token = await getIdToken();
+      if (!token) {
+        console.error("no auth token available");
+        return;
+      }
+
+      const response = await fetch("/api/sessions", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       if (response.ok && data.data) {
@@ -259,7 +310,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
               style={{ animationDelay: `${index * 50}ms` }}
               onMouseEnter={() => setHoveredSession(session.id)}
               onMouseLeave={() => setHoveredSession(null)}
-              onClick={onViewInsights}
+              onClick={() => onViewInsights(session.id)}
             >
               {/* Gradient Header */}
               <div className="relative h-40 overflow-hidden">
@@ -273,10 +324,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
                 {/* Favorite button */}
                 <button
                   className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors z-10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Toggle favorite
-                  }}
+                  onClick={(e) => handleToggleFavorite(session.id, e)}
                 >
                   <svg
                     className={cn(

@@ -17,6 +17,9 @@ export default function Home() {
   const [activeView, setActiveView] = useState<
     "home" | "record" | "library" | "insights" | "settings"
   >("home");
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (!loading && !user) {
@@ -46,9 +49,24 @@ export default function Home() {
         {activeView === "home" && <DashboardHome onNavigate={setActiveView} />}
         {activeView === "record" && <RecordingStudio />}
         {activeView === "library" && (
-          <AnalysisLibrary onViewInsights={() => setActiveView("insights")} />
+          <AnalysisLibrary
+            onViewInsights={(sessionId) => {
+              setSelectedSessionId(sessionId);
+              setActiveView("insights");
+            }}
+          />
         )}
-        {activeView === "insights" && <InsightsView />}
+        {activeView === "insights" && (
+          <InsightsView
+            sessionId={selectedSessionId}
+            onNavigate={(view) => {
+              if (view === "library") {
+                setSelectedSessionId(null);
+              }
+              setActiveView(view as typeof activeView);
+            }}
+          />
+        )}
         {activeView === "settings" && <SettingsView />}
       </main>
     </div>
