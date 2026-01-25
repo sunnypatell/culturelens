@@ -47,13 +47,22 @@ export async function PATCH(request: Request) {
         throw new DatabaseError("profile update", "user profile not found");
       }
 
-      // update firestore profile
-      await updateDocument(COLLECTIONS.USERS, userId, {
-        displayName: body.displayName,
-        organization: body.organization,
-        photoURL: body.photoURL,
+      // update firestore profile (filter out undefined values)
+      const updateData: Record<string, any> = {
         updatedAt: new Date().toISOString(),
-      });
+      };
+
+      if (body.displayName !== undefined) {
+        updateData.displayName = body.displayName;
+      }
+      if (body.organization !== undefined) {
+        updateData.organization = body.organization;
+      }
+      if (body.photoURL !== undefined) {
+        updateData.photoURL = body.photoURL;
+      }
+
+      await updateDocument(COLLECTIONS.USERS, userId, updateData);
 
       console.log(`[API_PROFILE_PATCH] Profile updated for user ${userId}`);
 
