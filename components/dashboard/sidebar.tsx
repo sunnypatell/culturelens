@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useUserStats } from "@/lib/hooks/useUserStats";
+import { UserMenu } from "./user-menu";
 
 interface SidebarProps {
   activeView: string;
@@ -191,31 +192,33 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
       {/* User Profile */}
       <div className="p-4 border-t border-border/50 backdrop-blur-sm relative z-10">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 transition-all duration-300 group">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary via-accent to-primary shadow-md" />
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
-          </div>
-          <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-semibold text-foreground truncate">
-              {user?.displayName || "user"}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user?.email || ""}
-            </p>
-          </div>
-          <svg
-            className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="12" cy="5" r="1" />
-            <circle cx="12" cy="19" r="1" />
-          </svg>
-        </button>
+        <UserMenu>
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 transition-all duration-300 group">
+            <div className="relative">
+              <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary via-accent to-primary shadow-md" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {user?.displayName || "user"}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email || ""}
+              </p>
+            </div>
+            <svg
+              className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="12" cy="5" r="1" />
+              <circle cx="12" cy="19" r="1" />
+            </svg>
+          </button>
+        </UserMenu>
       </div>
     </aside>
   );
