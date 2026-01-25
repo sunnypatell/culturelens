@@ -40,3 +40,8 @@ export const adminApp = initializeFirebaseAdmin();
 export const adminAuth = getAuth(adminApp);
 export const adminDb = getFirestore(adminApp);
 export const adminStorage = getStorage(adminApp);
+
+// configure Firestore settings
+adminDb.settings({
+  ignoreUndefinedProperties: true, // prevents errors when undefined values are passed
+});

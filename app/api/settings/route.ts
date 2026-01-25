@@ -78,6 +78,21 @@ export async function PUT(request: Request) {
     // validate request body
     const body = await validateRequest(request, SettingsSchema);
 
+    // filter out undefined values
+    const settingsData: Record<string, any> = {};
+    if (body.notifications !== undefined)
+      settingsData.notifications = body.notifications;
+    if (body.autoSave !== undefined) settingsData.autoSave = body.autoSave;
+    if (body.culturalAnalysis !== undefined)
+      settingsData.culturalAnalysis = body.culturalAnalysis;
+    if (body.dataRetention !== undefined)
+      settingsData.dataRetention = body.dataRetention;
+    if (body.sensitivityLevel !== undefined)
+      settingsData.sensitivityLevel = body.sensitivityLevel;
+    if (body.theme !== undefined) settingsData.theme = body.theme;
+    if (body.focusAreas !== undefined)
+      settingsData.focusAreas = body.focusAreas;
+
     try {
       // check if user document exists
       const existingUser = await getDocument(COLLECTIONS.USERS, userId);
@@ -85,7 +100,7 @@ export async function PUT(request: Request) {
       if (existingUser) {
         // update existing settings
         await updateDocument(COLLECTIONS.USERS, userId, {
-          settings: body,
+          settings: settingsData,
           updatedAt: new Date().toISOString(),
         });
       } else {
@@ -93,7 +108,7 @@ export async function PUT(request: Request) {
         await createDocumentWithId(COLLECTIONS.USERS, userId, {
           uid: decodedToken.uid,
           email: decodedToken.email || null,
-          settings: body,
+          settings: settingsData,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
