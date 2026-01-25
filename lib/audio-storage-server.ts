@@ -13,6 +13,8 @@ export interface StoredAudio {
   audioData: string; // base64 encoded audio
   contentType: string;
   size: number; // original size in bytes
+  userId: string; // owner of the audio file
+  sessionId?: string; // optional session association
   createdAt: string;
   expiresAt?: string; // optional expiration (for cleanup)
 }
@@ -23,8 +25,10 @@ export interface StoredAudio {
  */
 export async function storeAudioInFirestore(
   audioBuffer: ArrayBuffer,
+  userId: string,
   contentType: string = "audio/mpeg",
-  expiresInDays: number = 7 // auto-expire after 7 days
+  expiresInDays: number = 7, // auto-expire after 7 days
+  sessionId?: string // optional session association
 ): Promise<{ id: string; size: number }> {
   // convert arraybuffer to base64
   const base64Audio = arrayBufferToBase64(audioBuffer);
@@ -49,6 +53,8 @@ export async function storeAudioInFirestore(
     audioData: base64Audio,
     contentType,
     size: audioBuffer.byteLength,
+    userId,
+    sessionId,
     expiresAt: expiresAt.toISOString(),
   });
 
@@ -80,6 +86,8 @@ export async function getAudioFromFirestore(
     audioData: doc.audioData,
     contentType: doc.contentType || "audio/mpeg",
     size: doc.size,
+    userId: doc.userId,
+    sessionId: doc.sessionId,
     createdAt: doc.createdAt,
     expiresAt: doc.expiresAt,
   };

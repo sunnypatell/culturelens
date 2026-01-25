@@ -12,13 +12,40 @@ import {
   apiSuccess,
   ExternalServiceError,
   DatabaseError,
+  AuthenticationError,
   validateRequest,
 } from "@/lib/api";
 import { ElevenLabsSchemas } from "@/lib/api/schemas";
 import { storeAudioInFirestore } from "@/lib/audio-storage-server";
+import { verifyIdToken } from "@/lib/auth-server";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 export async function POST(request: Request) {
   return apiHandler(async () => {
+    console.log(`[API_TTS_POST] Received TTS request`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_TTS_POST] Authenticated user:`, userId);
+
+    // rate limiting: 10 requests per minute per user
+    try {
+      checkRateLimit(userId, 10, 60000);
+    } catch (error) {
+      console.warn(`[API_TTS_POST] Rate limit exceeded for user ${userId}`);
+      throw new ExternalServiceError(
+        "rate limit",
+        error instanceof Error ? error.message : "too many requests"
+      );
+    }
+
     const apiKey = process.env.ELEVENLABS_API_KEY;
 
     if (!apiKey) {
@@ -68,7 +95,12 @@ export async function POST(request: Request) {
     // store in firestore (free tier workaround instead of firebase storage)
     let audioId: string;
     try {
-      const stored = await storeAudioInFirestore(audioBuffer, "audio/mpeg", 7); // 7 day expiration
+      const stored = await storeAudioInFirestore(
+        audioBuffer,
+        userId,
+        "audio/mpeg",
+        7 // 7 day expiration
+      );
       audioId = stored.id;
     } catch (error) {
       throw new DatabaseError(

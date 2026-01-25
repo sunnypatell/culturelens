@@ -23,11 +23,13 @@ service cloud.firestore {
     // sessions collection
     // sessions contain conversation data with dual consent
     match /sessions/{sessionId} {
-      // read: authenticated users only
-      allow read: if isAuthenticated();
+      // read: owner or admin only
+      allow read: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isAdmin());
 
-      // create: authenticated users with dual consent
+      // create: authenticated users with dual consent and userId matches auth
       allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
         && request.resource.data.consent.personA == true
         && request.resource.data.consent.personB == true;
 
@@ -53,15 +55,17 @@ service cloud.firestore {
     // audio files collection (firestore storage workaround)
     // stores base64-encoded audio files (free tier workaround instead of firebase storage)
     match /audioFiles/{audioId} {
-      // allow public read for audio playback
-      allow read: if true;
+      // read: owner or admin only (authentication enforced in API route)
+      allow read: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isAdmin());
 
-      // allow server-side write from API routes
-      allow write: if true;
+      // create: authenticated users only, userId must match auth
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid;
 
-      // TODO: once auth is implemented, consider:
-      // allow read: if true; // keep public for audio playback
-      // allow write: if isAuthenticated(); // restrict writes to authenticated users
+      // update/delete: owner or admin only
+      allow update, delete: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // users collection

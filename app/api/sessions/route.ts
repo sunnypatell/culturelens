@@ -5,6 +5,7 @@ import {
   createDocumentWithId,
   getDocuments,
   orderByField,
+  whereEqual,
 } from "@/lib/firebase-server-utils";
 import {
   apiHandler,
@@ -12,6 +13,7 @@ import {
   ApiErrors,
   DatabaseError,
   validateRequest,
+  AuthenticationError,
 } from "@/lib/api";
 import { SessionSchemas } from "@/lib/api/schemas";
 import {
@@ -21,6 +23,7 @@ import {
   FIELDS,
   SESSION_STATUS,
 } from "@/lib/firestore-constants";
+import { verifyIdToken } from "@/lib/auth-server";
 
 /**
  * POST /api/sessions
@@ -29,6 +32,17 @@ import {
 export async function POST(request: Request) {
   return apiHandler(async () => {
     console.log(`[API_SESSIONS_POST] Received session creation request`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_SESSIONS_POST] Authenticated user:`, userId);
 
     // validate request body
     const body = await validateRequest(request, SessionSchemas.create);
@@ -56,6 +70,7 @@ export async function POST(request: Request) {
 
     const session: Session = {
       id: sessionId,
+      userId, // add userId to session
       createdAt: new Date().toISOString(),
       consent: {
         ...body.consent,
@@ -90,18 +105,32 @@ export async function POST(request: Request) {
 
 /**
  * GET /api/sessions
- * retrieves all sessions, ordered by creation date (most recent first)
+ * retrieves user's sessions, ordered by creation date (most recent first)
  */
-export async function GET() {
+export async function GET(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SESSIONS_GET] Fetching all sessions...`);
+    console.log(`[API_SESSIONS_GET] Fetching sessions...`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_SESSIONS_GET] Authenticated user:`, userId);
 
     try {
       const sessions = await getDocuments(COLLECTIONS.SESSIONS, [
+        whereEqual("userId", userId),
         orderByField(FIELDS.CREATED_AT, "desc"),
       ]);
 
-      console.log(`[API_SESSIONS_GET] Retrieved ${sessions.length} sessions`);
+      console.log(
+        `[API_SESSIONS_GET] Retrieved ${sessions.length} sessions for user ${userId}`
+      );
 
       return apiSuccess(sessions, {
         meta: { total: sessions.length },

@@ -14,9 +14,13 @@ import {
   ApiErrors,
   DatabaseError,
   NotFoundError,
+  AuthenticationError,
+  AuthorizationError,
   validateParams,
 } from "@/lib/api";
 import { SessionSchemas } from "@/lib/api/schemas";
+import { verifyIdToken } from "@/lib/auth-server";
+import { COLLECTIONS } from "@/lib/firestore-constants";
 
 /**
  * POST /api/sessions/[id]/analyze
@@ -27,13 +31,26 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
+    console.log(`[API_ANALYZE_POST] Received analysis request`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_ANALYZE_POST] Authenticated user:`, userId);
+
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // check if session exists
     let session: any;
     try {
-      session = await getDocument("sessions", id);
+      session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {
       throw new DatabaseError(
         "session retrieval",
@@ -43,6 +60,14 @@ export async function POST(
 
     if (!session) {
       throw new NotFoundError("session", id);
+    }
+
+    // verify ownership
+    if (session.userId !== userId) {
+      console.error(
+        `[API_ANALYZE_POST] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
+      );
+      throw new AuthorizationError("not authorized to access this session");
     }
 
     if (session.status !== "processing") {
@@ -112,7 +137,7 @@ export async function POST(
 
     // store analysis results in firestore
     try {
-      await updateDocument("sessions", id, {
+      await updateDocument(COLLECTIONS.SESSIONS, id, {
         status: "ready",
         analysisResult,
         analyzedAt: new Date().toISOString(),
@@ -139,12 +164,25 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
+    console.log(`[API_ANALYZE_GET] Fetching analysis results`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_ANALYZE_GET] Authenticated user:`, userId);
+
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
 
     let session: any;
     try {
-      session = await getDocument("sessions", id);
+      session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {
       throw new DatabaseError(
         "session retrieval",
@@ -154,6 +192,14 @@ export async function GET(
 
     if (!session) {
       throw new NotFoundError("session", id);
+    }
+
+    // verify ownership
+    if (session.userId !== userId) {
+      console.error(
+        `[API_ANALYZE_GET] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
+      );
+      throw new AuthorizationError("not authorized to access this session");
     }
 
     if (session.status !== "ready" || !session.analysisResult) {

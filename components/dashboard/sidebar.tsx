@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { useUserStats } from "@/lib/hooks/useUserStats";
 
 interface SidebarProps {
   activeView: string;

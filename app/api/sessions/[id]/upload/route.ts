@@ -12,9 +12,13 @@ import {
   DatabaseError,
   ExternalServiceError,
   NotFoundError,
+  AuthenticationError,
+  AuthorizationError,
   validateParams,
 } from "@/lib/api";
 import { SessionSchemas } from "@/lib/api/schemas";
+import { verifyIdToken } from "@/lib/auth-server";
+import { COLLECTIONS } from "@/lib/firestore-constants";
 
 /**
  * POST /api/sessions/[id]/upload
@@ -25,13 +29,26 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
+    console.log(`[API_UPLOAD_POST] Received upload request`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_UPLOAD_POST] Authenticated user:`, userId);
+
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // check if session exists
     let session: any;
     try {
-      session = await getDocument("sessions", id);
+      session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {
       throw new DatabaseError(
         "session retrieval",
@@ -41,6 +58,14 @@ export async function POST(
 
     if (!session) {
       throw new NotFoundError("session", id);
+    }
+
+    // verify ownership
+    if (session.userId !== userId) {
+      console.error(
+        `[API_UPLOAD_POST] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
+      );
+      throw new AuthorizationError("not authorized to access this session");
     }
 
     if (session.status !== "recording") {
@@ -74,7 +99,7 @@ export async function POST(
 
     // update session status and add audio url
     try {
-      await updateDocument("sessions", id, {
+      await updateDocument(COLLECTIONS.SESSIONS, id, {
         status: "processing",
         audioUrl: downloadURL,
         audioPath: storagePath,

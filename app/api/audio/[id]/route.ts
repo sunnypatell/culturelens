@@ -9,11 +9,14 @@ import {
   getAudioFromFirestore,
   base64ToBuffer,
 } from "@/lib/audio-storage-server";
+import { verifyIdToken } from "@/lib/auth-server";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  console.log(`[API_AUDIO_GET] Received audio request`);
+
   const { id } = await params;
 
   if (!id) {
@@ -26,6 +29,42 @@ export async function GET(
         },
       },
       { status: 400 }
+    );
+  }
+
+  // authenticate user
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader) {
+    console.error(`[API_AUDIO_GET] Missing authorization header`);
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "unauthorized",
+          message: "authentication required",
+        },
+      },
+      { status: 401 }
+    );
+  }
+
+  let userId: string;
+  try {
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    userId = decodedToken.uid;
+    console.log(`[API_AUDIO_GET] Authenticated user:`, userId);
+  } catch (error) {
+    console.error(`[API_AUDIO_GET] Invalid token:`, error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "unauthorized",
+          message: "invalid authentication token",
+        },
+      },
+      { status: 401 }
     );
   }
 
@@ -57,6 +96,23 @@ export async function GET(
         },
       },
       { status: 404 }
+    );
+  }
+
+  // verify ownership
+  if (audioData.userId !== userId) {
+    console.error(
+      `[API_AUDIO_GET] Authorization failed: audio ${id} belongs to ${audioData.userId}, not ${userId}`
+    );
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "forbidden",
+          message: "not authorized to access this audio file",
+        },
+      },
+      { status: 403 }
     );
   }
 

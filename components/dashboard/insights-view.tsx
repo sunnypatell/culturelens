@@ -7,8 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
+import { useSessionInsights } from "@/lib/hooks/useSessionInsights";
+import { useInsightsTrends } from "@/lib/hooks/useInsightsTrends";
+import { Loader2 } from "lucide-react";
 
-export function InsightsView() {
+interface InsightsViewProps {
+  sessionId?: string | null;
+  onNavigate?: (view: string) => void;
+}
+
+export function InsightsView({ sessionId = null, onNavigate }: InsightsViewProps) {
   const [mounted, setMounted] = useState(false);
   const [_selectedInsight, _setSelectedInsight] = useState<number | null>(null);
   const [expandedInsight, setExpandedInsight] = useState<number | null>(null);
@@ -17,154 +25,41 @@ export function InsightsView() {
     setMounted(true);
   }, []);
 
-  const communicationPatterns = [
-    {
-      id: 1,
-      title: "Turn-Taking Balance",
-      confidence: "high",
-      description:
-        "Participant A dominated 68% of speaking time, while Participant B contributed 32%.",
-      insight: "Consider creating more space for balanced participation",
-      evidence: [
-        "Participant A had 24 speaking turns averaging 42 seconds each",
-        "Participant B had 18 speaking turns averaging 18 seconds each",
-        "Longest uninterrupted speech was 2m 14s by Participant A",
-      ],
-      category: "Balance",
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      id: 2,
-      title: "Question Patterns",
-      confidence: "high",
-      description:
-        "High frequency of open-ended questions promoting collaborative discussion.",
-      insight: "Strong facilitation style encouraging dialogue",
-      evidence: [
-        "12 open-ended questions asked throughout conversation",
-        "Average response time of 3.2 seconds indicating thoughtful engagement",
-        "Questions led to 45% longer responses on average",
-      ],
-      category: "Engagement",
-      color: "from-purple-500 to-pink-500",
-    },
-    {
-      id: 3,
-      title: "Interruption Frequency",
-      confidence: "medium",
-      description:
-        "Moderate interruption rate detected, primarily collaborative overlaps.",
-      insight: "Interruptions appear supportive rather than competitive",
-      evidence: [
-        "8 interruptions total during 24-minute conversation",
-        "6 were collaborative completions or affirmations",
-        "2 were topic redirections",
-      ],
-      category: "Flow",
-      color: "from-orange-500 to-red-500",
-    },
-    {
-      id: 4,
-      title: "Pace and Rhythm",
-      confidence: "high",
-      description:
-        "Speaking pace averaged 145 words per minute with natural pauses.",
-      insight: "Comfortable communication pace allowing for processing",
-      evidence: [
-        "Average speaking rate: 145 wpm (optimal range: 130-170 wpm)",
-        "Natural pauses every 12-15 seconds",
-        "Pace increased 15% when discussing familiar topics",
-      ],
-      category: "Tempo",
-      color: "from-green-500 to-emerald-500",
-    },
-  ];
+  const {
+    communicationPatterns,
+    culturalContext,
+    keyMoments,
+    sessionMetadata,
+    loading,
+    error,
+  } = useSessionInsights(sessionId);
 
-  const culturalContext = [
-    {
-      id: 1,
-      title: "Direct Communication Style",
-      description:
-        "Conversation shows preference for explicit, straightforward communication",
-      examples: [
-        '"I need to be clear about this..."',
-        '"Let me state this directly..."',
-        '"To put it simply..."',
-      ],
-      context:
-        "Direct communication styles value clarity and explicit messaging. This is common in low-context cultures.",
-      color: "from-indigo-500 to-blue-500",
-    },
-    {
-      id: 2,
-      title: "Collaborative Decision-Making",
-      description: "Multiple perspectives sought before reaching conclusions",
-      examples: [
-        '"What do you think about..."',
-        '"I\'d like to hear your perspective..."',
-        '"Let\'s consider both options..."',
-      ],
-      context:
-        "Consensus-building approach where all voices are valued before decisions are made.",
-      color: "from-teal-500 to-green-500",
-    },
-    {
-      id: 3,
-      title: "Professional Formality",
-      description:
-        "Balanced tone mixing professional respect with personal warmth",
-      examples: [
-        "Use of full names initially, then first names",
-        "Formal greetings with casual conversation flow",
-        "Professional terminology with accessible explanations",
-      ],
-      context:
-        "Demonstrates flexibility in communication formality based on relationship and context.",
-      color: "from-violet-500 to-purple-500",
-    },
-  ];
+  const { trends } = useInsightsTrends();
 
-  const keyMoments = [
-    {
-      id: 1,
-      timestamp: "03:24",
-      title: "Decision Point",
-      description: "Critical decision made regarding project timeline",
-      type: "decision",
-      participants: ["Participant A", "Participant B"],
-    },
-    {
-      id: 2,
-      timestamp: "08:45",
-      title: "Shared Understanding",
-      description: "Both participants aligned on core objectives",
-      type: "alignment",
-      participants: ["Participant A", "Participant B"],
-    },
-    {
-      id: 3,
-      timestamp: "15:12",
-      title: "Clarification Request",
-      description: "Important question resolved with detailed explanation",
-      type: "clarification",
-      participants: ["Participant B"],
-    },
-    {
-      id: 4,
-      timestamp: "19:38",
-      title: "Action Items",
-      description: "Next steps and responsibilities clearly defined",
-      type: "action",
-      participants: ["Participant A", "Participant B"],
-    },
-  ];
+  // show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="text-lg text-muted-foreground">loading insights...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const trends = [
-    { month: "Oct", sessions: 12, insights: 45, avgDuration: 18 },
-    { month: "Nov", sessions: 18, insights: 72, avgDuration: 21 },
-    { month: "Dec", sessions: 24, insights: 96, avgDuration: 22 },
-    { month: "Jan", sessions: 24, insights: 142, avgDuration: 21 },
-  ];
+  // show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
+        <Card className="p-8 max-w-md">
+          <h2 className="text-2xl font-bold text-destructive mb-4">error loading insights</h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Button onClick={() => onNavigate?.("library")}>back to library</Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
@@ -186,7 +81,12 @@ export function InsightsView() {
           )}
         >
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={() => onNavigate?.("library")}
+            >
               <svg
                 className="w-4 h-4"
                 viewBox="0 0 24 24"
@@ -202,10 +102,10 @@ export function InsightsView() {
           <div className="flex items-start justify-between">
             <div className="space-y-2">
               <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-                Team Strategy Meeting
+                {sessionMetadata.title}
               </h1>
               <p className="text-lg text-muted-foreground">
-                Recorded 2 hours ago • 24:31 duration
+                {sessionMetadata.recordedAt} • {sessionMetadata.duration}
               </p>
             </div>
             <div className="flex items-center gap-3">
