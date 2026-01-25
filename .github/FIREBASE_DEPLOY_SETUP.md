@@ -1,10 +1,12 @@
-# Firebase Auto-Deploy Setup Guide
+# firebase auto-deploy setup (for maintainers)
 
 this document explains how to set up automated firebase deployment via github actions.
 
+⚠️ **for project maintainers only** - contributors do not need to set this up.
+
 ## how it works
 
-when you push changes to `main` branch that affect firebase configuration files:
+when changes are pushed to `main` branch that affect firebase configuration files:
 
 - `firestore.rules`
 - `firestore.indexes.json`
@@ -13,25 +15,34 @@ when you push changes to `main` branch that affect firebase configuration files:
 
 github actions will automatically deploy them to firebase.
 
-## setup instructions
+## setup instructions (maintainers only)
 
 ### 1. get firebase admin SDK credentials
 
-you should already have `firebase-adminsdk-key.json` locally. if not:
+you should already have the shared team credentials. if not, contact the project owner.
 
-1. go to [firebase console → service accounts](https://console.firebase.google.com/project/culturelens-2dd38/settings/serviceaccounts/adminsdk)
-2. click **"generate new private key"**
-3. save as `firebase-adminsdk-key.json` (already in .gitignore)
+**do NOT generate a new private key** - use the existing shared credentials.
 
 ### 2. add github secret
 
-1. go to your github repo: https://github.com/sunnypatell/culturelens
+1. go to github repo: https://github.com/sunnypatell/culturelens
 2. navigate to **settings** → **secrets and variables** → **actions**
 3. click **"new repository secret"**
 4. name: `FIREBASE_SERVICE_ACCOUNT`
-5. value: copy the ENTIRE contents of `firebase-adminsdk-key.json`
-   ```bash
-   cat firebase-adminsdk-key.json | pbcopy  # copies to clipboard on mac
+5. value: paste the complete service account JSON with the following format:
+   ```json
+   {
+     "type": "service_account",
+     "project_id": "culturelens-2dd38",
+     "private_key_id": "...",
+     "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+     "client_email": "firebase-adminsdk-fbsvc@culturelens-2dd38.iam.gserviceaccount.com",
+     "client_id": "...",
+     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+     "token_uri": "https://oauth2.googleapis.com/token",
+     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+     "client_x509_cert_url": "..."
+   }
    ```
 6. click **"add secret"**
 
@@ -89,23 +100,21 @@ check that:
 
 ## manual deployment
 
-you can still deploy manually anytime:
+you can still deploy manually anytime (requires firebase CLI authentication):
 
 ```bash
-# authenticate with admin SDK
-export GOOGLE_APPLICATION_CREDENTIALS="${PWD}/firebase-adminsdk-key.json"
-
 # deploy everything
 firebase deploy --only firestore:rules,firestore:indexes,storage:rules
 ```
 
 ## security notes
 
-⚠️ **never commit firebase-adminsdk-key.json to git**
+⚠️ **service account credentials**
 
-- already in `.gitignore`
-- contains sensitive credentials with full admin access
+- contain full admin access to firebase
 - github secret is encrypted and secure
+- never commit credentials to git
+- all team members use the same shared credentials
 
 ✅ **the admin SDK can:**
 
@@ -118,3 +127,4 @@ firebase deploy --only firestore:rules,firestore:indexes,storage:rules
 - be exposed in client-side code
 - be shared publicly
 - be committed to version control
+- be regenerated without team coordination

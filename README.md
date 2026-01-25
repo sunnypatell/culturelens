@@ -47,36 +47,35 @@ This will:
 
 1. Copy `.env.example` to `.env` in the root directory
 2. Copy `backend/.env.example` to `backend/.env`
-3. Fill in your API keys
+3. **Contact the project maintainer** for the actual credential values
 
 ```bash
-# Root .env
+# Root .env - use values from .env.example, contact maintainer for credentials
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_public_agent_id
+NEXT_PUBLIC_ELEVENLABS_AGENT_ID=<contact maintainer>
 
-# Firebase (get from firebase console → project settings → your apps)
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
+# Firebase - shared project credentials (contact maintainer)
+NEXT_PUBLIC_FIREBASE_API_KEY=<contact maintainer>
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=culturelens-2dd38.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=culturelens-2dd38
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=culturelens-2dd38.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=<contact maintainer>
+NEXT_PUBLIC_FIREBASE_APP_ID=<contact maintainer>
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=<contact maintainer>
+
+# Firebase Admin SDK (server-side, private - contact maintainer)
+FIREBASE_CLIENT_EMAIL=<contact maintainer>
+FIREBASE_PRIVATE_KEY=<contact maintainer>
 
 # backend/.env
-ELEVENLABS_API_KEY=your_elevenlabs_api_key
-OPENAI_API_KEY=your_openai_api_key
+ELEVENLABS_API_KEY=<contact maintainer>
 ```
 
 **Firebase Setup:**
 
-see [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for detailed firebase configuration.
+⚠️ **important:** this project uses a **shared firebase instance**. do NOT create your own firebase project.
 
-**quick firebase setup:**
-
-1. download `firebase-adminsdk-key.json` from [firebase console](https://console.firebase.google.com/project/culturelens-2dd38/settings/serviceaccounts/adminsdk)
-2. place in project root (already in .gitignore)
-3. enable firebase storage: https://console.firebase.google.com/project/culturelens-2dd38/storage
+see [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for detailed configuration and team setup instructions.
 
 #### Manual Setup (Alternative)
 

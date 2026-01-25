@@ -29,28 +29,29 @@ complete authentication system for culturelens with multiple signin methods and 
 - one-click signin
 - automatic profile import
 
+### 5. account linking
+
+- link multiple auth methods to single account
+- onboarding flow collects phone number for email signups
+- signin with any linked method accesses same account
+
 ## project structure
 
 ```
 lib/
-├── auth-server.ts           # server-side admin SDK utilities
-├── auth-client.ts           # client-side authentication functions
-├── firebase-admin.ts        # firebase admin SDK initialization
+├── firebase.ts              # firebase client SDK initialization
+├── firebase-admin.ts        # firebase admin SDK initialization (server-side)
+├── auth-client.ts           # client-side auth methods
+└── auth-server.ts           # server-side auth methods (admin SDK)
 
 components/auth/
-├── auth-provider.tsx        # React context provider with hooks
-├── login.tsx                # multi-method login component
-├── signup.tsx               # user registration component
-├── phone-login.tsx          # phone authentication with recaptcha
-├── reset-password.tsx       # password reset flow
-└── verify-email.tsx         # email verification handler
-
-app/auth/
-├── login/page.tsx           # /auth/login route
-├── signup/page.tsx          # /auth/signup route
-├── phone/page.tsx           # /auth/phone route
-├── reset-password/page.tsx  # /auth/reset-password route
-└── verify-email/page.tsx    # /auth/verify-email route
+├── auth-provider.tsx        # react context provider
+├── login.tsx                # email/password + email link signin
+├── signup.tsx               # email/password signup
+├── phone-login.tsx          # phone signin with SMS
+├── onboarding.tsx           # account linking flow
+├── verify-email.tsx         # email verification
+└── reset-password.tsx       # password reset
 
 app/api/auth/
 ├── user/route.ts            # GET current user info
@@ -96,22 +97,13 @@ middleware.ts                # route protection middleware
 ### client-side authentication
 
 ```typescript
-import { useAuth } from '@/components/auth/auth-provider';
+import { useAuth } from "@/components/auth/auth-provider";
 
 function MyComponent() {
-  const { user, signIn, signOut, loading } = useAuth();
+  const { user, loading, signIn, signOut } = useAuth();
 
-  // sign in with email/password
-  await signIn('user@example.com', 'password');
-
-  // sign in with Google
-  await signInWithGoogle();
-
-  // send magic link
-  await sendEmailLink('user@example.com');
-
-  // sign out
-  await signOut();
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>Please sign in</div>;
 
   return <div>{user?.displayName}</div>;
 }
@@ -142,6 +134,7 @@ routes protected by middleware:
 - `/results` - requires authentication
 - `/settings` - requires authentication
 - `/profile` - requires authentication
+- `/onboarding` - requires authentication
 
 unauthenticated users are redirected to `/auth/login` with return URL.
 
@@ -170,69 +163,44 @@ export async function GET(request: Request) {
 
 ## firestore security rules
 
-rules enforce authentication:
+authentication is enforced via firestore security rules:
 
 ```
-// sessions: authenticated users only
-- read: authenticated
-- create: authenticated + dual consent required
-- update/delete: owner or admin
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // users collection - users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
 
-// transcripts: authenticated users only
-- read: authenticated
-- create: authenticated
-- update/delete: owner or admin
-
-// audioFiles: public read, authenticated write
-- read: public (for audio playback)
-- write: authenticated
+    // sessions collection - only authenticated users
+    match /sessions/{sessionId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
 ```
 
-## firebase console setup
+## environment setup
 
-### required one-time actions
+### required environment variables
 
-1. **enable authentication**:
-   - go to https://console.firebase.google.com/project/culturelens-2dd38/authentication
-   - click "get started"
-   - enable sign-in methods:
-     - ✅ email/password
-     - ✅ email link (passwordless)
-     - ✅ phone
-     - ✅ google
-
-2. **configure google oauth** (for google sign-in):
-   - in authentication → sign-in method → google
-   - add authorized domains
-   - configure oauth consent screen
-
-3. **set up recaptcha** (for phone auth):
-   - authentication already handles this automatically
-   - test with development reCAPTCHA in localhost
-
-4. **service account permissions** (for github actions):
-   - go to https://console.firebase.google.com/project/culturelens-2dd38/settings/iam
-   - find service account: `firebase-adminsdk-fbsvc@culturelens-2dd38.iam.gserviceaccount.com`
-   - add roles:
-     - Firebase Admin
-     - Service Usage Consumer
-
-## environment variables
-
-required in `.env`:
+contact the project maintainer for the actual credential values. do NOT generate your own - use the shared team credentials.
 
 ```bash
-# firebase client SDK (already configured)
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
+# firebase client SDK (public, safe for client-side)
+NEXT_PUBLIC_FIREBASE_API_KEY=<contact maintainer>
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=culturelens-2dd38.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=culturelens-2dd38
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=culturelens-2dd38.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=<contact maintainer>
+NEXT_PUBLIC_FIREBASE_APP_ID=<contact maintainer>
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=<contact maintainer>
 
-# firebase admin SDK (for server-side operations)
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-fbsvc@culturelens-2dd38.iam.gserviceaccount.com
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+# firebase admin SDK (server-side - private, contact maintainer)
+FIREBASE_CLIENT_EMAIL=<contact maintainer>
+FIREBASE_PRIVATE_KEY=<contact maintainer>
 ```
 
 ## testing authentication
@@ -248,31 +216,11 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY----
    - http://localhost:3000/auth/signup
    - http://localhost:3000/auth/phone
 
-3. **create test account**:
-   - navigate to /auth/signup
-   - fill in details
-   - check email for verification link
-
-4. **test protected routes**:
-   - visit /dashboard without signin → redirects to login
-   - sign in → can access dashboard
-
-## next steps
-
-- [x] basic authentication infrastructure
-- [x] email/password signin
-- [x] google signin
-- [x] phone authentication
-- [x] passwordless signin
-- [x] role-based access control
-- [x] protected routes
-- [x] firestore security rules
-- [ ] integrate auth into dashboard UI
-- [ ] add profile management page
-- [ ] implement email templates customization
-- [ ] add multi-factor authentication (MFA)
-- [ ] implement session management UI
-- [ ] add user activity logging
+3. **test flows**:
+   - sign up with email → verify email → onboard (optional phone)
+   - sign in with phone → sms code
+   - sign in with google → redirect flow
+   - link phone to existing email account
 
 ## troubleshooting
 
@@ -306,7 +254,7 @@ ensure authorization header format: `Bearer <token>`
 
 1. **never expose private keys** - already in `.gitignore`
 2. **use HTTPS in production** - vercel handles this
-3. **validate all inputs** - using Zod schemas
+3. **validate tokens server-side** - all API routes verify tokens
 4. **rate limit auth endpoints** - consider implementing
 5. **monitor failed login attempts** - firebase auth logs this
 6. **regular security audits** - review firestore rules
