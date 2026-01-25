@@ -76,6 +76,22 @@ export function PhoneLogin() {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // validate phone number format
+    if (!phoneNumber.trim()) {
+      setError("please enter your phone number");
+      return;
+    }
+
+    // basic phone number validation (must be digits with optional + prefix)
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    const cleanedPhone = phoneNumber.replace(/[\s-()]/g, ""); // remove common separators
+
+    if (!phoneRegex.test(cleanedPhone)) {
+      setError("please enter a valid phone number (e.g., +1234567890)");
+      return;
+    }
+
     setLoading(true);
 
     if (!recaptchaVerifier) {
@@ -85,7 +101,7 @@ export function PhoneLogin() {
     }
 
     try {
-      const formattedPhone = formatPhoneNumber(phoneNumber);
+      const formattedPhone = formatPhoneNumber(cleanedPhone);
       const result = await sendPhoneCode(formattedPhone, recaptchaVerifier);
       setConfirmationResult(result);
       setCodeSent(true);
