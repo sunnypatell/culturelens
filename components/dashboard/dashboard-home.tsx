@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
 import { useAuth } from "@/components/auth/auth-provider";
+import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import { GlassCard, GradientCard } from "@/components/ui/glass-card";
+import { Mic, Library, LineChart, Clock, Users, Sparkles, TrendingUp, ArrowRight } from "lucide-react";
 
 interface DashboardHomeProps {
   onNavigate: (
@@ -21,13 +24,12 @@ export function DashboardHome({
 }: DashboardHomeProps) {
   const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [recentSessions, setRecentSessions] = useState<any[]>([]);
   const [stats, setStats] = useState([
-    { label: "Total Sessions", value: "0", change: "+0%", trend: "up" },
-    { label: "Hours Analyzed", value: "0", change: "+0%", trend: "up" },
-    { label: "Insights Generated", value: "0", change: "+0%", trend: "up" },
-    { label: "Avg. Session Length", value: "0m", change: "+0%", trend: "up" },
+    { label: "Total Sessions", value: "0", icon: Library, gradient: ["#6366f1", "#8b5cf6"] },
+    { label: "Hours Analyzed", value: "0", icon: Clock, gradient: ["#8b5cf6", "#d946ef"] },
+    { label: "Insights Generated", value: "0", icon: Sparkles, gradient: ["#d946ef", "#f43f5e"] },
+    { label: "Avg. Session Length", value: "0m", icon: TrendingUp, gradient: ["#f43f5e", "#fb923c"] },
   ]);
   const [_loading, setLoading] = useState(true);
 
@@ -53,12 +55,12 @@ export function DashboardHome({
       const data = await response.json();
 
       if (response.ok && data.data) {
-        const sessions = data.data.slice(0, 4); // get last 4 sessions
+        const sessions = data.data.slice(0, 4);
         const gradients = [
-          "from-blue-500 to-cyan-500",
-          "from-purple-500 to-pink-500",
-          "from-orange-500 to-red-500",
-          "from-green-500 to-emerald-500",
+          ["#6366f1", "#8b5cf6"],
+          ["#8b5cf6", "#d946ef"],
+          ["#f43f5e", "#fb923c"],
+          ["#10b981", "#06b6d4"],
         ];
 
         const transformedSessions = sessions.map(
@@ -69,18 +71,15 @@ export function DashboardHome({
             const insights = session.analysisResult?.insights?.length || 0;
             const participants = session.settings?.participantCount || 2;
 
-            // handle firestore timestamp properly
             let createdDate: Date;
             if (session.createdAt?._seconds) {
-              // firestore timestamp from JSON
               createdDate = new Date(session.createdAt._seconds * 1000);
             } else if (session.createdAt) {
               createdDate = new Date(session.createdAt);
             } else {
-              createdDate = new Date(); // fallback to now
+              createdDate = new Date();
             }
 
-            // validate date
             if (isNaN(createdDate.getTime())) {
               createdDate = new Date();
             }
@@ -92,13 +91,13 @@ export function DashboardHome({
 
             let dateStr = "";
             if (diffHours < 1) dateStr = "just now";
-            else if (diffHours < 24) dateStr = `${diffHours} hours ago`;
+            else if (diffHours < 24) dateStr = `${diffHours}h ago`;
             else if (diffDays === 1) dateStr = "yesterday";
-            else dateStr = `${diffDays} days ago`;
+            else dateStr = `${diffDays}d ago`;
 
             return {
               id: session.id,
-              title: `Session ${sessions.length - index}`,
+              title: session.settings?.title || `Session ${sessions.length - index}`,
               date: dateStr,
               duration,
               participants,
@@ -110,7 +109,6 @@ export function DashboardHome({
 
         setRecentSessions(transformedSessions);
 
-        // calculate stats
         const totalSessions = data.meta?.total || 0;
         const totalMs = sessions.reduce(
           (sum: number, s: any) => sum + (s.settings?.durationMs || 0),
@@ -128,30 +126,10 @@ export function DashboardHome({
             : 0;
 
         setStats([
-          {
-            label: "Total Sessions",
-            value: String(totalSessions),
-            change: "+0%",
-            trend: "up",
-          },
-          {
-            label: "Hours Analyzed",
-            value: totalHours,
-            change: "+0%",
-            trend: "up",
-          },
-          {
-            label: "Insights Generated",
-            value: String(totalInsights),
-            change: "+0%",
-            trend: "up",
-          },
-          {
-            label: "Avg. Session Length",
-            value: `${avgDuration}m`,
-            change: "+0%",
-            trend: "up",
-          },
+          { label: "Total Sessions", value: String(totalSessions), icon: Library, gradient: ["#6366f1", "#8b5cf6"] },
+          { label: "Hours Analyzed", value: totalHours, icon: Clock, gradient: ["#8b5cf6", "#d946ef"] },
+          { label: "Insights Generated", value: String(totalInsights), icon: Sparkles, gradient: ["#d946ef", "#f43f5e"] },
+          { label: "Avg. Session Length", value: `${avgDuration}m`, icon: TrendingUp, gradient: ["#f43f5e", "#fb923c"] },
         ]);
       }
     } catch (error) {
@@ -163,186 +141,205 @@ export function DashboardHome({
 
   const quickActions = [
     {
-      icon: MicIcon,
+      icon: Mic,
       label: "Start Recording",
       description: "Begin a new conversation session",
       action: () => onNavigate("record"),
-      gradient: "from-primary to-accent",
-      hoverEffect: "hover:scale-105 hover:shadow-2xl hover:shadow-primary/20",
+      gradient: ["#6366f1", "#8b5cf6"],
     },
     {
-      icon: LibraryIcon,
+      icon: Library,
       label: "Browse Library",
       description: "Access your recorded sessions",
       action: () => onNavigate("library"),
-      gradient: "from-purple-500 to-pink-500",
-      hoverEffect:
-        "hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20",
+      gradient: ["#8b5cf6", "#d946ef"],
     },
     {
-      icon: ChartIcon,
+      icon: LineChart,
       label: "View Insights",
       description: "Analyze communication patterns",
       action: () => onNavigate("insights"),
-      gradient: "from-orange-500 to-red-500",
-      hoverEffect:
-        "hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/20",
+      gradient: ["#f43f5e", "#fb923c"],
     },
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-        <div
-          className="absolute bottom-20 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float"
-          style={{ animationDelay: "2s" }}
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/5" />
+
+      {/* Floating orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            x: [0, 10, 0],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-20 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
         />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl animate-float"
-          style={{ animationDelay: "4s" }}
+        <motion.div
+          animate={{
+            y: [0, 20, 0],
+            x: [0, -10, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute bottom-20 -right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl"
         />
       </div>
 
-      <div className="relative z-10 p-8 space-y-8">
+      <div className="relative z-10 p-8 space-y-12">
         {/* Hero Section */}
-        <div
-          className={cn(
-            "space-y-6",
-            mounted && "animate-in fade-in slide-in-from-bottom-8 duration-700"
-          )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
         >
+          <div className="flex items-center gap-3">
+            <Badge
+              variant="outline"
+              className="px-3 py-1.5 text-sm font-medium border-green-500/30 bg-green-500/10"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-2 h-2 rounded-full bg-green-500 mr-2"
+              />
+              All Systems Operational
+            </Badge>
+          </div>
+
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Badge
-                variant="outline"
-                className="px-3 py-1 text-sm font-medium"
-              >
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse mr-2" />
-                All Systems Operational
-              </Badge>
-            </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground tracking-tight">
+            <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent">
               Welcome Back
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
-              Your conversation analytics dashboard. Track patterns, gain
-              insights, and improve communication with cultural awareness.
+              Your conversation analytics dashboard. Track patterns, gain insights,
+              and improve communication with cultural awareness.
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Stats Grid */}
-        <div
-          className={cn(
-            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
-            mounted &&
-              "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100"
-          )}
-        >
-          {stats.map((stat, index) => (
-            <Card
-              key={stat.label}
-              className="p-6 hover-lift relative overflow-hidden group"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 space-y-2">
-                <p className="text-sm text-muted-foreground font-medium">
-                  {stat.label}
-                </p>
-                <div className="flex items-end gap-2">
-                  <p className="text-4xl font-bold text-foreground">
-                    {stat.value}
-                  </p>
-                  <Badge
-                    variant={stat.trend === "up" ? "default" : "secondary"}
-                    className="mb-1.5"
-                  >
-                    {stat.change}
-                  </Badge>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Quick Actions */}
-        <div
-          className={cn(
-            "grid grid-cols-1 md:grid-cols-3 gap-6",
-            mounted &&
-              "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200"
-          )}
-        >
-          {quickActions.map((action, index) => {
-            const Icon = action.icon;
+        {/* Stats Grid with Glass Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
             return (
-              <button
-                key={action.label}
-                onClick={action.action}
-                className={cn(
-                  "group relative overflow-hidden rounded-2xl p-8 text-left transition-all duration-500",
-                  action.hoverEffect
-                )}
-                style={{ animationDelay: `${index * 100}ms` }}
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
               >
-                {/* Gradient background */}
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-linear-to-br opacity-100 group-hover:opacity-90 transition-opacity",
-                    action.gradient
-                  )}
-                />
-
-                {/* Content */}
-                <div className="relative z-10 space-y-4">
-                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <Icon className="w-7 h-7 text-white" />
+                <GlassCard
+                  gradientFrom={stat.gradient[0]}
+                  gradientTo={stat.gradient[1]}
+                  className="group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-background/50 to-background/30">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <motion.div
+                        animate={{ rotate: [0, 5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <TrendingUp className="w-4 h-4 text-green-500" />
+                      </motion.div>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold">{stat.value}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {stat.label}
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-white">
-                      {action.label}
-                    </h3>
-                    <p className="text-white/80">{action.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/90 group-hover:gap-3 transition-all">
-                    <span className="text-sm font-medium">Get Started</span>
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Shine effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent shimmer" />
-                </div>
-              </button>
+                </GlassCard>
+              </motion.div>
             );
           })}
         </div>
 
-        {/* Recent Sessions */}
-        <div
-          className={cn(
-            "space-y-6",
-            mounted &&
-              "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300"
-          )}
-        >
+        {/* Quick Actions with 3D Cards */}
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {quickActions.map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <motion.div
+                  key={action.label}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
+                >
+                  <CardContainer>
+                    <CardBody className="w-full h-full">
+                      <div
+                        onClick={action.action}
+                        className="cursor-pointer rounded-2xl p-8 bg-gradient-to-br from-background/95 to-background/80 border border-white/10 hover:border-white/20 transition-all group"
+                        style={{
+                          background: `linear-gradient(135deg, ${action.gradient[0]}15, ${action.gradient[1]}15)`,
+                        }}
+                      >
+                        <CardItem translateZ={50} className="space-y-4">
+                          <div
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                            style={{
+                              background: `linear-gradient(135deg, ${action.gradient[0]}, ${action.gradient[1]})`,
+                            }}
+                          >
+                            <Icon className="w-8 h-8 text-white" />
+                          </div>
+                        </CardItem>
+
+                        <CardItem translateZ={60} className="space-y-2 mt-6">
+                          <h3 className="text-2xl font-bold">{action.label}</h3>
+                          <p className="text-muted-foreground">{action.description}</p>
+                        </CardItem>
+
+                        <CardItem translateZ={40} className="mt-6">
+                          <div className="flex items-center gap-2 text-sm font-medium group-hover:gap-3 transition-all">
+                            <span>Get Started</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </div>
+                        </CardItem>
+                      </div>
+                    </CardBody>
+                  </CardContainer>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent Sessions with Modern Cards */}
+        <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-foreground">
-                Recent Sessions
-              </h2>
+              <h2 className="text-3xl font-bold">Recent Sessions</h2>
               <p className="text-muted-foreground mt-1">
                 Your latest conversation recordings
               </p>
@@ -353,140 +350,86 @@ export function DashboardHome({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {recentSessions.map((session) => (
-              <Card
+            {recentSessions.map((session, index) => (
+              <motion.div
                 key={session.id}
-                className="group relative overflow-hidden hover-lift cursor-pointer"
-                onMouseEnter={() => setHoveredCard(session.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => onViewInsights?.(session.id)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}
               >
-                {/* Gradient header */}
-                <div
-                  className={cn(
-                    "h-32 bg-linear-to-br relative",
-                    session.gradient
-                  )}
+                <GradientCard
+                  gradientFrom={session.gradient[0]}
+                  gradientTo={session.gradient[1]}
+                  onClick={() => onViewInsights?.(session.id)}
+                  className="h-full"
                 >
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
-                  {hoveredCard === session.id && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Button variant="secondary" size="sm">
-                        View Analysis
-                      </Button>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-xl font-bold">{session.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {session.date}
+                      </p>
                     </div>
-                  )}
-                </div>
 
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground">
-                      {session.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {session.date}
-                    </p>
-                  </div>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span className="text-xs">Duration</span>
+                        </div>
+                        <p className="font-medium">{session.duration}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Users className="w-3.5 h-3.5" />
+                          <span className="text-xs">People</span>
+                        </div>
+                        <p className="font-medium">{session.participants}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-primary">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span className="text-xs">Insights</span>
+                        </div>
+                        <p className="font-medium text-primary">{session.insights}</p>
+                      </div>
+                    </div>
 
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                      </svg>
-                      <span>{session.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      </svg>
-                      <span>{session.participants} people</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-primary font-medium">
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                      </svg>
-                      <span>{session.insights} insights</span>
-                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full group"
+                    >
+                      <span>View Analysis</span>
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
                   </div>
-                </div>
-              </Card>
+                </GradientCard>
+              </motion.div>
             ))}
           </div>
+
+          {recentSessions.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16"
+            >
+              <Library className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h3 className="text-xl font-semibold mb-2">No sessions yet</h3>
+              <p className="text-muted-foreground mb-6">
+                Start your first conversation recording to see insights here
+              </p>
+              <Button onClick={() => onNavigate("record")}>
+                <Mic className="w-4 h-4 mr-2" />
+                Start Recording
+              </Button>
+            </motion.div>
+          )}
         </div>
       </div>
 
       <Footer />
     </div>
-  );
-}
-
-function MicIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <line x1="12" y1="19" x2="12" y2="23" />
-      <line x1="8" y1="23" x2="16" y2="23" />
-    </svg>
-  );
-}
-
-function LibraryIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    </svg>
-  );
-}
-
-function ChartIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <line x1="18" y1="20" x2="18" y2="10" />
-      <line x1="12" y1="20" x2="12" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="14" />
-    </svg>
   );
 }
