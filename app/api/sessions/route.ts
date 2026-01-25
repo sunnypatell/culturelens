@@ -2,7 +2,7 @@
 
 import { Session } from "@/lib/types";
 import {
-  createDocument,
+  createDocumentWithId,
   getDocuments,
   orderByField,
 } from "@/lib/firebase-server-utils";
@@ -46,9 +46,9 @@ export async function POST(request: Request) {
       status: "recording",
     };
 
-    // store in firestore
+    // store in firestore with specific document ID
     try {
-      await createDocument("sessions", session);
+      await createDocumentWithId("sessions", sessionId, session);
     } catch (error) {
       throw new DatabaseError(
         "session creation",

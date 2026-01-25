@@ -5,6 +5,7 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   getDoc,
@@ -31,6 +32,20 @@ export const createDocument = async (collectionName: string, data: any) => {
     updatedAt: Timestamp.now(),
   });
   return docRef.id;
+};
+
+export const createDocumentWithId = async (
+  collectionName: string,
+  docId: string,
+  data: any
+) => {
+  const docRef = doc(db, collectionName, docId);
+  await setDoc(docRef, {
+    ...data,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
+  return docId;
 };
 
 export const updateDocument = async (
