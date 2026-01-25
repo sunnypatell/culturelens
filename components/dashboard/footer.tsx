@@ -36,8 +36,7 @@ export function Footer() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Understanding Through Listening. A consent-based conversation
-                mirror with cultural awareness.
+                Built for internal conflict resolution and team trust.
               </p>
             </div>
 

@@ -515,10 +515,10 @@ export function SettingsView() {
                     htmlFor="cultural-analysis"
                     className="text-base font-medium cursor-pointer"
                   >
-                    Enable Cultural Context Analysis
+                    Enable Neutrality & Bias Checks
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Analyze communication through cultural awareness lens
+                    Helps reduce misread intent and escalation risk
                   </p>
                 </div>
                 <Switch
@@ -532,10 +532,10 @@ export function SettingsView() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-base font-medium">
-                      Cultural Sensitivity Level
+                      Neutrality Focus Level
                     </Label>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Adjust how much cultural context influences insights
+                      Adjust how strictly neutrality checks are applied
                     </p>
                   </div>
                   <Badge className="text-base px-4 py-1.5">

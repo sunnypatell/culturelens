@@ -192,22 +192,22 @@ export function DashboardHome({
 
   const quickActions = [
     {
-      icon: Mic,
-      label: "Start Recording",
-      description: "Begin a new conversation session",
+      icon: MicIcon,
+      label: "Start Mediation",
+      description: "Capture a live conflict or sensitive conversation",
       action: () => onNavigate("record"),
       gradient: ["#6366f1", "#8b5cf6"],
     },
     {
       icon: Library,
       label: "Browse Library",
-      description: "Access your recorded sessions",
+      description: "Review Past Cases",
       action: () => onNavigate("library"),
       gradient: ["#8b5cf6", "#d946ef"],
     },
     {
       icon: LineChart,
-      label: "View Insights",
+      label: "Team Insights",
       description: "Analyze communication patterns",
       action: () => onNavigate("insights"),
       gradient: ["#f43f5e", "#fb923c"],
@@ -273,11 +273,11 @@ export function DashboardHome({
 
           <div className="space-y-4">
             <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent">
-              Welcome Back
+              Resolve workplace friction faster.
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
-              Your conversation analytics dashboard. Track patterns, gain
-              insights, and improve communication with cultural awareness.
+              Spot patterns in tough conversations, guide teams back to alignment, 
+              and document action plans—privately and neutrally.
             </p>
           </div>
         </motion.div>
@@ -382,9 +382,9 @@ export function DashboardHome({
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold">Recent Sessions</h2>
+              <h2 className="text-3xl font-bold">Recent Cases</h2>
               <p className="text-muted-foreground mt-1">
-                Your latest conversation recordings
+                Latest mediated conversations and outcomes
               </p>
             </div>
             <Button variant="outline" onClick={() => onNavigate("library")}>
