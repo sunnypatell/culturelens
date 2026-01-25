@@ -19,6 +19,7 @@ import {
   Sparkles,
   TrendingUp,
   ArrowRight,
+  MicIcon
 } from "lucide-react";
 
 interface DashboardHomeProps {
