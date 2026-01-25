@@ -677,18 +677,18 @@ export function RecordingStudio({
             <div className="space-y-4">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Audio Debrief
+                  Neutral Debrief
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Connect to the CultureLens voice agent to receive a neutral,
-                  culturally-aware audio reflection of your conversation
-                  patterns.
+                  Connect to the CultureLens voice agent to receive a neutral, workplace-focused
+                  audio reflection of communication patterns and potential
+                  next steps.
                 </p>
               </div>
               <VoiceAgent sessionId={currentSessionId || undefined} />
               <p className="text-xs text-muted-foreground italic">
-                CultureLens provides reflection, not advice or therapy.
-                Interpretations are hypotheses, not facts.
+                CultureLens provides reflection and pattern recognition, not legal or HR advice.
+                All observations are suggestions for improvement, not conclusions.
               </p>
             </div>
           </Card>

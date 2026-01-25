@@ -35,10 +35,10 @@ export function TermsOfServiceModal({
                 Introduction
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                CultureLens is a consent-based conversation mirror designed to
-                promote self-awareness and understanding through audio-based
-                insights. This service is provided as a reflection tool, not a
-                diagnostic or therapeutic service.
+                CultureLens is a neutral workplace mediation assistant that captures
+                conversations and generates action-oriented insights. This service is
+                provided for internal conflict resolution and team alignment, not legal
+                counsel or HR documentation.
               </p>
             </section>
 
@@ -110,9 +110,9 @@ export function TermsOfServiceModal({
                   <p>CultureLens provides:</p>
                   <ul className="list-disc pl-6 mt-2 space-y-1">
                     <li>Pattern recognition in communication styles</li>
-                    <li>Cultural context awareness</li>
-                    <li>Neutral observations without judgment</li>
-                    <li>Evidence-based insights from transcript analysis</li>
+                    <li>Neutrality and bias checks</li>
+                    <li>Objective observations without judgment</li>
+                    <li>Evidence-based insights and suggested action plans</li>
                   </ul>
                 </div>
 
@@ -142,12 +142,12 @@ export function TermsOfServiceModal({
             {/* Cultural Sensitivity */}
             <section>
               <h3 className="text-lg font-semibold text-foreground mb-3">
-                Cultural Sensitivity
+                Neutrality & Bias Protection
               </h3>
               <div className="space-y-3 text-muted-foreground leading-relaxed">
-                <p>Our cultural context analysis:</p>
+                <p>Our analysis methodology:</p>
                 <ul className="list-disc pl-6 mt-2 space-y-1">
-                  <li>Recognizes diverse communication styles</li>
+                  <li>Recognizes diverse communication and conflict styles</li>
                   <li>Avoids stereotyping or making assumptions</li>
                   <li>Provides educational context, not prescriptive advice</li>
                   <li>Respects individual and cultural differences</li>
