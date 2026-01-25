@@ -41,7 +41,7 @@ export function VerifyEmail() {
         await completeEmailLink();
         setSuccess(true);
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/");
         }, SUCCESS_REDIRECT_DELAY_MS);
       } catch (err: unknown) {
         if (err instanceof Error && err.message.includes("email not found")) {
@@ -70,7 +70,7 @@ export function VerifyEmail() {
       await completeEmailLink(emailInput);
       setSuccess(true);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/");
       }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
       if (err instanceof Error) {

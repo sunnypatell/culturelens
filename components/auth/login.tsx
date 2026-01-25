@@ -49,7 +49,7 @@ export function Login() {
     try {
       await signIn(email, password);
       setSuccess("Signed in successfully!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -90,7 +90,7 @@ export function Login() {
     try {
       await signInWithGoogle();
       setSuccess("Signed in with Google!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

@@ -110,7 +110,7 @@ export function PhoneLogin() {
     try {
       await verifyPhoneCode(confirmationResult, verificationCode);
       setSuccess("Signed in successfully!");
-      router.push("/dashboard");
+      router.push("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

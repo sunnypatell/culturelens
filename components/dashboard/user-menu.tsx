@@ -37,7 +37,7 @@ export function UserMenu({ children }: { children: React.ReactNode }) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => router.push("/dashboard?view=settings")}
+          onClick={() => router.push("/?view=settings")}
         >
           <Settings className="mr-2 h-4 w-4" />
           settings

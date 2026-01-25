@@ -51,7 +51,7 @@ export function Onboarding({ user }: OnboardingProps) {
   const totalSteps = hasPhone ? 1 : 2;
 
   const handleSkip = () => {
-    router.push("/dashboard");
+    router.push("/");
   };
 
   const handleSendPhoneCode = async (e: React.FormEvent) => {
@@ -112,7 +112,7 @@ export function Onboarding({ user }: OnboardingProps) {
 
       setSuccess("phone number linked successfully!");
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/");
       }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
       if (err instanceof Error) {
