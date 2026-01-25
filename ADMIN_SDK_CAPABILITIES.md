@@ -92,6 +92,7 @@ we can enable and configure firebase authentication without the console:
 i can create a complete authentication system without you touching the console:
 
 **files to create**:
+
 - `lib/auth-server.ts` - admin SDK auth utilities
 - `lib/auth-client.ts` - client-side auth hooks
 - `app/api/auth/[...nextauth]/route.ts` - authentication API routes
@@ -100,6 +101,7 @@ i can create a complete authentication system without you touching the console:
 - `components/auth/signup.tsx` - signup component
 
 **features**:
+
 - email/password authentication
 - google sign-in (requires oauth setup in console once)
 - protected routes
@@ -113,6 +115,7 @@ i can create a complete authentication system without you touching the console:
 i can create a cloud function to automatically delete expired audio files:
 
 **files to create**:
+
 - `functions/cleanup-audio.ts` - scheduled function
 - runs daily, deletes expired audioFiles
 
@@ -123,6 +126,7 @@ i can create a cloud function to automatically delete expired audio files:
 i can update firestore rules to require authentication:
 
 **changes**:
+
 - sessions: require auth + dual consent verification
 - transcripts: require auth + owner verification
 - audioFiles: public read, authenticated write
