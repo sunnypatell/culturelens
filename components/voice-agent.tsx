@@ -2,6 +2,7 @@
 
 import { useConversation } from "@elevenlabs/react";
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useAuth } from "@/components/auth/auth-provider";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -46,10 +47,12 @@ const VOICES = [
   },
 ];
 type VoiceAgentProps = {
+  sessionId?: string;
   onSessionId?: (sessionId: string) => void;
 };
 
-export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
+export function VoiceAgent({ sessionId: providedSessionId, onSessionId }: VoiceAgentProps) {
+  const { getIdToken } = useAuth();
   const [status, setStatus] = useState<"idle" | "connecting" | "connected">(
     "idle"
   );
@@ -57,7 +60,7 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
   const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id); // Default to Rachel
   const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
   const [transcript, setTranscript] = useState<string[]>([]);
-  const [sessionId] = useState(() => `session-${Date.now()}`);
+  const [sessionId] = useState(() => providedSessionId || `session-${Date.now()}`);
   const transcriptRef = useRef<string[]>([]);
 
   // Keep the ref in sync with the state
@@ -109,32 +112,55 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
     }
 
     try {
+      const token = await getIdToken();
+      if (!token) {
+        console.error("no auth token available for transcript save");
+        return;
+      }
+
       const transcriptText = currentTranscript.join("\n\n");
 
-      // Use our API endpoint instead of direct Firestore calls
-      const response = await fetch("/api/transcripts", {
+      // save transcript to firestore
+      const transcriptResponse = await fetch("/api/transcripts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           sessionId: sessionId,
           transcript: transcriptText,
           timestamp: new Date().toISOString(),
-          segments: [], // Could be populated if we have segment data
+          segments: [],
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+      if (!transcriptResponse.ok) {
+        throw new Error(`transcript save failed: ${transcriptResponse.status}`);
       }
 
-      await response.json();
-    } catch {
+      // update session status to "processing" to trigger analysis
+      const statusResponse = await fetch(`/api/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: "processing",
+        }),
+      });
+
+      if (!statusResponse.ok) {
+        throw new Error(`status update failed: ${statusResponse.status}`);
+      }
+
+      console.log(`[VoiceAgent] Transcript saved and session ${sessionId} marked as processing`);
+    } catch (error) {
+      console.error("[VoiceAgent] Failed to save transcript:", error);
       // silently fail - transcript saving is not critical to user experience
-      // could be logged to an error tracking service in production
     }
-  }, [sessionId]);
+  }, [sessionId, getIdToken]);
 
   const connect = useCallback(async () => {
     setError(null);

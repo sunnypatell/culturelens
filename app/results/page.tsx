@@ -46,11 +46,42 @@ export default function ResultsPage() {
     try {
       setLoading(true);
 
-      // fetch actual analysis from backend
-      const response = await fetch(`/api/sessions/${id}/analyze`);
-      const data = await response.json();
+      // get auth token
+      const auth = (await import("@/lib/firebase")).auth;
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        throw new Error("not authenticated");
+      }
 
-      if (!response.ok) {
+      // first try to fetch existing analysis
+      let response = await fetch(`/api/sessions/${id}/analyze`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      let data = await response.json();
+
+      // if analysis doesn't exist but session is processing, trigger analysis
+      if (!response.ok && data.error?.code === "BAD_REQUEST") {
+        console.log("[Results] Analysis not ready, triggering analysis...");
+
+        // trigger analysis
+        const triggerResponse = await fetch(`/api/sessions/${id}/analyze`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!triggerResponse.ok) {
+          const triggerData = await triggerResponse.json();
+          throw new Error(
+            triggerData.error?.message || "failed to trigger analysis"
+          );
+        }
+
+        data = await triggerResponse.json();
+      } else if (!response.ok) {
         throw new Error(data.error?.message || "failed to load analysis");
       }
 

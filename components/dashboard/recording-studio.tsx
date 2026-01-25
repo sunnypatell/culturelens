@@ -426,7 +426,10 @@ export function RecordingStudio() {
           {/* Voice Agent */}
           <Card className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             <div className="space-y-4">
-              <VoiceAgent onSessionId={setAgentSessionId} />
+              <VoiceAgent
+                sessionId={currentSessionId || undefined}
+                onSessionId={setAgentSessionId}
+              />
             </div>
           </Card>
 
@@ -438,10 +441,10 @@ export function RecordingStudio() {
             <Button
               onClick={() =>
                 router.push(
-                  `/results${agentSessionId ? `?sessionId=${agentSessionId}` : ""}`
+                  `/results${currentSessionId ? `?sessionId=${currentSessionId}` : ""}`
                 )
               }
-              disabled={!agentSessionId}
+              disabled={!currentSessionId}
               className="px-6"
             >
               View Analysis Results
