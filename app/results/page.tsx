@@ -27,55 +27,64 @@ interface AnalysisResult {
 const DEMO_ANALYSIS: AnalysisResult = {
   sessionId: "demo-session",
   timestamp: Date.now(),
-  transcript: `[Jordan] I feel like my ideas keep getting dismissed in meetings. It's frustrating because I put a lot of thought into my proposals.
+  transcript: `[Jordan] I'm done covering for you on these projects. You missed another deadline and I had to stay until midnight fixing your code.
 
-[Alex] I hear you, Jordan. Can you give me a specific example of when this happened?
+[Alex] Whoa, calm down. It was one deadline and I told you I had a family emergency.
 
-[Jordan] Last Tuesday, I suggested we pivot our marketing strategy to focus on Gen Z, and before I could even finish explaining, someone jumped in with a completely different idea.
+[Jordan] That's the third "emergency" this month! The rest of us have lives too but we still deliver on time.
 
-[Alex] That sounds frustrating. How did that make you feel in the moment?
+[Alex] Are you seriously questioning whether my emergencies are real? That's incredibly disrespectful.
 
-[Jordan] Honestly? Invisible. Like my contributions don't matter to the team.
+[Jordan] I'm questioning why I'm always the one picking up the slack. Sarah and Mike have noticed too.
 
-[Alex] I appreciate you sharing that. From my perspective, I think the team values your input, but our meeting culture might need some adjustment. Would you be open to discussing this with the group?
+[Alex] Oh great, so you've been talking about me behind my back. Really professional.
 
-[Jordan] I think that could help. I just want to feel heard.
+[Jordan] Someone had to say something! Management thinks everything is fine because I keep covering for you.
 
-[Alex] Absolutely. Let's work on creating more space for everyone to finish their thoughts. I'll bring this up in our next team sync.`,
+[Alex] Maybe if you weren't such a control freak, you'd let me handle things my own way instead of "fixing" everything.
+
+[Jordan] Your way doesn't work! The client almost dropped us because of the bugs you shipped.
+
+[Alex] That was ONE time, and the requirements were unclear. But sure, blame everything on me.
+
+[Jordan] I just want you to take responsibility for once instead of making excuses.
+
+[Alex] Fine. You want me to be honest? I've been struggling, okay? But attacking me isn't helping.`,
   mediatorInputs: [
-    "Acknowledged Jordan's frustration while maintaining neutrality",
-    "Asked clarifying questions to understand the specific situation",
-    "Validated emotions without taking sides",
-    "Proposed collaborative solution focused on systemic change",
-    "Redirected conversation toward constructive action",
+    "Detected escalating tension - both parties using accusatory language",
+    "Identified underlying issues: workload distribution, communication gaps, personal stress",
+    "Noted defensive responses blocking productive dialogue",
+    "Recognized breakthrough moment when Alex acknowledged struggling",
+    "Flagged opportunity for de-escalation and collaborative problem-solving",
   ],
   insights: {
     summary:
-      "This conversation demonstrates a constructive conflict resolution dialogue between two colleagues. Jordan expressed feelings of being overlooked in team meetings, while Alex practiced active listening and empathetic responses. The exchange shows healthy communication patterns with opportunities for improved turn-taking awareness in the broader team context.",
+      "This conversation reveals a workplace conflict that has been building over time. Initial accusations about missed deadlines escalated into personal attacks before a breakthrough moment where underlying struggles were acknowledged. The exchange demonstrates how unaddressed tensions can explode, but also shows potential for resolution when vulnerability replaces defensiveness.",
     keyPoints: [
-      "Jordan feels their contributions are being dismissed in team meetings",
-      "A specific incident involving a marketing strategy proposal triggered these feelings",
-      "Alex demonstrated active listening and validated Jordan's emotional experience",
-      "Both parties agreed to address meeting culture at the team level",
-      "The conversation ended with a concrete action plan for improvement",
+      "Underlying resentment has built up over multiple incidents",
+      "Both parties feel unheard and disrespected by the other",
+      "Third-party involvement (Sarah, Mike, management) has complicated the dynamic",
+      "Personal struggles are affecting work performance but weren't communicated",
+      "A vulnerable admission created an opening for potential resolution",
     ],
     culturalObservations: [
-      "Direct communication style: Both participants expressed thoughts openly and honestly",
-      "Individualistic framing: Focus on personal feelings and individual recognition",
-      "Low power distance: Comfortable peer-to-peer dialogue about workplace dynamics",
-      "Task-oriented resolution: Quick pivot from emotional expression to actionable solutions",
+      "High-context conflict: Multiple unspoken grievances surfaced simultaneously",
+      "Individualistic accountability framing: Focus on personal blame rather than systemic issues",
+      "Direct confrontation style: Emotions expressed openly but aggressively",
+      "Face-saving behavior: Defensive responses to protect self-image",
     ],
     communicationPatterns: [
-      "Turn-taking balance: 52% Jordan, 48% Alex - well-balanced dialogue",
-      "Active listening indicators: Alex used reflective statements and clarifying questions",
-      "Emotional validation: Feelings were acknowledged before problem-solving began",
-      "Collaborative language: Use of 'we' and 'let's' in solution-finding phase",
+      "Turn-taking balance: 55% Jordan, 45% Alex - Jordan dominated early exchanges",
+      "Escalation pattern: Each response increased emotional intensity",
+      "Interruption frequency: High - 4 instances of cutting off or dismissing",
+      "De-escalation moment: Alex's admission of struggling shifted the tone",
     ],
     recommendations: [
-      "Implement a 'no interruption' rule during idea presentations in team meetings",
-      "Consider a round-robin format for brainstorming sessions to ensure equal airtime",
-      "Schedule regular 1:1 check-ins to surface concerns before they escalate",
-      "Practice the 'build on' technique: acknowledge previous ideas before introducing new ones",
+      "Establish regular check-ins to surface issues before they escalate",
+      "Use 'I feel' statements instead of accusatory 'you always' language",
+      "Create a safe space for discussing workload and personal challenges",
+      "Implement a team agreement on deadline communication and coverage",
+      "Consider mediated follow-up conversation to rebuild trust",
     ],
   },
   status: "complete",
