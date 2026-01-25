@@ -11,6 +11,8 @@ import { useSessionInsights } from "@/lib/hooks/useSessionInsights";
 import { useInsightsTrends } from "@/lib/hooks/useInsightsTrends";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { motion } from "framer-motion";
 
 interface InsightsViewProps {
   sessionId?: string | null;
@@ -50,13 +52,76 @@ export function InsightsView({
     // TODO: implement audio player with session debrief audio
   };
 
-  // show loading state
+  // show loading state with aceternity UI
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-          <p className="text-lg text-muted-foreground">loading insights...</p>
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center relative overflow-hidden">
+        {/* animated floating orbs */}
+        <motion.div
+          animate={{
+            y: [0, -30, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.4, 0.6, 0.4],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            y: [0, 30, 0],
+            scale: [1, 1.4, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl pointer-events-none"
+        />
+
+        <div className="relative z-10 flex flex-col items-center gap-8 max-w-2xl px-6">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="relative"
+          >
+            <Loader2 className="w-16 h-16 animate-spin text-primary" />
+          </motion.div>
+
+          <TextGenerateEffect
+            words="analyzing conversation patterns and cultural context"
+            className="text-center text-foreground"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex gap-2"
+          >
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+              className="w-2 h-2 rounded-full bg-primary"
+            />
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+              className="w-2 h-2 rounded-full bg-primary"
+            />
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+              className="w-2 h-2 rounded-full bg-primary"
+            />
+          </motion.div>
         </div>
       </div>
     );
