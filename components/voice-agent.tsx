@@ -8,6 +8,15 @@ import { useState, useCallback, useEffect, useRef } from "react";
 // Docs: https://elevenlabs.io/docs/agents-platform/libraries/react
 const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
 
+// validate critical environment variable
+if (typeof window !== "undefined" && !AGENT_ID) {
+  throw new Error(
+    "missing NEXT_PUBLIC_ELEVENLABS_AGENT_ID environment variable. " +
+      "please add it to your .env file. " +
+      "see README.md for setup instructions."
+  );
+}
+
 // Natural-sounding free voices (pre-made by ElevenLabs)
 // These are available on free tier and sound conversational
 const VOICES = [
