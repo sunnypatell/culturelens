@@ -19,109 +19,79 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
     "all"
   );
   const [hoveredSession, setHoveredSession] = useState<number | null>(null);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    fetchSessions();
   }, []);
 
-  const sessions = [
-    {
-      id: 1,
-      title: "Team Strategy Meeting",
-      date: "Jan 24, 2026",
-      timeAgo: "2 hours ago",
-      duration: "24:31",
-      participants: 3,
-      insights: 12,
-      type: "Professional",
-      gradient: "from-blue-500 via-blue-600 to-cyan-500",
-      isFavorite: true,
-    },
-    {
-      id: 2,
-      title: "Client Onboarding Call",
-      date: "Jan 23, 2026",
-      timeAgo: "Yesterday",
-      duration: "18:45",
-      participants: 2,
-      insights: 8,
-      type: "Professional",
-      gradient: "from-purple-500 via-purple-600 to-pink-500",
-      isFavorite: false,
-    },
-    {
-      id: 3,
-      title: "Design Review Session",
-      date: "Jan 22, 2026",
-      timeAgo: "2 days ago",
-      duration: "32:18",
-      participants: 4,
-      insights: 15,
-      type: "Collaborative",
-      gradient: "from-orange-500 via-orange-600 to-red-500",
-      isFavorite: true,
-    },
-    {
-      id: 4,
-      title: "Weekly Check-in",
-      date: "Jan 21, 2026",
-      timeAgo: "3 days ago",
-      duration: "15:22",
-      participants: 2,
-      insights: 6,
-      type: "Personal",
-      gradient: "from-green-500 via-green-600 to-emerald-500",
-      isFavorite: false,
-    },
-    {
-      id: 5,
-      title: "Brainstorming Workshop",
-      date: "Jan 20, 2026",
-      timeAgo: "4 days ago",
-      duration: "45:12",
-      participants: 6,
-      insights: 22,
-      type: "Collaborative",
-      gradient: "from-teal-500 via-teal-600 to-cyan-500",
-      isFavorite: false,
-    },
-    {
-      id: 6,
-      title: "Performance Review",
-      date: "Jan 19, 2026",
-      timeAgo: "5 days ago",
-      duration: "28:55",
-      participants: 2,
-      insights: 11,
-      type: "Professional",
-      gradient: "from-indigo-500 via-indigo-600 to-purple-500",
-      isFavorite: true,
-    },
-    {
-      id: 7,
-      title: "Project Kickoff",
-      date: "Jan 18, 2026",
-      timeAgo: "6 days ago",
-      duration: "35:44",
-      participants: 5,
-      insights: 18,
-      type: "Professional",
-      gradient: "from-pink-500 via-pink-600 to-rose-500",
-      isFavorite: false,
-    },
-    {
-      id: 8,
-      title: "Coffee Chat",
-      date: "Jan 17, 2026",
-      timeAgo: "1 week ago",
-      duration: "12:33",
-      participants: 2,
-      insights: 5,
-      type: "Personal",
-      gradient: "from-amber-500 via-amber-600 to-yellow-500",
-      isFavorite: false,
-    },
-  ];
+  const fetchSessions = async () => {
+    try {
+      const response = await fetch("/api/sessions");
+      const data = await response.json();
+
+      if (response.ok && data.data) {
+        const gradients = [
+          "from-blue-500 via-blue-600 to-cyan-500",
+          "from-purple-500 via-purple-600 to-pink-500",
+          "from-orange-500 via-orange-600 to-red-500",
+          "from-green-500 via-green-600 to-emerald-500",
+          "from-teal-500 via-teal-600 to-cyan-500",
+          "from-indigo-500 via-indigo-600 to-purple-500",
+          "from-pink-500 via-pink-600 to-rose-500",
+          "from-amber-500 via-amber-600 to-yellow-500",
+        ];
+
+        const transformedSessions = data.data.map(
+          (session: any, index: number) => {
+            const duration = session.settings?.durationMs
+              ? `${Math.floor(session.settings.durationMs / 60000)}:${String(Math.floor((session.settings.durationMs % 60000) / 1000)).padStart(2, "0")}`
+              : "0:00";
+            const insights = session.analysisResult?.insights?.length || 0;
+            const participants = session.settings?.participantCount || 2;
+            const createdDate = new Date(session.createdAt);
+            const now = new Date();
+            const diffMs = now.getTime() - createdDate.getTime();
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+
+            let timeAgo = "";
+            if (diffHours < 1) timeAgo = "just now";
+            else if (diffHours < 24) timeAgo = `${diffHours} hours ago`;
+            else if (diffDays === 1) timeAgo = "yesterday";
+            else if (diffDays < 7) timeAgo = `${diffDays} days ago`;
+            else
+              timeAgo = `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? "s" : ""} ago`;
+
+            return {
+              id: session.id,
+              title: `Session ${data.data.length - index}`,
+              date: createdDate.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }),
+              timeAgo,
+              duration,
+              participants,
+              insights,
+              type: session.settings?.culturalContext?.[0] || "Personal",
+              gradient: gradients[index % gradients.length],
+              isFavorite: false,
+            };
+          }
+        );
+
+        setSessions(transformedSessions);
+      }
+    } catch (error) {
+      console.error("failed to fetch sessions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">

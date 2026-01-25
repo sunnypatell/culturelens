@@ -16,61 +16,117 @@ interface DashboardHomeProps {
 export function DashboardHome({ onNavigate }: DashboardHomeProps) {
   const [mounted, setMounted] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [recentSessions, setRecentSessions] = useState<any[]>([]);
+  const [stats, setStats] = useState([
+    { label: "Total Sessions", value: "0", change: "+0%", trend: "up" },
+    { label: "Hours Analyzed", value: "0", change: "+0%", trend: "up" },
+    { label: "Insights Generated", value: "0", change: "+0%", trend: "up" },
+    { label: "Avg. Session Length", value: "0m", change: "+0%", trend: "up" },
+  ]);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
+    fetchSessions();
   }, []);
 
-  const recentSessions = [
-    {
-      id: 1,
-      title: "Team Strategy Meeting",
-      date: "2 hours ago",
-      duration: "24:31",
-      participants: 3,
-      insights: 12,
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      id: 2,
-      title: "Client Onboarding Call",
-      date: "Yesterday",
-      duration: "18:45",
-      participants: 2,
-      insights: 8,
-      gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      id: 3,
-      title: "Design Review Session",
-      date: "2 days ago",
-      duration: "32:18",
-      participants: 4,
-      insights: 15,
-      gradient: "from-orange-500 to-red-500",
-    },
-    {
-      id: 4,
-      title: "Weekly Check-in",
-      date: "3 days ago",
-      duration: "15:22",
-      participants: 2,
-      insights: 6,
-      gradient: "from-green-500 to-emerald-500",
-    },
-  ];
+  const fetchSessions = async () => {
+    try {
+      const response = await fetch("/api/sessions");
+      const data = await response.json();
 
-  const stats = [
-    { label: "Total Sessions", value: "24", change: "+12%", trend: "up" },
-    { label: "Hours Analyzed", value: "8.5", change: "+23%", trend: "up" },
-    { label: "Insights Generated", value: "142", change: "+18%", trend: "up" },
-    {
-      label: "Avg. Session Length",
-      value: "21m",
-      change: "-5%",
-      trend: "down",
-    },
-  ];
+      if (response.ok && data.data) {
+        const sessions = data.data.slice(0, 4); // get last 4 sessions
+        const gradients = [
+          "from-blue-500 to-cyan-500",
+          "from-purple-500 to-pink-500",
+          "from-orange-500 to-red-500",
+          "from-green-500 to-emerald-500",
+        ];
+
+        const transformedSessions = sessions.map(
+          (session: any, index: number) => {
+            const duration = session.settings?.durationMs
+              ? `${Math.floor(session.settings.durationMs / 60000)}:${String(Math.floor((session.settings.durationMs % 60000) / 1000)).padStart(2, "0")}`
+              : "0:00";
+            const insights = session.analysisResult?.insights?.length || 0;
+            const participants = session.settings?.participantCount || 2;
+            const createdDate = new Date(session.createdAt);
+            const now = new Date();
+            const diffMs = now.getTime() - createdDate.getTime();
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffHours / 24);
+
+            let dateStr = "";
+            if (diffHours < 1) dateStr = "just now";
+            else if (diffHours < 24) dateStr = `${diffHours} hours ago`;
+            else if (diffDays === 1) dateStr = "yesterday";
+            else dateStr = `${diffDays} days ago`;
+
+            return {
+              id: session.id,
+              title: `Session ${sessions.length - index}`,
+              date: dateStr,
+              duration,
+              participants,
+              insights,
+              gradient: gradients[index % gradients.length],
+            };
+          }
+        );
+
+        setRecentSessions(transformedSessions);
+
+        // calculate stats
+        const totalSessions = data.meta?.total || 0;
+        const totalMs = sessions.reduce(
+          (sum: number, s: any) => sum + (s.settings?.durationMs || 0),
+          0
+        );
+        const totalHours = (totalMs / (1000 * 60 * 60)).toFixed(1);
+        const totalInsights = sessions.reduce(
+          (sum: number, s: any) =>
+            sum + (s.analysisResult?.insights?.length || 0),
+          0
+        );
+        const avgDuration =
+          totalSessions > 0
+            ? Math.floor(totalMs / totalSessions / 1000 / 60)
+            : 0;
+
+        setStats([
+          {
+            label: "Total Sessions",
+            value: String(totalSessions),
+            change: "+0%",
+            trend: "up",
+          },
+          {
+            label: "Hours Analyzed",
+            value: totalHours,
+            change: "+0%",
+            trend: "up",
+          },
+          {
+            label: "Insights Generated",
+            value: String(totalInsights),
+            change: "+0%",
+            trend: "up",
+          },
+          {
+            label: "Avg. Session Length",
+            value: `${avgDuration}m`,
+            change: "+0%",
+            trend: "up",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("failed to fetch sessions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const quickActions = [
     {

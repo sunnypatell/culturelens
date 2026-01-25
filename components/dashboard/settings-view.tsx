@@ -12,8 +12,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
+import { useAuth } from "@/components/auth/auth-provider";
 
 export function SettingsView() {
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
@@ -80,8 +82,8 @@ export function SettingsView() {
                 </Label>
                 <Input
                   id="name"
-                  placeholder="John Doe"
-                  defaultValue="John Doe"
+                  placeholder="Enter your name"
+                  defaultValue={user?.displayName || ""}
                   className="h-11"
                 />
               </div>
@@ -92,8 +94,9 @@ export function SettingsView() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="john@example.com"
-                  defaultValue="john@example.com"
+                  placeholder="Enter your email"
+                  defaultValue={user?.email || ""}
+                  disabled
                   className="h-11"
                 />
               </div>
