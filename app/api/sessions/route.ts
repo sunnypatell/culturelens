@@ -69,7 +69,10 @@ export async function POST(request: Request) {
     try {
       console.log(`[API_SESSIONS_POST] Storing session in Firestore...`);
       await createDocumentWithId(COLLECTIONS.SESSIONS, sessionId, session);
-      console.log(`[API_SESSIONS_POST] Session created successfully:`, sessionId);
+      console.log(
+        `[API_SESSIONS_POST] Session created successfully:`,
+        sessionId
+      );
     } catch (error) {
       console.error(`[API_SESSIONS_POST] Failed to create session:`, error);
       throw new DatabaseError(

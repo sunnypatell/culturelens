@@ -64,10 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await createOrUpdateUserProfile(user);
           console.log(`[AUTH_PROVIDER] User profile synchronized`);
         } catch (error) {
-          console.error(
-            `[AUTH_PROVIDER] Failed to sync user profile:`,
-            error
-          );
+          console.error(`[AUTH_PROVIDER] Failed to sync user profile:`, error);
         }
       }
 

@@ -11,10 +11,7 @@ import {
   createDocumentWithId,
   updateDocument,
 } from "./firebase-server-utils";
-import {
-  COLLECTIONS,
-  generateUserIdFromUid,
-} from "./firestore-constants";
+import { COLLECTIONS, generateUserIdFromUid } from "./firestore-constants";
 
 export interface UserProfile {
   id: string;
@@ -65,10 +62,7 @@ export async function createOrUpdateUserProfile(
     const existingProfile = await getDocument(COLLECTIONS.USERS, userId);
 
     if (existingProfile) {
-      console.log(
-        `[ACCOUNT_LINKING] User profile exists, updating...`,
-        userId
-      );
+      console.log(`[ACCOUNT_LINKING] User profile exists, updating...`, userId);
 
       // update existing profile with latest data
       await updateDocument(COLLECTIONS.USERS, userId, {
@@ -109,9 +103,7 @@ export async function createOrUpdateUserProfile(
  * @param email - email address to check
  * @returns array of provider IDs (e.g., ['password', 'google.com'])
  */
-export async function checkExistingProviders(
-  email: string
-): Promise<string[]> {
+export async function checkExistingProviders(email: string): Promise<string[]> {
   console.log(
     `[ACCOUNT_LINKING] Checking existing providers for email:`,
     email

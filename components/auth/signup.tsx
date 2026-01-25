@@ -55,7 +55,7 @@ export function Signup() {
 
     console.log(`[SIGNUP_FORM] Field changed:`, {
       field: e.target.id,
-      value: e.target.id === 'password' ? '***' : e.target.value,
+      value: e.target.id === "password" ? "***" : e.target.value,
     });
   };
 
@@ -68,7 +68,9 @@ export function Signup() {
     console.log(`[SIGNUP_VALIDATION] Starting form validation`);
 
     if (!formData.displayName.trim()) {
-      console.error(`[SIGNUP_VALIDATION] Validation failed: missing display name`);
+      console.error(
+        `[SIGNUP_VALIDATION] Validation failed: missing display name`
+      );
       setError("Please enter your display name");
       return false;
     }
@@ -78,18 +80,23 @@ export function Signup() {
       return false;
     }
     if (!passwordStrength.isValid) {
-      console.error(`[SIGNUP_VALIDATION] Validation failed: password does not meet requirements`, {
-        strength: passwordStrength.strength,
-        score: passwordStrength.score,
-        unmetRequirements: passwordStrength.requirements
-          .filter((req) => !req.met)
-          .map((req) => req.label),
-      });
+      console.error(
+        `[SIGNUP_VALIDATION] Validation failed: password does not meet requirements`,
+        {
+          strength: passwordStrength.strength,
+          score: passwordStrength.score,
+          unmetRequirements: passwordStrength.requirements
+            .filter((req) => !req.met)
+            .map((req) => req.label),
+        }
+      );
       setError("Password does not meet all requirements");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      console.error(`[SIGNUP_VALIDATION] Validation failed: passwords do not match`);
+      console.error(
+        `[SIGNUP_VALIDATION] Validation failed: passwords do not match`
+      );
       setError("Passwords do not match");
       return false;
     }
@@ -116,7 +123,9 @@ export function Signup() {
     });
 
     if (!validateForm()) {
-      console.error(`[SIGNUP_SUBMIT] Form validation failed, aborting submission`);
+      console.error(
+        `[SIGNUP_SUBMIT] Form validation failed, aborting submission`
+      );
       return;
     }
 
@@ -125,11 +134,16 @@ export function Signup() {
 
     try {
       await signUp(formData.email, formData.password, formData.displayName);
-      console.log(`[SIGNUP_SUBMIT] Successfully created account for:`, formData.email);
+      console.log(
+        `[SIGNUP_SUBMIT] Successfully created account for:`,
+        formData.email
+      );
       setSuccess(true);
 
       // redirect to onboarding to complete profile
-      console.log(`[SIGNUP_SUBMIT] Redirecting to onboarding in ${SUCCESS_REDIRECT_DELAY_MS}ms`);
+      console.log(
+        `[SIGNUP_SUBMIT] Redirecting to onboarding in ${SUCCESS_REDIRECT_DELAY_MS}ms`
+      );
       setTimeout(() => {
         router.push("/onboarding");
       }, SUCCESS_REDIRECT_DELAY_MS);
@@ -200,8 +214,12 @@ export function Signup() {
                       {/* Strength Bar */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium">Password Strength</span>
-                          <span className={`text-xs font-semibold ${getStrengthTextColor(passwordStrength.strength)}`}>
+                          <span className="text-xs font-medium">
+                            Password Strength
+                          </span>
+                          <span
+                            className={`text-xs font-semibold ${getStrengthTextColor(passwordStrength.strength)}`}
+                          >
                             {passwordStrength.strength.toUpperCase()}
                           </span>
                         </div>
@@ -216,13 +234,22 @@ export function Signup() {
                       {/* Requirements Checklist */}
                       <div className="space-y-1 pt-1">
                         {passwordStrength.requirements.map((req, index) => (
-                          <div key={index} className="flex items-center gap-2 text-xs">
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 text-xs"
+                          >
                             {req.met ? (
                               <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
                             ) : (
                               <XCircle className="h-3.5 w-3.5 text-muted-foreground" />
                             )}
-                            <span className={req.met ? "text-green-600" : "text-muted-foreground"}>
+                            <span
+                              className={
+                                req.met
+                                  ? "text-green-600"
+                                  : "text-muted-foreground"
+                              }
+                            >
                               {req.label}
                             </span>
                           </div>

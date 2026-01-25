@@ -107,7 +107,9 @@ export function Login() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Sign In to CultureLens</CardTitle>
-          <CardDescription>Choose your preferred sign-in method</CardDescription>
+          <CardDescription>
+            Choose your preferred sign-in method
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="email" className="w-full">

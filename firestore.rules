@@ -64,6 +64,23 @@ service cloud.firestore {
       // allow write: if isAuthenticated(); // restrict writes to authenticated users
     }
 
+    // users collection
+    // stores user profiles synced from Firebase Auth
+    match /users/{userId} {
+      // users can read their own profile
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.uid;
+
+      // users can create/update their own profile
+      // the userId is generated from uid, so we need to check the uid field matches
+      allow create, update: if isAuthenticated() && request.auth.uid == request.resource.data.uid;
+
+      // admins can read all profiles
+      allow read: if isAdmin();
+
+      // only admins can delete profiles
+      allow delete: if isAdmin();
+    }
+
     // deny all other collections by default
     match /{document=**} {
       allow read, write: if false;
