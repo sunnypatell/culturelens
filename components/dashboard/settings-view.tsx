@@ -43,6 +43,7 @@ export function SettingsView() {
   const [dataRetention, setDataRetention] = useState("90");
   const [sensitivityLevel, setSensitivityLevel] = useState([70]);
   const [audioQuality, setAudioQuality] = useState("high");
+  const [selectedFocusAreas, setSelectedFocusAreas] = useState<string[]>([]);
 
   // password dialog state
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -85,6 +86,8 @@ export function SettingsView() {
             setOrganization(settings.organization);
           if (settings.audioQuality !== undefined)
             setAudioQuality(settings.audioQuality);
+          if (settings.focusAreas !== undefined)
+            setSelectedFocusAreas(settings.focusAreas);
         }
       } catch (error) {
         console.error("[SettingsView] Failed to load settings:", error);
@@ -93,6 +96,12 @@ export function SettingsView() {
 
     loadSettings();
   }, [getIdToken, setTheme]);
+
+  const toggleFocusArea = (focus: string) => {
+    setSelectedFocusAreas((prev) =>
+      prev.includes(focus) ? prev.filter((f) => f !== focus) : [...prev, focus]
+    );
+  };
 
   const handleSaveProfile = async () => {
     try {
@@ -143,6 +152,7 @@ export function SettingsView() {
           sensitivityLevel: sensitivityLevel[0] / 20,
           theme,
           audioQuality,
+          focusAreas: selectedFocusAreas,
         }),
       });
 
@@ -558,16 +568,40 @@ export function SettingsView() {
                     "Interruptions",
                     "Topic Transitions",
                     "Emotional Tone",
-                  ].map((focus) => (
-                    <Button
-                      key={focus}
-                      variant="outline"
-                      className="justify-start h-auto py-3 bg-transparent"
-                    >
-                      <div className="w-4 h-4 rounded border-2 border-primary mr-3 flex-shrink-0" />
-                      {focus}
-                    </Button>
-                  ))}
+                  ].map((focus) => {
+                    const isSelected = selectedFocusAreas.includes(focus);
+                    return (
+                      <Button
+                        key={focus}
+                        variant="outline"
+                        className={cn(
+                          "justify-start h-auto py-3 bg-transparent",
+                          isSelected && "bg-primary/10 border-primary"
+                        )}
+                        onClick={() => toggleFocusArea(focus)}
+                      >
+                        <div
+                          className={cn(
+                            "w-4 h-4 rounded border-2 border-primary mr-3 flex-shrink-0 flex items-center justify-center",
+                            isSelected && "bg-primary"
+                          )}
+                        >
+                          {isSelected && (
+                            <svg
+                              className="w-3 h-3 text-primary-foreground"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        {focus}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
