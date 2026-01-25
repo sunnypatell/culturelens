@@ -10,6 +10,7 @@ import { Footer } from "./footer";
 import { useSessionInsights } from "@/lib/hooks/useSessionInsights";
 import { useInsightsTrends } from "@/lib/hooks/useInsightsTrends";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface InsightsViewProps {
   sessionId?: string | null;
@@ -38,6 +39,16 @@ export function InsightsView({
   } = useSessionInsights(sessionId);
 
   const { trends } = useInsightsTrends();
+
+  const handleExportReport = () => {
+    toast.info("report export coming soon");
+    // TODO: implement markdown/PDF report generation with session insights
+  };
+
+  const handlePlayAudio = () => {
+    toast.info("audio playback coming soon");
+    // TODO: implement audio player with session debrief audio
+  };
 
   // show loading state
   if (loading) {
@@ -116,7 +127,7 @@ export function InsightsView({
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={handleExportReport}>
                 <svg
                   className="w-5 h-5 mr-2"
                   viewBox="0 0 24 24"
@@ -130,7 +141,7 @@ export function InsightsView({
                 </svg>
                 Export Report
               </Button>
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2" onClick={handlePlayAudio}>
                 <svg
                   className="w-5 h-5"
                   viewBox="0 0 24 24"
