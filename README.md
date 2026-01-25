@@ -92,8 +92,8 @@ app/
 │   ├── sessions/                # session CRUD with firebase admin SDK
 │   │   ├── route.ts             # create session (POST), list sessions (GET)
 │   │   └── [id]/
-│   │       ├── route.ts         # get/delete session
-│   │       ├── analyze/         # trigger analysis pipeline
+│   │       ├── route.ts         # get/update/delete session
+│   │       ├── analyze/         # trigger Gemini AI analysis pipeline
 │   │       ├── favorite/        # toggle favorite status
 │   │       └── upload/          # resumable audio upload
 │   ├── user/                    # user management endpoints
@@ -101,6 +101,10 @@ app/
 │   │   ├── export/              # GDPR-compliant data export
 │   │   ├── delete/              # cascade account deletion
 │   │   └── sync-profile/        # firebase auth → firestore sync
+│   ├── auth/                    # authentication endpoints
+│   │   ├── user/                # GET current user info
+│   │   └── admin/roles/         # POST set user roles (admin only)
+│   ├── audio/[id]/              # audio file retrieval
 │   ├── settings/                # user preferences persistence
 │   ├── elevenlabs/              # voice agent integration
 │   │   ├── signed-url/          # generate signed URLs for private agents
@@ -115,7 +119,9 @@ components/
 │   ├── insights-view.tsx        # detailed analysis visualization
 │   ├── settings-view.tsx        # user preferences + account mgmt
 │   ├── sidebar.tsx              # navigation with active state
-│   └── footer.tsx               # app metadata
+│   ├── footer.tsx               # app metadata
+│   ├── user-menu.tsx            # dropdown menu with sign-out
+│   └── terms-of-service-modal.tsx # consent modal for legal compliance
 │
 ├── audio/
 │   └── advanced-waveform.tsx    # real-time audio visualization
@@ -142,10 +148,14 @@ components/
 └── voice-agent.tsx              # elevenlabs conversational ai integration
 
 lib/
-├── firebase/
-│   ├── firebase.ts              # client SDK initialization
-│   ├── firebase-server-utils.ts # admin SDK firestore helpers
-│   └── auth-server.ts           # server-side auth verification
+├── firebase.ts                  # client SDK initialization
+├── firebase-admin.ts            # admin SDK singleton
+├── firebase-server-utils.ts     # admin SDK firestore helpers
+├── firebase-utils.ts            # client-side firestore helpers
+├── auth-client.ts               # client-side auth methods
+├── auth-server.ts               # server-side auth verification
+├── gemini-analysis.ts           # Google Gemini AI transcript analysis
+├── rate-limiter.ts              # API rate limiting
 │
 ├── hooks/                       # custom react hooks
 │   ├── useSessions.ts           # real-time session subscription
@@ -522,11 +532,12 @@ firebase deploy --only storage
 
 Built at **MLH HackHive 2026** by:
 
-| Contributor             | GitHub                                             | Role                     |
-| ----------------------- | -------------------------------------------------- | ------------------------ |
-| **Sunny Patel**         | [@sunnypatell](https://github.com/sunnypatell)     | Full-Stack, Architecture |
-| **Daniyal Lilani**      | [@daniyallilani](https://github.com/daniyallilani) | Backend, AI/ML           |
-| **Aryan Kashefi-Aazam** | [@aryan-ka](https://github.com/aryan-ka)           | Frontend, UI/UX          |
+| Contributor             | GitHub                                             | Role                       |
+| ----------------------- | -------------------------------------------------- | -------------------------- |
+| **Sunny Patel**         | [@sunnypatell](https://github.com/sunnypatell)     | Full-Stack, Architecture   |
+| **Daniyal Lilani**      | [@daniyallilani](https://github.com/daniyallilani) | Backend, AI/ML             |
+| **Aryan Kashefi-Aazam** | [@aryan-ka](https://github.com/aryan-ka)           | Frontend, UI/UX            |
+| **Paul Joseph**         | [@pauljoseph](https://github.com/pauljoseph)       | Frontend, UI/UX, Marketing |
 
 ---
 
