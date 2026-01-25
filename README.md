@@ -92,12 +92,23 @@ Open [http://localhost:3000](http://localhost:3000)
 
 **Terminal 2 - Backend:**
 
+**Windows:**
 ```bash
-npm run dev:backend
-# Or manually:
+cd backend
+venv\Scripts\activate
+uvicorn app.main:app --reload --port 8000
+```
+
+**macOS/Linux:**
+```bash
 cd backend
 source venv/bin/activate
 uvicorn app.main:app --reload --port 8000
+```
+
+**Or use npm script (Unix only):**
+```bash
+npm run dev:backend
 ```
 
 Backend API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
@@ -115,15 +126,31 @@ npm run typecheck            # Run TypeScript compiler
 
 **Backend:**
 
+**Windows:**
 ```bash
-npm run lint:backend         # Run Ruff check
-npm run format:backend       # Format with Ruff
-npm run test:backend         # Run Pytest
-# Or manually from backend/:
+cd backend
+venv\Scripts\activate
 ruff check .                 # Lint
 ruff check . --fix           # Auto-fix issues
 ruff format .                # Format code
 pytest -v                    # Run tests
+```
+
+**macOS/Linux:**
+```bash
+cd backend
+source venv/bin/activate
+ruff check .                 # Lint
+ruff check . --fix           # Auto-fix issues
+ruff format .                # Format code
+pytest -v                    # Run tests
+```
+
+**Or use npm scripts (Unix only):**
+```bash
+npm run lint:backend         # Run Ruff check
+npm run format:backend       # Format with Ruff
+npm run test:backend         # Run Pytest
 ```
 
 **Note:** Linting will not block commits, but CI checks will run on pull requests. Make sure to fix issues before pushing.
