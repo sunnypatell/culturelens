@@ -82,6 +82,19 @@ Docs: [ElevenLabs React SDK](https://elevenlabs.io/docs/agents-platform/librarie
 
 ### Run Development Servers
 
+**Option 1: Single Command (Recommended)**
+
+```bash
+npm run dev:all
+```
+
+This runs both frontend and backend concurrently in a single terminal.
+
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+**Option 2: Separate Terminals**
+
 **Terminal 1 - Frontend:**
 
 ```bash
