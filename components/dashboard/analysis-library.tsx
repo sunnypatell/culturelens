@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -162,6 +162,37 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
     }
   };
 
+  // filter and search sessions
+  const filteredSessions = useMemo(() => {
+    let filtered = [...sessions];
+
+    // apply filter type
+    if (filterType === "recent") {
+      // show sessions from last 7 days
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      filtered = filtered.filter((session) => {
+        const sessionDate = new Date(session.date);
+        return sessionDate >= weekAgo;
+      });
+    } else if (filterType === "favorites") {
+      filtered = filtered.filter((session) => session.isFavorite);
+    }
+
+    // apply search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (session) =>
+          session.title.toLowerCase().includes(query) ||
+          session.type.toLowerCase().includes(query) ||
+          session.participants.toString().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [sessions, filterType, searchQuery]);
+
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
       {/* Animated background */}
@@ -319,7 +350,7 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
               "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200"
           )}
         >
-          {sessions.map((session, index) => (
+          {filteredSessions.map((session, index) => (
             <Card
               key={session.id}
               className="group relative overflow-hidden hover-lift cursor-pointer transition-all duration-500"
@@ -457,7 +488,7 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
         </div>
 
         {/* Empty state for when no sessions match filter */}
-        {sessions.length === 0 && (
+        {filteredSessions.length === 0 && (
           <Card className="p-12 text-center">
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
               <svg
