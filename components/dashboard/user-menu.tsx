@@ -36,9 +36,7 @@ export function UserMenu({ children }: { children: React.ReactNode }) {
           <p className="text-xs text-muted-foreground">{user?.email}</p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => router.push("/?view=settings")}
-        >
+        <DropdownMenuItem onClick={() => router.push("/?view=settings")}>
           <Settings className="mr-2 h-4 w-4" />
           settings
         </DropdownMenuItem>

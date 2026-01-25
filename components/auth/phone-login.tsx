@@ -25,7 +25,12 @@ import { Loader2, Phone, ShieldCheck } from "lucide-react";
 
 export function PhoneLogin() {
   const router = useRouter();
-  const { sendPhoneCode, verifyPhoneCode, user, loading: authLoading } = useAuth();
+  const {
+    sendPhoneCode,
+    verifyPhoneCode,
+    user,
+    loading: authLoading,
+  } = useAuth();
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");

@@ -25,7 +25,13 @@ import { Loader2, Mail, Phone, Lock } from "lucide-react";
 
 export function Login() {
   const router = useRouter();
-  const { signIn, sendEmailLink, signInWithGoogle, user, loading: authLoading } = useAuth();
+  const {
+    signIn,
+    sendEmailLink,
+    signInWithGoogle,
+    user,
+    loading: authLoading,
+  } = useAuth();
 
   // email/password state
   const [email, setEmail] = useState("");
