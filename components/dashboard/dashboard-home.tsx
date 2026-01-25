@@ -102,7 +102,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
@@ -158,7 +158,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
               className="p-6 hover-lift relative overflow-hidden group"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 space-y-2">
                 <p className="text-sm text-muted-foreground font-medium">
                   {stat.label}
@@ -202,7 +202,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
                 {/* Gradient background */}
                 <div
                   className={cn(
-                    "absolute inset-0 bg-gradient-to-br opacity-100 group-hover:opacity-90 transition-opacity",
+                    "absolute inset-0 bg-linear-to-br opacity-100 group-hover:opacity-90 transition-opacity",
                     action.gradient
                   )}
                 />
@@ -275,7 +275,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
                 {/* Gradient header */}
                 <div
                   className={cn(
-                    "h-32 bg-gradient-to-br relative",
+                    "h-32 bg-linear-to-br relative",
                     session.gradient
                   )}
                 >

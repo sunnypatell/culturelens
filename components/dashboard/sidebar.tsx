@@ -58,7 +58,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       {/* Header */}
       <div className="p-6 border-b border-border/50 backdrop-blur-sm relative z-10">
         <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+          <div className="w-11 h-11 rounded-xl bg-linear-to-br from-primary via-primary to-accent flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
             <svg
               width="24"
               height="24"
@@ -158,7 +158,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       </nav>
 
       {/* Stats Bar */}
-      <div className="mx-4 mb-4 p-4 rounded-xl bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 border border-border/50 backdrop-blur-sm relative z-10">
+      <div className="mx-4 mb-4 p-4 rounded-xl bg-linear-to-br from-primary/10 via-accent/5 to-primary/5 border border-border/50 backdrop-blur-sm relative z-10">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Sessions This Month</span>
@@ -178,7 +178,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       <div className="p-4 border-t border-border/50 backdrop-blur-sm relative z-10">
         <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 transition-all duration-300 group">
           <div className="relative">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary via-accent to-primary shadow-md" />
+            <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary via-accent to-primary shadow-md" />
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
           </div>
           <div className="flex-1 min-w-0 text-left">

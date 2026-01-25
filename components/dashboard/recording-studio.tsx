@@ -102,7 +102,7 @@ export function RecordingStudio() {
 
   if (state === "setup") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 p-8">
+      <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/20 p-8">
         <div className="max-w-5xl mx-auto space-y-8">
           <div
             className={cn(
@@ -351,7 +351,7 @@ export function RecordingStudio() {
 
   if (state === "agent") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 p-8">
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 p-8">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <h1 className="text-4xl font-bold text-foreground">
@@ -394,7 +394,7 @@ export function RecordingStudio() {
 
   if (state === "processing") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-8">
         <Card className="max-w-md w-full p-12 text-center space-y-6">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto animate-pulse">
             <svg
@@ -422,7 +422,7 @@ export function RecordingStudio() {
 
   if (state === "results") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 p-8">
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 p-8">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <h1 className="text-4xl font-bold text-foreground">
@@ -505,7 +505,7 @@ export function RecordingStudio() {
 
   // Recording or Paused State
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 p-8">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/20 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">

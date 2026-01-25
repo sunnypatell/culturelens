@@ -124,7 +124,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
@@ -246,14 +246,14 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
             >
               <div
                 className={cn(
-                  "absolute inset-0 bg-gradient-to-br opacity-5 group-hover:opacity-10 transition-opacity",
+                  "absolute inset-0 bg-linear-to-br opacity-5 group-hover:opacity-10 transition-opacity",
                   stat.color
                 )}
               />
               <div className="relative z-10 flex items-center gap-4">
                 <div
                   className={cn(
-                    "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center",
+                    "w-12 h-12 rounded-xl bg-linear-to-br flex items-center justify-center",
                     stat.color
                   )}
                 >
@@ -293,7 +293,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
               <div className="relative h-40 overflow-hidden">
                 <div
                   className={cn(
-                    "absolute inset-0 bg-gradient-to-br transition-transform duration-500 group-hover:scale-110",
+                    "absolute inset-0 bg-linear-to-br transition-transform duration-500 group-hover:scale-110",
                     session.gradient
                   )}
                 />

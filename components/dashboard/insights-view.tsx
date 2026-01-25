@@ -167,7 +167,7 @@ export function InsightsView() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-40 left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
@@ -390,7 +390,7 @@ export function InsightsView() {
           <TabsContent value="cultural" className="space-y-6">
             <Card
               className={cn(
-                "p-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-900",
+                "p-6 bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-amber-200 dark:border-amber-900",
                 mounted &&
                   "animate-in fade-in slide-in-from-bottom-4 duration-500"
               )}

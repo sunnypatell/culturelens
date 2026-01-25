@@ -125,7 +125,7 @@ export function AdvancedWaveform({
   }, [isRecording, isPaused, amplitudeData]);
 
   return (
-    <div className="relative w-full h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800">
+    <div className="relative w-full h-32 rounded-2xl overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800">
       <canvas ref={canvasRef} className="w-full h-full" />
       {isRecording && !isPaused && (
         <div className="absolute top-3 right-3 flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
