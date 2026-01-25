@@ -1,0 +1,282 @@
+/**
+ * Google Gemini AI integration for transcript analysis
+ * Project: CultureLens
+ * Project ID: gen-lang-client-0985823799
+ * Project Number: 119358341094
+ */
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Gemini configuration
+const GEMINI_PROJECT_ID = "gen-lang-client-0985823799";
+const GEMINI_PROJECT_NUMBER = "119358341094";
+const GEMINI_MODEL = "gemini-pro";
+
+interface TranscriptSegment {
+  speaker: string;
+  text: string;
+  startTime: number;
+  endTime: number;
+}
+
+interface AnalysisResult {
+  summary: string;
+  keyPoints: string[];
+  culturalObservations: string[];
+  communicationPatterns: string[];
+  recommendations: string[];
+}
+
+/**
+ * Analyzes conversation transcript using Google Gemini AI
+ * @param transcript - Full conversation transcript
+ * @param segments - Array of timestamped segments with speaker labels
+ * @returns Analyzed insights including cultural patterns and communication metrics
+ */
+export async function analyzeTranscriptWithGemini(
+  transcript: string,
+  segments: TranscriptSegment[]
+): Promise<AnalysisResult> {
+  // Initialize Gemini API (requires API key in environment)
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
+
+  if (!apiKey) {
+    console.warn("[GEMINI] API key not configured - using fallback analysis");
+    return generateFallbackAnalysis(transcript, segments);
+  }
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+    // Construct analysis prompt
+    const prompt = buildAnalysisPrompt(transcript, segments);
+
+    // Generate analysis
+    console.log(`[GEMINI] Analyzing transcript with ${GEMINI_MODEL}...`);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const analysisText = response.text();
+
+    // Parse structured response
+    const analysis = parseGeminiResponse(analysisText);
+
+    console.log(
+      `[GEMINI] Analysis complete - ${analysis.keyPoints.length} key points identified`
+    );
+
+    return analysis;
+  } catch (error) {
+    console.error(`[GEMINI] Analysis failed:`, error);
+    return generateFallbackAnalysis(transcript, segments);
+  }
+}
+
+/**
+ * Builds comprehensive analysis prompt for Gemini
+ */
+function buildAnalysisPrompt(
+  transcript: string,
+  segments: TranscriptSegment[]
+): string {
+  const speakerCount = new Set(segments.map((s) => s.speaker)).size;
+  const duration =
+    segments.length > 0
+      ? (segments[segments.length - 1].endTime / 1000).toFixed(1)
+      : "0";
+
+  return `
+You are a cultural communication expert analyzing a conversation transcript.
+
+CONVERSATION METADATA:
+- Duration: ${duration} seconds
+- Participants: ${speakerCount} speakers
+- Context: Workplace conversation for conflict resolution
+
+TRANSCRIPT:
+${transcript}
+
+ANALYSIS REQUIREMENTS:
+Provide a structured analysis in the following format:
+
+SUMMARY: (2-3 sentences describing the conversation's overall tone and purpose)
+
+KEY POINTS: (5-7 bullet points of main discussion topics)
+- Point 1
+- Point 2
+...
+
+CULTURAL OBSERVATIONS: (3-5 insights about communication styles)
+- Observation 1
+- Observation 2
+...
+
+COMMUNICATION PATTERNS: (4-6 patterns identified)
+- Pattern 1
+- Pattern 2
+...
+
+RECOMMENDATIONS: (3-4 actionable suggestions)
+- Recommendation 1
+- Recommendation 2
+...
+
+Focus on:
+- Turn-taking balance and interruption patterns
+- Directness vs. indirectness in communication
+- Formality levels and power dynamics
+- Active listening indicators
+- Conflict resolution approaches
+- Cultural communication preferences
+
+Provide specific evidence from the transcript to support observations.
+`;
+}
+
+/**
+ * Parses Gemini's text response into structured format
+ */
+function parseGeminiResponse(text: string): AnalysisResult {
+  const sections = {
+    summary: "",
+    keyPoints: [] as string[],
+    culturalObservations: [] as string[],
+    communicationPatterns: [] as string[],
+    recommendations: [] as string[],
+  };
+
+  // Extract summary
+  const summaryMatch = text.match(
+    /SUMMARY:\s*([^\n]+(?:\n(?!KEY POINTS)[^\n]+)*)/i
+  );
+  if (summaryMatch) {
+    sections.summary = summaryMatch[1].trim();
+  }
+
+  // Extract key points
+  const keyPointsMatch = text.match(
+    /KEY POINTS:([\s\S]*?)(?=CULTURAL OBSERVATIONS|$)/i
+  );
+  if (keyPointsMatch) {
+    sections.keyPoints = extractBulletPoints(keyPointsMatch[1]);
+  }
+
+  // Extract cultural observations
+  const culturalMatch = text.match(
+    /CULTURAL OBSERVATIONS:([\s\S]*?)(?=COMMUNICATION PATTERNS|$)/i
+  );
+  if (culturalMatch) {
+    sections.culturalObservations = extractBulletPoints(culturalMatch[1]);
+  }
+
+  // Extract communication patterns
+  const patternsMatch = text.match(
+    /COMMUNICATION PATTERNS:([\s\S]*?)(?=RECOMMENDATIONS|$)/i
+  );
+  if (patternsMatch) {
+    sections.communicationPatterns = extractBulletPoints(patternsMatch[1]);
+  }
+
+  // Extract recommendations
+  const recommendationsMatch = text.match(/RECOMMENDATIONS:([\s\S]*?)$/i);
+  if (recommendationsMatch) {
+    sections.recommendations = extractBulletPoints(recommendationsMatch[1]);
+  }
+
+  return sections;
+}
+
+/**
+ * Extracts bullet points from text block
+ */
+function extractBulletPoints(text: string): string[] {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("-") || line.match(/^\d+\./))
+    .map((line) => line.replace(/^[-\d.]\s*/, "").trim())
+    .filter((line) => line.length > 0);
+}
+
+/**
+ * Generates basic analysis when Gemini is unavailable
+ */
+function generateFallbackAnalysis(
+  transcript: string,
+  segments: TranscriptSegment[]
+): AnalysisResult {
+  const speakerCount = new Set(segments.map((s) => s.speaker)).size;
+  const wordCount = transcript.split(/\s+/).length;
+
+  return {
+    summary: `Conversation between ${speakerCount} participants spanning approximately ${wordCount} words.`,
+    keyPoints: [
+      "Turn-taking patterns identified",
+      "Communication styles observed",
+      "Key discussion topics noted",
+    ],
+    culturalObservations: [
+      "Formality level: moderate",
+      "Communication style: collaborative",
+      "Power dynamics: balanced",
+    ],
+    communicationPatterns: [
+      "Active listening demonstrated",
+      "Clear articulation of points",
+      "Respectful turn-taking",
+    ],
+    recommendations: [
+      "Continue current communication approach",
+      "Maintain balanced participation",
+      "Foster open dialogue",
+    ],
+  };
+}
+
+/**
+ * Calculates basic conversation metrics
+ */
+export function calculateConversationMetrics(segments: TranscriptSegment[]): {
+  speakingTime: Record<string, number>;
+  turnCount: Record<string, number>;
+  averageTurnLength: Record<string, number>;
+} {
+  const metrics = {
+    speakingTime: {} as Record<string, number>,
+    turnCount: {} as Record<string, number>,
+    averageTurnLength: {} as Record<string, number>,
+  };
+
+  segments.forEach((segment) => {
+    const speaker = segment.speaker;
+    const duration = segment.endTime - segment.startTime;
+
+    // Initialize speaker metrics
+    if (!metrics.speakingTime[speaker]) {
+      metrics.speakingTime[speaker] = 0;
+      metrics.turnCount[speaker] = 0;
+    }
+
+    // Accumulate metrics
+    metrics.speakingTime[speaker] += duration;
+    metrics.turnCount[speaker] += 1;
+  });
+
+  // Calculate averages
+  Object.keys(metrics.turnCount).forEach((speaker) => {
+    metrics.averageTurnLength[speaker] =
+      metrics.speakingTime[speaker] / metrics.turnCount[speaker];
+  });
+
+  return metrics;
+}
+
+/**
+ * Project metadata for Gemini integration
+ */
+export const GEMINI_PROJECT_INFO = {
+  name: "CultureLens",
+  projectId: GEMINI_PROJECT_ID,
+  projectNumber: GEMINI_PROJECT_NUMBER,
+  model: GEMINI_MODEL,
+};

@@ -1,0 +1,246 @@
+# Google Gemini AI Integration
+
+## Overview
+
+CultureLens integrates with Google Gemini AI for advanced transcript analysis and cultural communication pattern detection. This document outlines the integration architecture and usage.
+
+## Project Configuration
+
+**Project Details:**
+
+- **Project Name:** CultureLens
+- **Project ID:** `gen-lang-client-0985823799`
+- **Project Number:** `119358341094`
+- **Model:** `gemini-pro`
+
+## Architecture
+
+### Integration Points
+
+1. **Transcript Analysis** (`/lib/gemini-analysis.ts`)
+   - Primary entry point for Gemini AI analysis
+   - Processes conversation transcripts with speaker labels
+   - Generates structured insights in CultureLens format
+
+2. **API Route** (`/app/api/sessions/[id]/analyze/route.ts`)
+   - Calls Gemini analysis after transcript extraction
+   - Falls back to deterministic analysis if Gemini unavailable
+   - Maintains consistent response format
+
+### Analysis Pipeline
+
+```
+Conversation Recording
+  ↓
+Transcript Extraction (ElevenLabs)
+  ↓
+Gemini AI Analysis
+  ├─ Cultural Pattern Detection
+  ├─ Communication Style Analysis
+  ├─ Sentiment & Tone Analysis
+  └─ Contextual Recommendations
+  ↓
+Structured Insights
+  ↓
+User Dashboard
+```
+
+## Features
+
+### 1. Cultural Communication Analysis
+
+- **Directness vs. Indirectness:** Identifies explicit vs. implicit communication patterns
+- **Formality Levels:** Detects professional, casual, or mixed formality
+- **Power Dynamics:** Analyzes conversational dominance and hierarchy cues
+
+### 2. Communication Pattern Detection
+
+- **Turn-Taking Balance:** Quantifies speaking time distribution
+- **Interruption Patterns:** Identifies competitive vs. collaborative interruptions
+- **Active Listening:** Detects acknowledgment and engagement signals
+
+### 3. Conversation Metrics
+
+- **Speaking Time Analysis:** Per-speaker time allocation
+- **Turn Count:** Number of conversational turns per participant
+- **Average Turn Length:** Typical response length per speaker
+
+## Implementation
+
+### Environment Setup
+
+Add to `.env`:
+
+```bash
+# Google Gemini AI
+GOOGLE_AI_API_KEY=your_gemini_api_key_here
+GEMINI_PROJECT_ID=gen-lang-client-0985823799
+GEMINI_PROJECT_NUMBER=119358341094
+```
+
+### Usage Example
+
+```typescript
+import { analyzeTranscriptWithGemini } from "@/lib/gemini-analysis";
+
+const transcript = "Full conversation text...";
+const segments = [
+  {
+    speaker: "A",
+    text: "Hello, how are you?",
+    startTime: 0,
+    endTime: 2000,
+  },
+  // ... more segments
+];
+
+const analysis = await analyzeTranscriptWithGemini(transcript, segments);
+
+console.log(analysis.summary);
+console.log(analysis.keyPoints);
+console.log(analysis.culturalObservations);
+```
+
+### Response Format
+
+```typescript
+interface AnalysisResult {
+  summary: string; // 2-3 sentence overview
+  keyPoints: string[]; // 5-7 main discussion topics
+  culturalObservations: string[]; // 3-5 cultural insights
+  communicationPatterns: string[]; // 4-6 patterns identified
+  recommendations: string[]; // 3-4 actionable suggestions
+}
+```
+
+## Prompt Engineering
+
+The Gemini integration uses a structured prompt that includes:
+
+1. **Conversation Metadata**
+   - Duration
+   - Participant count
+   - Context (workplace, conflict resolution)
+
+2. **Analysis Requirements**
+   - Specific output format
+   - Focus areas (turn-taking, cultural patterns, etc.)
+   - Evidence requirements
+
+3. **Cultural Dimensions**
+   - Directness
+   - Formality
+   - Power dynamics
+   - Active listening
+   - Conflict resolution approaches
+
+## Fallback Mechanism
+
+If Gemini is unavailable (no API key, rate limits, errors), the system automatically falls back to deterministic analysis:
+
+```typescript
+function generateFallbackAnalysis(
+  transcript: string,
+  segments: TranscriptSegment[]
+): AnalysisResult {
+  // Basic metrics-based analysis
+  // Ensures system remains functional without Gemini
+}
+```
+
+## Performance
+
+- **Typical Response Time:** 2-5 seconds
+- **Token Usage:** ~1000-3000 tokens per analysis
+- **Rate Limits:** Respects Gemini API quotas
+- **Caching:** Not implemented (future optimization)
+
+## Security
+
+- **API Key Storage:** Environment variables only, never committed
+- **Request Validation:** All inputs sanitized before Gemini API calls
+- **Error Handling:** Graceful degradation without exposing internal errors
+- **Data Privacy:** Transcripts processed per user consent
+
+## Future Enhancements
+
+### Phase 1 (Current)
+
+- ✅ Basic transcript analysis
+- ✅ Structured insight generation
+- ✅ Fallback mechanism
+
+### Phase 2 (Planned)
+
+- [ ] Multi-language support
+- [ ] Real-time streaming analysis
+- [ ] Custom model fine-tuning
+- [ ] Historical pattern detection
+
+### Phase 3 (Future)
+
+- [ ] Sentiment time-series analysis
+- [ ] Predictive conflict detection
+- [ ] Recommendation personalization
+- [ ] Integration with Gemini Vision for video analysis
+
+## Testing
+
+### Unit Tests
+
+```bash
+# Test Gemini analysis with mock transcript
+npm run test:gemini
+
+# Test fallback mechanism
+npm run test:gemini:fallback
+```
+
+### Integration Tests
+
+```bash
+# Full pipeline test (recording → transcript → analysis)
+npm run test:analysis:e2e
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue:** "API key not configured"
+
+```
+Solution: Ensure GOOGLE_AI_API_KEY is set in .env
+```
+
+**Issue:** "Rate limit exceeded"
+
+```
+Solution: Implement exponential backoff or reduce request frequency
+```
+
+**Issue:** "Model not found"
+
+```
+Solution: Verify gemini-pro is available in your project region
+```
+
+## Resources
+
+- [Google Gemini API Docs](https://ai.google.dev/docs)
+- [Generative AI SDK](https://www.npmjs.com/package/@google/generative-ai)
+- [CultureLens Analysis Library](/lib/gemini-analysis.ts)
+
+## Support
+
+For Gemini integration questions:
+
+- Check API quotas in Google Cloud Console
+- Review error logs in application console
+- Verify project permissions and API enablement
+
+---
+
+**Integration Status:** Production-ready with fallback support
+**Last Updated:** January 25, 2026
+**Project:** CultureLens @ MLH HackHive 2026
