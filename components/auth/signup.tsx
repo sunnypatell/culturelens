@@ -64,6 +64,12 @@ export function Signup() {
     [formData.password]
   );
 
+  const passwordMismatch = useMemo(() => {
+    // only show mismatch if user has typed in confirm password field
+    if (!formData.confirmPassword) return false;
+    return formData.password !== formData.confirmPassword;
+  }, [formData.password, formData.confirmPassword]);
+
   const validateForm = () => {
     console.log(`[SIGNUP_VALIDATION] Starting form validation`);
 
@@ -268,7 +274,13 @@ export function Signup() {
                     onChange={handleChange}
                     required
                     disabled={loading}
+                    className={passwordMismatch ? "border-destructive" : ""}
                   />
+                  {passwordMismatch && (
+                    <p className="text-sm text-destructive">
+                      passwords do not match
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
