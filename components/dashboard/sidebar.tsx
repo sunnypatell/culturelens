@@ -15,6 +15,7 @@ interface SidebarProps {
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const { user } = useAuth();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const { stats, loading } = useUserStats();
 
   const navItems = [
     {
@@ -165,14 +166,25 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Sessions This Month</span>
-            <span className="font-bold text-foreground">12</span>
+            <span className="font-bold text-foreground">
+              {loading ? "..." : stats?.sessionsThisMonth || 0}
+            </span>
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-            <div className="h-full w-[60%] bg-gradient-to-r from-primary to-accent rounded-full animate-in slide-in-from-left duration-1000" />
+            <div
+              className="h-full bg-gradient-to-r from-primary to-accent rounded-full animate-in slide-in-from-left duration-1000"
+              style={{
+                width: stats?.sessionsThisMonth
+                  ? `${Math.min((stats.sessionsThisMonth / 30) * 100, 100)}%`
+                  : "0%",
+              }}
+            />
           </div>
           <div className="flex items-center justify-between text-xs">
             <span className="text-muted-foreground">Insights Gained</span>
-            <span className="font-bold text-foreground">47</span>
+            <span className="font-bold text-foreground">
+              {loading ? "..." : stats?.totalInsights || 0}
+            </span>
           </div>
         </div>
       </div>
