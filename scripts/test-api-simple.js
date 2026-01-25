@@ -47,9 +47,7 @@ async function testEndpoint(name, method, path, options = {}) {
       }
       return { success: true, data, status };
     } else {
-      console.log(
-        `⚠️  ${name} returned ${status}, expected ${expected}`
-      );
+      console.log(`⚠️  ${name} returned ${status}, expected ${expected}`);
       console.log(`   response:`, JSON.stringify(data).substring(0, 150));
       return { success: false, data, status };
     }
@@ -117,15 +115,10 @@ async function runTests() {
   ];
 
   for (const test of tests) {
-    const result = await testEndpoint(
-      test.name,
-      test.method,
-      test.path,
-      {
-        expectedStatus: test.expectedStatus,
-        body: test.body,
-      }
-    );
+    const result = await testEndpoint(test.name, test.method, test.path, {
+      expectedStatus: test.expectedStatus,
+      body: test.body,
+    });
     result.success ? results.passed++ : results.failed++;
   }
 

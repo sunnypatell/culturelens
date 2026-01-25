@@ -12,7 +12,16 @@ import { useUserStats } from "@/lib/hooks/useUserStats";
 import { useAuth } from "@/components/auth/auth-provider";
 import { toast } from "sonner";
 import { GradientCard } from "@/components/ui/glass-card";
-import { Clock, Users, Sparkles, Star, ArrowRight } from "lucide-react";
+import {
+  Clock,
+  Users,
+  Sparkles,
+  Star,
+  ArrowRight,
+  Loader2,
+  FileText,
+} from "lucide-react";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 interface AnalysisLibraryProps {
   onViewInsights: (sessionId: string) => void;
@@ -33,7 +42,7 @@ export function AnalysisLibrary({
   );
   const [hoveredSession, setHoveredSession] = useState<number | null>(null);
   const [sessions, setSessions] = useState<any[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { stats } = useUserStats();
 
   useEffect(() => {
@@ -219,6 +228,82 @@ export function AnalysisLibrary({
 
     return filtered;
   }, [sessions, filterType, searchQuery]);
+
+  // show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center relative overflow-hidden">
+        {/* animated floating orbs */}
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            scale: [1, 1.2, 1],
+            opacity: [0.4, 0.6, 0.4],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-1/3 left-1/4 w-80 h-80 bg-primary/20 rounded-full blur-3xl pointer-events-none"
+        />
+        <motion.div
+          animate={{
+            y: [0, 20, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-accent/20 rounded-full blur-3xl pointer-events-none"
+        />
+
+        <div className="relative z-10 flex flex-col items-center gap-8 max-w-2xl px-6">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="relative flex items-center gap-3"
+          >
+            <FileText className="w-14 h-14 text-primary" />
+            <Loader2 className="w-14 h-14 animate-spin text-primary absolute -right-4 -top-4 opacity-60" />
+          </motion.div>
+
+          <TextGenerateEffect
+            words="loading your conversation archive"
+            className="text-center text-foreground"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex gap-2"
+          >
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+              className="w-2 h-2 rounded-full bg-primary"
+            />
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+              className="w-2 h-2 rounded-full bg-primary"
+            />
+            <motion.div
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+              className="w-2 h-2 rounded-full bg-primary"
+            />
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
