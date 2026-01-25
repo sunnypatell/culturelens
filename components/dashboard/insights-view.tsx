@@ -233,21 +233,21 @@ export function InsightsView({
         <Tabs defaultValue="patterns" className="space-y-6">
           <TabsList
             className={cn(
-              "grid w-full grid-cols-4 h-auto p-1",
+              "flex w-full h-auto p-1 gap-1",
               mounted &&
                 "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100"
             )}
           >
-            <TabsTrigger value="patterns" className="py-3 text-base">
-              Communication Patterns
+            <TabsTrigger value="patterns" className="flex-1 py-3 text-sm whitespace-nowrap">
+              Patterns
             </TabsTrigger>
-            <TabsTrigger value="cultural" className="py-3 text-base">
-              Cultural Context
+            <TabsTrigger value="cultural" className="flex-1 py-3 text-sm whitespace-nowrap">
+              Cultural
             </TabsTrigger>
-            <TabsTrigger value="moments" className="py-3 text-base">
-              Key Moments
+            <TabsTrigger value="moments" className="flex-1 py-3 text-sm whitespace-nowrap">
+              Moments
             </TabsTrigger>
-            <TabsTrigger value="trends" className="py-3 text-base">
+            <TabsTrigger value="trends" className="flex-1 py-3 text-sm whitespace-nowrap">
               Trends
             </TabsTrigger>
           </TabsList>
