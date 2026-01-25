@@ -10,13 +10,31 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
 import { useAuth } from "@/components/auth/auth-provider";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export function SettingsView() {
-  const { user } = useAuth();
+  const { user, getIdToken, signOut } = useAuth();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // profile state
+  const [displayName, setDisplayName] = useState("");
+  const [organization, setOrganization] = useState("");
+
+  // settings state
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [culturalAnalysis, setCulturalAnalysis] = useState(true);
@@ -24,9 +42,147 @@ export function SettingsView() {
   const [sensitivityLevel, setSensitivityLevel] = useState([70]);
   const [theme, setTheme] = useState("system");
 
+  // password dialog state
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+
   useEffect(() => {
     setMounted(true);
-  }, []);
+    setDisplayName(user?.displayName || "");
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    try {
+      setLoading(true);
+      const token = await getIdToken();
+
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          displayName,
+          organization,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("failed to update profile");
+      }
+
+      toast.success("profile updated successfully");
+    } catch (error) {
+      console.error("[SettingsView] Profile update error:", error);
+      toast.error("failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      setLoading(true);
+      const token = await getIdToken();
+
+      const response = await fetch("/api/settings", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          notifications: notificationsEnabled,
+          autoSave: autoSaveEnabled,
+          culturalAnalysis,
+          dataRetention,
+          sensitivityLevel: sensitivityLevel[0] / 20,
+          theme,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("failed to save settings");
+      }
+
+      toast.success("settings saved successfully");
+    } catch (error) {
+      console.error("[SettingsView] Settings save error:", error);
+      toast.error("failed to save settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      setLoading(true);
+      const token = await getIdToken();
+
+      const response = await fetch("/api/user/export", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("failed to export data");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `culturelens-data-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("data exported successfully");
+    } catch (error) {
+      console.error("[SettingsView] Export error:", error);
+      toast.error("failed to export data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (
+      !confirm(
+        "are you sure you want to delete your account? this action cannot be undone and will delete all your sessions and data."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = await getIdToken();
+
+      const response = await fetch("/api/user/delete", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("failed to delete account");
+      }
+
+      toast.success("account deleted successfully");
+      await signOut();
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("[SettingsView] Delete account error:", error);
+      toast.error("failed to delete account");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
@@ -83,7 +239,8 @@ export function SettingsView() {
                 <Input
                   id="name"
                   placeholder="Enter your name"
-                  defaultValue={user?.displayName || ""}
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
                   className="h-11"
                 />
               </div>
@@ -109,14 +266,44 @@ export function SettingsView() {
               <Input
                 id="organization"
                 placeholder="Ontario Tech University"
-                defaultValue="Ontario Tech University"
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
                 className="h-11"
               />
             </div>
 
             <div className="flex items-center gap-3">
-              <Button>Save Changes</Button>
-              <Button variant="outline">Change Password</Button>
+              <Button onClick={handleSaveProfile} disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Changes
+              </Button>
+              <Dialog
+                open={showPasswordDialog}
+                onOpenChange={setShowPasswordDialog}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Change Password</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>change password</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      to change your password, please use the password reset
+                      feature from the login page
+                    </p>
+                    <Button
+                      onClick={() => {
+                        router.push("/auth/reset-password");
+                      }}
+                      className="w-full"
+                    >
+                      go to password reset
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </Card>
@@ -429,31 +616,49 @@ export function SettingsView() {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 bg-transparent">
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
+                <Button
+                  variant="outline"
+                  className="flex-1 bg-transparent"
+                  onClick={handleExportData}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  )}
                   Download My Data
                 </Button>
-                <Button variant="destructive" className="flex-1">
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  </svg>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={handleDeleteAccount}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  )}
                   Delete All Data
                 </Button>
               </div>
