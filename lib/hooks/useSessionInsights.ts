@@ -70,27 +70,32 @@ function transformToCommunicationPatterns(
 ): CommunicationPattern[] {
   const patterns: CommunicationPattern[] = [];
 
-  // turn-taking balance from metrics
+  // turn-taking balance from metrics - only show if both participants spoke
   const totalTalkTime = metrics.talkTimeMs.A + metrics.talkTimeMs.B;
-  const percentA = Math.round((metrics.talkTimeMs.A / totalTalkTime) * 100);
-  const percentB = Math.round((metrics.talkTimeMs.B / totalTalkTime) * 100);
+  const hasBothParticipants =
+    metrics.talkTimeMs.A > 0 && metrics.talkTimeMs.B > 0;
 
-  patterns.push({
-    id: 1,
-    title: "Turn-Taking Balance",
-    confidence: "high",
-    description: `Participant A spoke ${percentA}% of the time, while Participant B contributed ${percentB}%.`,
-    insight:
-      percentA > 60 || percentB > 60
-        ? "Consider creating more space for balanced participation"
-        : "Well-balanced conversation with both participants contributing equally",
-    evidence: [
-      `Participant A had ${metrics.turnCount.A} speaking turns averaging ${Math.round(metrics.avgTurnLengthMs.A / 1000)}s each`,
-      `Participant B had ${metrics.turnCount.B} speaking turns averaging ${Math.round(metrics.avgTurnLengthMs.B / 1000)}s each`,
-    ],
-    category: "Balance",
-    color: COLOR_PALETTES[0],
-  });
+  if (hasBothParticipants && totalTalkTime > 0) {
+    const percentA = Math.round((metrics.talkTimeMs.A / totalTalkTime) * 100);
+    const percentB = Math.round((metrics.talkTimeMs.B / totalTalkTime) * 100);
+
+    patterns.push({
+      id: 1,
+      title: "Turn-Taking Balance",
+      confidence: "high",
+      description: `Participant A spoke ${percentA}% of the time, while Participant B contributed ${percentB}%.`,
+      insight:
+        percentA > 60 || percentB > 60
+          ? "Consider creating more space for balanced participation"
+          : "Well-balanced conversation with both participants contributing equally",
+      evidence: [
+        `Participant A had ${metrics.turnCount.A} speaking turns averaging ${Math.round(metrics.avgTurnLengthMs.A / 1000)}s each`,
+        `Participant B had ${metrics.turnCount.B} speaking turns averaging ${Math.round(metrics.avgTurnLengthMs.B / 1000)}s each`,
+      ],
+      category: "Balance",
+      color: COLOR_PALETTES[0],
+    });
+  }
 
   // interruption frequency from metrics
   const totalInterruptions =
@@ -116,24 +121,26 @@ function transformToCommunicationPatterns(
     });
   }
 
-  // transform insights from API
-  insights.forEach((insight, index) => {
-    patterns.push({
-      id: patterns.length + 1,
-      title: insight.title,
-      confidence: insight.confidence,
-      description: insight.summary,
-      insight: insight.hypothesis || insight.whyThisWasFlagged,
-      evidence: insight.evidence.map((e) => e.quote),
-      category:
-        insight.category === "turnTaking"
-          ? "Balance"
-          : insight.category === "emotion"
-            ? "Engagement"
-            : "Analysis",
-      color: COLOR_PALETTES[(index + 3) % COLOR_PALETTES.length],
+  // transform insights from API - filter out mock/unavailable insights
+  insights
+    .filter((i) => !i.title.toLowerCase().includes("unavailable"))
+    .forEach((insight, index) => {
+      patterns.push({
+        id: patterns.length + 1,
+        title: insight.title,
+        confidence: insight.confidence,
+        description: insight.summary,
+        insight: insight.hypothesis || insight.whyThisWasFlagged,
+        evidence: insight.evidence.map((e) => e.quote),
+        category:
+          insight.category === "turnTaking"
+            ? "Balance"
+            : insight.category === "emotion"
+              ? "Engagement"
+              : "Analysis",
+        color: COLOR_PALETTES[(index + 3) % COLOR_PALETTES.length],
+      });
     });
-  });
 
   return patterns;
 }

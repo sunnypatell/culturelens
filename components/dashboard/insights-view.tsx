@@ -255,7 +255,9 @@ export function InsightsView({
           {/* Communication Patterns Tab */}
           <TabsContent value="patterns" className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
-              {communicationPatterns.map((pattern, index) => (
+              {communicationPatterns
+                .filter((p) => !p.title.toLowerCase().includes("unavailable"))
+                .map((pattern, index) => (
                 <Card
                   key={pattern.id}
                   className={cn(
@@ -373,6 +375,30 @@ export function InsightsView({
                   </div>
                 </Card>
               ))}
+              {communicationPatterns.filter(
+                (p) => !p.title.toLowerCase().includes("unavailable")
+              ).length === 0 && (
+                <Card className="p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8 text-muted-foreground"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    No transcript data available
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    This session doesn't have conversation data to analyze. Try
+                    starting a new session with the voice agent.
+                  </p>
+                </Card>
+              )}
             </div>
           </TabsContent>
 
