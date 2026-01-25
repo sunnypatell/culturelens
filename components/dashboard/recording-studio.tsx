@@ -41,6 +41,7 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
   );
   const [mounted, setMounted] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [_agentSessionId, _setAgentSessionId] = useState<string | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -107,6 +108,22 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
   };
 
   const handleStartSession = async () => {
+    // clear previous validation errors
+    setValidationError(null);
+
+    // validate required fields
+    if (!sessionTitle.trim()) {
+      setValidationError("session title is required");
+      toast.error("session title is required");
+      return;
+    }
+
+    if (sessionTitle.trim().length < 3) {
+      setValidationError("session title must be at least 3 characters");
+      toast.error("session title must be at least 3 characters");
+      return;
+    }
+
     try {
       setCreating(true);
       const token = await getIdToken();
@@ -124,7 +141,7 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
             timestamp: new Date().toISOString(),
           },
           settings: {
-            title: sessionTitle || `Session ${new Date().toLocaleDateString()}`,
+            title: sessionTitle.trim(),
             sessionType,
             participantCount: parseInt(numberOfParticipants.split(" ")[0]),
             culturalContextTags: culturalContext,
@@ -205,10 +222,23 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
                   id="session-title"
                   type="text"
                   placeholder="e.g., Team Meeting, Client Call, Brainstorming Session"
-                  className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  className={cn(
+                    "w-full px-4 py-3 rounded-lg border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring",
+                    validationError
+                      ? "border-destructive focus:ring-destructive"
+                      : "border-input"
+                  )}
                   value={sessionTitle}
-                  onChange={(e) => setSessionTitle(e.target.value)}
+                  onChange={(e) => {
+                    setSessionTitle(e.target.value);
+                    setValidationError(null);
+                  }}
                 />
+                {validationError && (
+                  <p className="text-sm text-destructive mt-1">
+                    {validationError}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
