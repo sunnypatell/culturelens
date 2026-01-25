@@ -6,12 +6,7 @@ import {
   fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth } from "./firebase";
-import {
-  getDocument,
-  createDocumentWithId,
-  updateDocument,
-} from "./firebase-server-utils";
-import { COLLECTIONS, generateUserIdFromUid } from "./firestore-constants";
+import { generateUserIdFromUid } from "./firestore-constants";
 
 export interface UserProfile {
   id: string;
@@ -58,37 +53,34 @@ export async function createOrUpdateUserProfile(
   };
 
   try {
-    // check if profile already exists
-    const existingProfile = await getDocument(COLLECTIONS.USERS, userId);
+    // sync profile via API endpoint
+    const token = await user.getIdToken();
 
-    if (existingProfile) {
-      console.log(`[ACCOUNT_LINKING] User profile exists, updating...`, userId);
-
-      // update existing profile with latest data
-      await updateDocument(COLLECTIONS.USERS, userId, {
+    const response = await fetch("/api/user/sync-profile", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         email: user.email,
         displayName: user.displayName,
         phoneNumber: user.phoneNumber,
         photoURL: user.photoURL,
         emailVerified: user.emailVerified,
         linkedProviders,
-        updatedAt: new Date().toISOString(),
-      });
+      }),
+    });
 
-      console.log(`[ACCOUNT_LINKING] User profile updated successfully`);
-    } else {
-      console.log(
-        `[ACCOUNT_LINKING] User profile does not exist, creating...`,
-        userId
-      );
-
-      // create new profile
-      await createDocumentWithId(COLLECTIONS.USERS, userId, profile);
-
-      console.log(`[ACCOUNT_LINKING] User profile created successfully`);
+    if (!response.ok) {
+      throw new Error("failed to sync user profile");
     }
 
-    return profile;
+    const result = await response.json();
+
+    console.log(`[ACCOUNT_LINKING] User profile synced successfully`);
+
+    return result.data as UserProfile;
   } catch (error) {
     console.error(
       `[ACCOUNT_LINKING] Failed to create/update user profile:`,
@@ -256,23 +248,39 @@ export async function handleAccountLinking(
 /**
  * gets user profile from Firestore by UID
  * @param uid - Firebase Auth UID
+ * @param token - Firebase Auth token
  */
-export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+export async function getUserProfile(
+  uid: string,
+  token: string
+): Promise<UserProfile | null> {
   console.log(`[ACCOUNT_LINKING] Fetching user profile for UID:`, uid);
 
   const userId = generateUserIdFromUid(uid);
 
   try {
-    const profile = await getDocument(COLLECTIONS.USERS, userId);
+    const response = await fetch("/api/user/sync-profile", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    if (!profile) {
+    if (!response.ok) {
+      console.warn(`[ACCOUNT_LINKING] User profile not found for UID:`, uid);
+      return null;
+    }
+
+    const result = await response.json();
+
+    if (!result.data) {
       console.warn(`[ACCOUNT_LINKING] User profile not found for UID:`, uid);
       return null;
     }
 
     console.log(`[ACCOUNT_LINKING] User profile retrieved successfully`);
 
-    return profile as UserProfile;
+    return result.data as UserProfile;
   } catch (error) {
     console.error(`[ACCOUNT_LINKING] Failed to get user profile:`, error);
     return null;
