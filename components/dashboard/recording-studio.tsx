@@ -13,7 +13,9 @@ import { VoiceAgent } from "@/components/voice-agent";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/auth-provider";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { motion } from "framer-motion";
 
 type RecordingState =
   | "setup"
@@ -492,28 +494,125 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
 
   if (state === "processing") {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-8">
-        <Card className="max-w-md w-full p-12 text-center space-y-6">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto animate-pulse">
-            <svg
-              className="w-10 h-10 text-primary animate-spin"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Animated gradient background */}
+        <div className="fixed inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/5" />
+
+        {/* Floating orbs background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              y: [0, -30, 0],
+              x: [0, 20, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              y: [0, 30, 0],
+              x: [0, -20, 0],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl"
+          />
+        </div>
+
+        {/* Content */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 max-w-2xl w-full px-8"
+        >
+          <div className="backdrop-blur-xl bg-background/30 border border-white/20 rounded-3xl p-12 space-y-8">
+            {/* Animated icon */}
+            <motion.div
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                rotate: { duration: 3, repeat: Infinity, ease: "linear" },
+                scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+              }}
+              className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto relative"
             >
-              <path d="M21 12a9 9 0 11-6.219-8.56" />
-            </svg>
+              <Sparkles className="w-12 h-12 text-white" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-accent opacity-50 blur-xl animate-pulse" />
+            </motion.div>
+
+            {/* Text Generate Effect */}
+            <div className="text-center space-y-4">
+              <TextGenerateEffect
+                words="Analyzing conversation patterns and cultural context"
+                className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent"
+                duration={0.8}
+              />
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 0.5 }}
+                className="text-lg text-muted-foreground"
+              >
+                Our AI is processing your recording to extract meaningful insights and cultural observations
+              </motion.p>
+            </div>
+
+            {/* Progress indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2, duration: 0.5 }}
+              className="space-y-3"
+            >
+              {[
+                "Transcribing audio",
+                "Identifying communication patterns",
+                "Analyzing cultural context",
+                "Generating insights",
+              ].map((step, index) => (
+                <motion.div
+                  key={step}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 2 + index * 0.2, duration: 0.4 }}
+                  className="flex items-center gap-3 text-sm text-muted-foreground"
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full"
+                  />
+                  {step}
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Processing Recording
-            </h2>
-            <p className="text-muted-foreground">
-              Preparing your audio for analysis...
-            </p>
-          </div>
-        </Card>
+        </motion.div>
       </div>
     );
   }
