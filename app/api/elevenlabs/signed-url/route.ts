@@ -14,9 +14,23 @@ import {
   AuthenticationError,
   ExternalServiceError,
 } from "@/lib/api";
+import { verifyIdToken } from "@/lib/auth-server";
 
-export async function GET() {
+export async function GET(request: Request) {
   return apiHandler(async () => {
+    console.log(`[API_SIGNED_URL] Requesting signed URL`);
+
+    // authenticate user
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader) {
+      throw new AuthenticationError("missing authorization header");
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const decodedToken = await verifyIdToken(token);
+    const userId = decodedToken.uid;
+    console.log(`[API_SIGNED_URL] Authenticated user:`, userId);
+
     const apiKey = process.env.ELEVENLABS_API_KEY;
     const agentId = process.env.ELEVENLABS_AGENT_ID;
 
