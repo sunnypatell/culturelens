@@ -20,6 +20,9 @@ type RecordingState =
   | "processing"
   | "results";
 
+// delay for simulating processing time before showing results
+const PROCESSING_DELAY_MS = 3000;
+
 export function RecordingStudio() {
   const router = useRouter();
   const [state, setState] = useState<RecordingState>("setup");
@@ -89,7 +92,7 @@ export function RecordingStudio() {
     setState("processing");
     setTimeout(() => {
       setState("results");
-    }, 3000);
+    }, PROCESSING_DELAY_MS);
   };
 
   const toggleCulturalContext = (context: string) => {

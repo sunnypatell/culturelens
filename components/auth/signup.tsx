@@ -23,6 +23,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Mail, Check } from "lucide-react";
 
+// delay before redirecting to onboarding after successful signup
+const SUCCESS_REDIRECT_DELAY_MS = 2000;
+
 export function Signup() {
   const router = useRouter();
   const { signUp } = useAuth();
@@ -86,7 +89,7 @@ export function Signup() {
       // redirect to onboarding to complete profile
       setTimeout(() => {
         router.push("/onboarding");
-      }, 2000);
+      }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

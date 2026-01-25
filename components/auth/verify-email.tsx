@@ -21,6 +21,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Check, X } from "lucide-react";
 
+// delay before redirecting to dashboard after successful authentication
+const SUCCESS_REDIRECT_DELAY_MS = 2000;
+
 export function VerifyEmail() {
   const router = useRouter();
   const { completeEmailLink } = useAuth();
@@ -39,7 +42,7 @@ export function VerifyEmail() {
         setSuccess(true);
         setTimeout(() => {
           router.push("/dashboard");
-        }, 2000);
+        }, SUCCESS_REDIRECT_DELAY_MS);
       } catch (err: unknown) {
         if (err instanceof Error && err.message.includes("email not found")) {
           setNeedsEmail(true);
@@ -68,7 +71,7 @@ export function VerifyEmail() {
       setSuccess(true);
       setTimeout(() => {
         router.push("/dashboard");
-      }, 2000);
+      }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

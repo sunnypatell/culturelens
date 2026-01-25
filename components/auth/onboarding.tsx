@@ -22,6 +22,9 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Phone, Check, ArrowRight } from "lucide-react";
 
+// delay before redirecting to dashboard after successful phone verification
+const SUCCESS_REDIRECT_DELAY_MS = 1500;
+
 interface OnboardingProps {
   user: {
     uid: string;
@@ -110,7 +113,7 @@ export function Onboarding({ user }: OnboardingProps) {
       setSuccess("phone number linked successfully!");
       setTimeout(() => {
         router.push("/dashboard");
-      }, 1500);
+      }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
