@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useAuth } from "@/components/auth/auth-provider";
 
 interface SidebarProps {
   activeView: string;
@@ -11,6 +12,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeView, onViewChange }: SidebarProps) {
+  const { user } = useAuth();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const navItems = [
@@ -183,10 +185,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           </div>
           <div className="flex-1 min-w-0 text-left">
             <p className="text-sm font-semibold text-foreground truncate">
-              User Profile
+              {user?.displayName || "user"}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              user@example.com
+              {user?.email || ""}
             </p>
           </div>
           <svg
