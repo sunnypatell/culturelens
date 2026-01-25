@@ -252,7 +252,7 @@ export function DashboardHome({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
               >
-                <GlassCard
+                <GradientCard
                   gradientFrom={stat.gradient[0]}
                   gradientTo={stat.gradient[1]}
                   className="group"
@@ -276,7 +276,7 @@ export function DashboardHome({
                       </p>
                     </div>
                   </div>
-                </GlassCard>
+                </GradientCard>
               </motion.div>
             );
           })}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,8 @@ import { Footer } from "./footer";
 import { useUserStats } from "@/lib/hooks/useUserStats";
 import { useAuth } from "@/components/auth/auth-provider";
 import { toast } from "sonner";
+import { GradientCard } from "@/components/ui/glass-card";
+import { Clock, Users, Sparkles, Star, ArrowRight } from "lucide-react";
 
 interface AnalysisLibraryProps {
   onViewInsights: (sessionId: string) => void;
@@ -103,14 +106,14 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
 
       if (response.ok && data.data) {
         const gradients = [
-          "from-blue-500 via-blue-600 to-cyan-500",
-          "from-purple-500 via-purple-600 to-pink-500",
-          "from-orange-500 via-orange-600 to-red-500",
-          "from-green-500 via-green-600 to-emerald-500",
-          "from-teal-500 via-teal-600 to-cyan-500",
-          "from-indigo-500 via-indigo-600 to-purple-500",
-          "from-pink-500 via-pink-600 to-rose-500",
-          "from-amber-500 via-amber-600 to-yellow-500",
+          ["#6366f1", "#8b5cf6"],
+          ["#8b5cf6", "#d946ef"],
+          ["#f43f5e", "#fb923c"],
+          ["#10b981", "#06b6d4"],
+          ["#14b8a6", "#06b6d4"],
+          ["#6366f1", "#d946ef"],
+          ["#ec4899", "#f43f5e"],
+          ["#f59e0b", "#fbbf24"],
         ];
 
         const transformedSessions = data.data.map(
@@ -150,7 +153,7 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
 
             return {
               id: session.id,
-              title: `Session ${data.data.length - index}`,
+              title: session.settings?.title || `Session ${data.data.length - index}`,
               date: createdDate.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -160,9 +163,9 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
               duration,
               participants,
               insights,
-              type: session.settings?.culturalContext?.[0] || "Personal",
-              gradient: gradients[index % gradients.length],
-              isFavorite: false,
+              type: session.settings?.sessionType || session.settings?.culturalContext?.[0] || "Personal",
+              gradientColors: gradients[index % gradients.length],
+              isFavorite: session.isFavorite || false,
             };
           }
         );
@@ -365,139 +368,90 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
           )}
         >
           {filteredSessions.map((session, index) => (
-            <Card
+            <motion.div
               key={session.id}
-              className="group relative overflow-hidden hover-lift cursor-pointer transition-all duration-500"
-              style={{ animationDelay: `${index * 50}ms` }}
-              onMouseEnter={() => setHoveredSession(session.id)}
-              onMouseLeave={() => setHoveredSession(null)}
-              onClick={() => onViewInsights(session.id)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
             >
-              {/* Gradient Header */}
-              <div className="relative h-40 overflow-hidden">
-                <div
-                  className={cn(
-                    "absolute inset-0 bg-linear-to-br transition-transform duration-500 group-hover:scale-110",
-                    session.gradient
-                  )}
-                />
-
+              <GradientCard
+                gradientFrom={session.gradientColors?.[0] || "#6366f1"}
+                gradientTo={session.gradientColors?.[1] || "#8b5cf6"}
+                onClick={() => onViewInsights(session.id)}
+                className="h-full relative group"
+              >
                 {/* Favorite button */}
                 <button
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors z-10"
                   onClick={(e) => handleToggleFavorite(session.id, e)}
                 >
-                  <svg
+                  <Star
                     className={cn(
                       "w-4 h-4",
-                      session.isFavorite ? "fill-white" : "fill-none"
+                      session.isFavorite
+                        ? "fill-yellow-500 text-yellow-500"
+                        : "text-muted-foreground"
                     )}
-                    viewBox="0 0 24 24"
-                    stroke="white"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
+                  />
                 </button>
 
-                {/* Hover overlay */}
-                {hoveredSession === session.id && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200">
-                    <Button size="sm" variant="secondary">
-                      View Analysis
-                    </Button>
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold line-clamp-2">
+                      {session.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {session.timeAgo}
+                    </p>
                   </div>
-                )}
 
-                {/* Duration badge */}
-                <div className="absolute bottom-3 left-3">
-                  <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30">
-                    {session.duration}
-                  </Badge>
-                </div>
-              </div>
+                  <div className="grid grid-cols-3 gap-3 text-sm">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span className="text-xs">Time</span>
+                      </div>
+                      <p className="font-medium">{session.duration}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-muted-foreground">
+                        <Users className="w-3 h-3" />
+                        <span className="text-xs">People</span>
+                      </div>
+                      <p className="font-medium">{session.participants}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-primary">
+                        <Sparkles className="w-3 h-3" />
+                        <span className="text-xs">Insights</span>
+                      </div>
+                      <p className="font-medium text-primary">{session.insights || 0}</p>
+                    </div>
+                  </div>
 
-              {/* Content */}
-              <div className="p-5 space-y-4">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-                    {session.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {session.timeAgo}
-                  </p>
-                </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {session.type}
+                    </Badge>
+                    {session.isFavorite && (
+                      <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-600">
+                        <Star className="w-3 h-3 mr-1 fill-current" />
+                        Favorite
+                      </Badge>
+                    )}
+                  </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    {session.type}
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    <svg
-                      className="w-3 h-3 mr-1"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                    {session.participants}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="text-xs text-primary border-primary"
-                  >
-                    <svg
-                      className="w-3 h-3 mr-1"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                    </svg>
-                    {session.insights} insights
-                  </Badge>
-                </div>
-
-                <div className="flex items-center gap-2 pt-2 border-t border-border">
                   <Button
+                    variant="secondary"
                     size="sm"
-                    variant="ghost"
-                    className="flex-1 text-xs h-8"
-                    onClick={(e) => handlePlayAudio(session.id, e)}
+                    className="w-full group/btn"
                   >
-                    <svg
-                      className="w-3.5 h-3.5 mr-1.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                    Play Audio
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={(e) => handleMoreOptions(session.id, e)}>
-                    <svg
-                      className="w-3.5 h-3.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <circle cx="12" cy="12" r="1" />
-                      <circle cx="19" cy="12" r="1" />
-                      <circle cx="5" cy="12" r="1" />
-                    </svg>
+                    <span>View Analysis</span>
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </div>
-              </div>
-            </Card>
+              </GradientCard>
+            </motion.div>
           ))}
         </div>
 
