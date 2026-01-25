@@ -9,25 +9,75 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CultureLens — Understanding Through Listening",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+  title: {
+    default: "CultureLens — Understanding Through Listening",
+    template: "%s | CultureLens",
+  },
   description:
     "A consent-based conversation mirror that analyzes communication patterns with cultural awareness, delivering neutral audio insights without judgment.",
+  keywords: [
+    "conversation analysis",
+    "cultural awareness",
+    "communication patterns",
+    "AI mediator",
+    "relationship insights",
+    "conversation mirror",
+    "cultural sensitivity",
+    "communication tools",
+  ],
+  authors: [{ name: "CultureLens Team" }],
+  creator: "CultureLens",
+  publisher: "CultureLens",
+  applicationName: "CultureLens",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CultureLens",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "CultureLens — Understanding Through Listening",
+    description:
+      "A consent-based conversation mirror that analyzes communication patterns with cultural awareness, delivering neutral audio insights without judgment.",
+    siteName: "CultureLens",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CultureLens — Understanding Through Listening",
+    description:
+      "A consent-based conversation mirror that analyzes communication patterns with cultural awareness, delivering neutral audio insights without judgment.",
+    creator: "@culturelens",
+  },
   icons: {
     icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.svg", type: "image/svg+xml", sizes: "any" },
     ],
-    apple: "/apple-icon.png",
+    apple: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
+  manifest: "/site.webmanifest",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

@@ -1,0 +1,20 @@
+{
+  "name": "CultureLens",
+  "short_name": "CultureLens",
+  "description": "A consent-based conversation mirror that analyzes communication patterns with cultural awareness, delivering neutral audio insights without judgment.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "communication", "utilities"],
+  "screenshots": []
+}

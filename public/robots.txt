@@ -1,0 +1,9 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow authentication pages from being indexed
+Disallow: /auth/
+
+# Sitemap location
+Sitemap: https://culturelens.app/sitemap.xml

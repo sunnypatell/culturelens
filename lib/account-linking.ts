@@ -3,9 +3,6 @@
 import {
   User,
   linkWithCredential,
-  EmailAuthProvider,
-  GoogleAuthProvider,
-  PhoneAuthProvider,
   fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth } from "./firebase";
@@ -17,8 +14,6 @@ import {
 import {
   COLLECTIONS,
   generateUserIdFromUid,
-  FIELDS,
-  AUTH_PROVIDERS,
 } from "./firestore-constants";
 
 export interface UserProfile {
