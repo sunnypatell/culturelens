@@ -24,7 +24,11 @@ import {
 } from "firebase/auth";
 import { auth } from "./firebase";
 
-export type { User } from "firebase/auth";
+export type {
+  User,
+  ConfirmationResult,
+  RecaptchaVerifier,
+} from "firebase/auth";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -130,10 +134,11 @@ export async function completeEmailLinkSignIn(email?: string) {
     // get email from localStorage if not provided
     let signInEmail = email;
     if (!signInEmail) {
-      signInEmail = window.localStorage.getItem("emailForSignIn");
-      if (!signInEmail) {
+      const storedEmail = window.localStorage.getItem("emailForSignIn");
+      if (!storedEmail) {
         throw new Error("email not found for signin");
       }
+      signInEmail = storedEmail;
     }
 
     const userCredential = await signInWithEmailLink(

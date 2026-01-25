@@ -48,7 +48,10 @@ export async function POST(request: NextRequest) {
       const body = await validateRequest(request, setRoleSchema);
 
       // set user claims
-      const claims: { role: string; plan?: string } = { role: body.role };
+      const claims: {
+        role: "admin" | "user" | "moderator";
+        plan?: "free" | "pro" | "enterprise";
+      } = { role: body.role };
       if (body.plan) {
         claims.plan = body.plan;
       }

@@ -7,7 +7,6 @@ import { NextRequest } from "next/server";
 import {
   apiHandler,
   apiSuccess,
-  apiError,
   AuthenticationError,
 } from "@/lib/api";
 import { verifyIdToken, getUserByUid } from "@/lib/auth-server";

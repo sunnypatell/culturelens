@@ -3,7 +3,12 @@
  * provides admin access to firebase services with elevated privileges
  */
 
-import { initializeApp, getApps, cert, type ServiceAccount } from "firebase-admin/app";
+import {
+  initializeApp,
+  getApps,
+  cert,
+  type ServiceAccount,
+} from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
@@ -17,7 +22,9 @@ function initializeFirebaseAdmin() {
   // initialize with service account credentials
   const serviceAccount: ServiceAccount = {
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL || "firebase-adminsdk-fbsvc@culturelens-2dd38.iam.gserviceaccount.com",
+    clientEmail:
+      process.env.FIREBASE_CLIENT_EMAIL ||
+      "firebase-adminsdk-fbsvc@culturelens-2dd38.iam.gserviceaccount.com",
     privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
   };
 

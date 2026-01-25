@@ -5,22 +5,26 @@ complete authentication system for culturelens with multiple signin methods and 
 ## authentication methods implemented
 
 ### 1. email/password authentication
+
 - traditional email and password signin
 - password strength requirements (minimum 6 characters)
 - email verification after signup
 - password reset via email link
 
 ### 2. passwordless email link signin
+
 - magic link sent to email
 - no password required
 - secure token-based authentication
 
 ### 3. phone authentication
+
 - SMS verification code
 - reCAPTCHA v2 integration for security
 - supports international phone numbers
 
 ### 4. google sign-in
+
 - OAuth2 integration with Google
 - one-click signin
 - automatic profile import
@@ -58,6 +62,7 @@ middleware.ts                # route protection middleware
 ## features
 
 ### user management
+
 - create users with email/password
 - update user profiles (display name, photo URL)
 - delete users
@@ -65,12 +70,14 @@ middleware.ts                # route protection middleware
 - get user by UID, email, or phone number
 
 ### token management
+
 - verify Firebase ID tokens
 - generate custom tokens
 - get ID token with claims
 - automatic token refresh
 
 ### role-based access control (RBAC)
+
 - three roles: admin, user, moderator
 - three plans: free, pro, enterprise
 - custom claims stored in JWT
@@ -78,6 +85,7 @@ middleware.ts                # route protection middleware
 - admin-only API routes for role management
 
 ### email services
+
 - email verification links
 - password reset links
 - passwordless signin links
@@ -112,23 +120,24 @@ function MyComponent() {
 ### server-side authentication
 
 ```typescript
-import { verifyIdToken, getUserByUid, hasRole } from '@/lib/auth-server';
+import { verifyIdToken, getUserByUid, hasRole } from "@/lib/auth-server";
 
 // verify token from request
-const authHeader = request.headers.get('authorization');
-const token = authHeader.split('Bearer ')[1];
+const authHeader = request.headers.get("authorization");
+const token = authHeader.split("Bearer ")[1];
 const decodedToken = await verifyIdToken(token);
 
 // get full user data
 const user = await getUserByUid(decodedToken.uid);
 
 // check permissions
-const isAdmin = await hasRole(decodedToken.uid, 'admin');
+const isAdmin = await hasRole(decodedToken.uid, "admin");
 ```
 
 ### protected routes
 
 routes protected by middleware:
+
 - `/dashboard` - requires authentication
 - `/results` - requires authentication
 - `/settings` - requires authentication
@@ -141,17 +150,17 @@ unauthenticated users are redirected to `/auth/login` with return URL.
 API routes can verify tokens:
 
 ```typescript
-import { apiHandler, AuthenticationError } from '@/lib/api';
-import { verifyIdToken } from '@/lib/auth-server';
+import { apiHandler, AuthenticationError } from "@/lib/api";
+import { verifyIdToken } from "@/lib/auth-server";
 
 export async function GET(request: Request) {
   return apiHandler(async () => {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      throw new AuthenticationError('missing authorization header');
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      throw new AuthenticationError("missing authorization header");
     }
 
-    const token = authHeader.split('Bearer ')[1];
+    const token = authHeader.split("Bearer ")[1];
     const decoded = await verifyIdToken(token);
 
     // ... handle authenticated request
@@ -229,6 +238,7 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY----
 ## testing authentication
 
 1. **start development server**:
+
    ```bash
    npm run dev:all
    ```
@@ -267,21 +277,27 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY----
 ## troubleshooting
 
 ### "firebase not initialized" error
+
 check that `AuthProvider` wraps your app in `app/layout.tsx`
 
 ### "recaptcha not working" in production
+
 add your production domain to authorized domains in firebase console
 
 ### "permission denied" on firestore
+
 check that firestore rules are deployed:
+
 ```bash
 firebase deploy --only firestore:rules
 ```
 
 ### "invalid token" errors
+
 ensure authorization header format: `Bearer <token>`
 
 ### phone auth not working
+
 - verify phone number includes country code (+1...)
 - check recaptcha container exists in DOM
 - ensure firebase phone auth is enabled in console
@@ -299,6 +315,7 @@ ensure authorization header format: `Bearer <token>`
 ## support
 
 for issues or questions:
+
 - firebase documentation: https://firebase.google.com/docs/auth
 - firebase console: https://console.firebase.google.com/project/culturelens-2dd38
 - github issues: https://github.com/sunnypatell/culturelens/issues
