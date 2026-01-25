@@ -1,32 +1,13 @@
 // Server-side Firebase utilities for API routes
 // These functions can be used in Next.js API routes (server-side)
+// IMPORTANT: Uses Firebase Admin SDK which bypasses all security rules
 
-import {
-  collection,
-  doc,
-  addDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-  Timestamp,
-} from "firebase/firestore";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage";
-import { db, storage } from "./firebase";
+import { adminDb, adminStorage } from "./firebase-admin";
+import { Timestamp } from "firebase-admin/firestore";
 
-// Firestore utility functions for server-side use
+// Firestore utility functions for server-side use with Admin SDK
 export const createDocument = async (collectionName: string, data: any) => {
-  const docRef = await addDoc(collection(db, collectionName), {
+  const docRef = await adminDb.collection(collectionName).add({
     ...data,
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -39,12 +20,14 @@ export const createDocumentWithId = async (
   docId: string,
   data: any
 ) => {
-  const docRef = doc(db, collectionName, docId);
-  await setDoc(docRef, {
-    ...data,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  });
+  await adminDb
+    .collection(collectionName)
+    .doc(docId)
+    .set({
+      ...data,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    });
   return docId;
 };
 
@@ -53,57 +36,107 @@ export const updateDocument = async (
   docId: string,
   data: any
 ) => {
-  const docRef = doc(db, collectionName, docId);
-  await updateDoc(docRef, {
-    ...data,
-    updatedAt: Timestamp.now(),
-  });
+  await adminDb
+    .collection(collectionName)
+    .doc(docId)
+    .update({
+      ...data,
+      updatedAt: Timestamp.now(),
+    });
 };
 
 export const deleteDocument = async (collectionName: string, docId: string) => {
-  await deleteDoc(doc(db, collectionName, docId));
+  await adminDb.collection(collectionName).doc(docId).delete();
 };
 
 export const getDocument = async (collectionName: string, docId: string) => {
-  const docRef = doc(db, collectionName, docId);
-  const docSnap = await getDoc(docRef);
-  return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+  const docSnap = await adminDb.collection(collectionName).doc(docId).get();
+  return docSnap.exists ? { id: docSnap.id, ...docSnap.data() } : null;
 };
 
 export const getDocuments = async (
   collectionName: string,
   constraints: any[] = []
 ) => {
-  const q = query(collection(db, collectionName), ...constraints);
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  let query = adminDb.collection(collectionName) as any;
+
+  // apply constraints
+  for (const constraint of constraints) {
+    if (constraint.type === "where") {
+      query = query.where(constraint.field, constraint.op, constraint.value);
+    } else if (constraint.type === "orderBy") {
+      query = query.orderBy(constraint.field, constraint.direction);
+    } else if (constraint.type === "limit") {
+      query = query.limit(constraint.count);
+    }
+  }
+
+  const querySnapshot = await query.get();
+  return querySnapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
 };
 
-// Storage utility functions for server-side use
-export const uploadFile = async (file: File, path: string) => {
-  const storageRef = ref(storage, path);
-  const snapshot = await uploadBytes(storageRef, file);
-  const downloadURL = await getDownloadURL(snapshot.ref);
-  return { downloadURL, path: snapshot.ref.fullPath };
-};
+// Common query constraints for Admin SDK
+export const whereEqual = (field: string, value: any) => ({
+  type: "where",
+  field,
+  op: "==",
+  value,
+});
 
-export const deleteFile = async (path: string) => {
-  const storageRef = ref(storage, path);
-  await deleteObject(storageRef);
-};
+export const whereIn = (field: string, values: any[]) => ({
+  type: "where",
+  field,
+  op: "in",
+  value: values,
+});
 
-export const getFileURL = async (path: string) => {
-  const storageRef = ref(storage, path);
-  return await getDownloadURL(storageRef);
-};
-
-// Common queries
-export const whereEqual = (field: string, value: any) =>
-  where(field, "==", value);
-export const whereIn = (field: string, values: any[]) =>
-  where(field, "in", values);
 export const orderByField = (
   field: string,
   direction: "asc" | "desc" = "asc"
-) => orderBy(field, direction);
-export const limitResults = (count: number) => limit(count);
+) => ({
+  type: "orderBy",
+  field,
+  direction,
+});
+
+export const limitResults = (count: number) => ({
+  type: "limit",
+  count,
+});
+
+// Firebase Storage operations using Admin SDK
+export const uploadFile = async (
+  file: File,
+  path: string
+): Promise<{ downloadURL: string; path: string }> => {
+  const bucket = adminStorage.bucket();
+  const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+  const fileRef = bucket.file(path);
+  await fileRef.save(fileBuffer, {
+    metadata: {
+      contentType: file.type,
+    },
+  });
+
+  // make file publicly accessible
+  await fileRef.makePublic();
+
+  const downloadURL = `https://storage.googleapis.com/${bucket.name}/${path}`;
+
+  return { downloadURL, path };
+};
+
+export const deleteFile = async (path: string): Promise<void> => {
+  const bucket = adminStorage.bucket();
+  await bucket.file(path).delete();
+};
+
+export const getFileURL = async (path: string): Promise<string> => {
+  const bucket = adminStorage.bucket();
+  const [url] = await bucket.file(path).getSignedUrl({
+    action: "read",
+    expires: Date.now() + 60 * 60 * 1000, // 1 hour
+  });
+  return url;
+};
