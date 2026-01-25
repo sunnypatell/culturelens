@@ -83,9 +83,9 @@ export function Signup() {
     try {
       await signUp(formData.email, formData.password, formData.displayName);
       setSuccess(true);
-      // redirect to dashboard after 2 seconds
+      // redirect to onboarding to complete profile
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/onboarding");
       }, 2000);
     } catch (err: unknown) {
       if (err instanceof Error) {

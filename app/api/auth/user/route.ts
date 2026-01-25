@@ -4,11 +4,7 @@
 // retrieves authenticated user information including custom claims
 
 import { NextRequest } from "next/server";
-import {
-  apiHandler,
-  apiSuccess,
-  AuthenticationError,
-} from "@/lib/api";
+import { apiHandler, apiSuccess, AuthenticationError } from "@/lib/api";
 import { verifyIdToken, getUserByUid } from "@/lib/auth-server";
 
 export async function GET(request: NextRequest) {
