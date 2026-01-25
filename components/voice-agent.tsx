@@ -4,6 +4,7 @@ import { useConversation } from "@elevenlabs/react";
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Orb, type AgentState } from "@/components/ui/orb";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -340,25 +341,142 @@ export function VoiceAgent({
 
       {status === "connected" && (
         <>
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-sm text-muted-foreground flex items-center justify-center gap-2 mb-4"
+          >
+            <motion.span
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-2 h-2 rounded-full bg-green-500"
+            />
             Agent is listening — speak naturally
-            {conversation.isSpeaking && (
-              <span className="ml-2 text-primary font-medium">
-                Agent is speaking...
-              </span>
-            )}
-          </div>
+            <AnimatePresence>
+              {conversation.isSpeaking && (
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="ml-2 text-primary font-medium"
+                >
+                  Agent is speaking...
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
-          {/* Modern circular orb visualization */}
-          <div className="w-full flex justify-center py-8">
-            <div className="w-64 h-64">
-              <Orb
-                agentState={agentState}
-                colors={["#6366f1", "#8b5cf6"]}
-                className="w-full h-full"
+          {/* Enhanced Orb Visualization - Main Conversation Screen */}
+          <div className="relative w-full flex justify-center py-12">
+            {/* Glassmorphic container with floating animation */}
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+                scale: conversation.isSpeaking ? [1, 1.05, 1] : 1,
+              }}
+              transition={{
+                y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                scale: { duration: 1, repeat: Infinity },
+              }}
+              className="relative"
+            >
+              {/* Outer glow rings */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-accent blur-3xl opacity-50"
+                style={{ transform: "scale(1.5)" }}
               />
-            </div>
+
+              {/* Middle glow ring */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.15, 1],
+                  opacity: [0.4, 0.7, 0.4],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5,
+                }}
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-accent to-primary blur-2xl opacity-40"
+                style={{ transform: "scale(1.3)" }}
+              />
+
+              {/* Glassmorphic border */}
+              <div className="relative p-2 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20">
+                {/* Inner shadow ring */}
+                <div className="p-3 rounded-full bg-gradient-to-br from-background/50 to-background/30 backdrop-blur-md">
+                  {/* Orb container */}
+                  <div className="w-80 h-80 relative">
+                    {/* Animated pulse ring when speaking */}
+                    <AnimatePresence>
+                      {conversation.isSpeaking && (
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{
+                            scale: [1, 1.3, 1],
+                            opacity: [0.5, 0, 0.5],
+                          }}
+                          exit={{ scale: 0.8, opacity: 0 }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeOut",
+                          }}
+                          className="absolute inset-0 rounded-full border-4 border-primary"
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    <Orb
+                      agentState={agentState}
+                      colors={["#6366f1", "#8b5cf6"]}
+                      className="w-full h-full"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating particles around orb */}
+              {conversation.isSpeaking &&
+                [...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{
+                      opacity: [0, 1, 0],
+                      scale: [0, 1, 0],
+                      x: [
+                        0,
+                        Math.cos((i * Math.PI * 2) / 6) * 100,
+                        Math.cos((i * Math.PI * 2) / 6) * 150,
+                      ],
+                      y: [
+                        0,
+                        Math.sin((i * Math.PI * 2) / 6) * 100,
+                        Math.sin((i * Math.PI * 2) / 6) * 150,
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                      ease: "easeOut",
+                    }}
+                    className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-primary"
+                    style={{ marginLeft: "-4px", marginTop: "-4px" }}
+                  />
+                ))}
+            </motion.div>
           </div>
         </>
       )}
