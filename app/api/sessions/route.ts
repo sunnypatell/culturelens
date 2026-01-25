@@ -78,6 +78,7 @@ export async function POST(request: Request) {
       },
       settings: body.settings,
       status: SESSION_STATUS.RECORDING,
+      isFavorite: false, // initialize favorite status
     };
 
     // store in firestore with specific document ID
