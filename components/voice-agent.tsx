@@ -1,8 +1,9 @@
 "use client";
 
 import { useConversation } from "@elevenlabs/react";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { Orb, type AgentState } from "@/components/ui/orb";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -229,6 +230,13 @@ export function VoiceAgent({
     await conversation.endSession();
   }, [conversation]);
 
+  // Compute agent state for the Orb visualization
+  const agentState: AgentState = useMemo(() => {
+    if (status !== "connected") return null;
+    if (conversation.isSpeaking) return "talking";
+    return "listening";
+  }, [status, conversation.isSpeaking]);
+
   return (
     <div className="space-y-4">
       {/* Voice Selection */}
@@ -331,15 +339,28 @@ export function VoiceAgent({
       </div>
 
       {status === "connected" && (
-        <div className="text-sm text-muted-foreground flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          Agent is listening — speak naturally
-          {conversation.isSpeaking && (
-            <span className="ml-2 text-primary font-medium">
-              Agent is speaking...
-            </span>
-          )}
-        </div>
+        <>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Agent is listening — speak naturally
+            {conversation.isSpeaking && (
+              <span className="ml-2 text-primary font-medium">
+                Agent is speaking...
+              </span>
+            )}
+          </div>
+
+          {/* Modern circular orb visualization */}
+          <div className="w-full flex justify-center py-8">
+            <div className="w-64 h-64">
+              <Orb
+                agentState={agentState}
+                colors={["#6366f1", "#8b5cf6"]}
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </>
       )}
 
       {/* Transcript Display */}
