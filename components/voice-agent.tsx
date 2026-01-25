@@ -209,6 +209,7 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
             onChange={(e) => setUseAgentVoice(e.target.checked)}
             disabled={status !== "idle"}
             className="rounded"
+            aria-label="toggle agent's preset voice"
           />
           <label
             htmlFor="use-agent-voice"
@@ -235,6 +236,8 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
                       ? "border-primary bg-primary/10 ring-2 ring-primary/20"
                       : "border-border hover:border-primary/50"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  aria-label={`select ${voice.name} voice - ${voice.gender}, ${voice.description}`}
+                  aria-pressed={selectedVoice === voice.id}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -263,6 +266,11 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
           className="border px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={connect}
           disabled={status !== "idle"}
+          aria-label={
+            status === "connecting"
+              ? "connecting to voice agent"
+              : "connect to voice agent"
+          }
         >
           {status === "connecting" ? "Connecting…" : "Connect to Agent"}
         </button>
@@ -271,6 +279,7 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
           className="border px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={disconnect}
           disabled={status !== "connected"}
+          aria-label="disconnect from voice agent"
         >
           Disconnect
         </button>
@@ -304,6 +313,7 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
             <button
               onClick={saveTranscript}
               className="text-xs px-2 py-1 bg-primary/10 hover:bg-primary/20 rounded text-primary"
+              aria-label="save conversation transcript to file"
             >
               Save to File
             </button>
