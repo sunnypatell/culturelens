@@ -21,7 +21,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Phone, Lock } from "lucide-react";
+import { Loader2, Mail, Phone, Lock, Sparkles } from "lucide-react";
+import { FlipWords } from "@/components/ui/flip-words";
+import { motion } from "framer-motion";
 
 export function Login() {
   const router = useRouter();
@@ -114,15 +116,131 @@ export function Login() {
     }
   };
 
+  const flipWords = [
+    "Understanding",
+    "Cultural Awareness",
+    "Empathy",
+    "Connection",
+    "Insight",
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-background via-primary/5 to-accent/10 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign In to CultureLens</CardTitle>
-          <CardDescription>
-            Choose your preferred sign-in method
-          </CardDescription>
-        </CardHeader>
+    <div className="flex min-h-screen relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-background via-primary/10 to-accent/10" />
+
+      {/* Floating orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            y: [0, -30, 0],
+            x: [0, 20, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            y: [0, 30, 0],
+            x: [0, -20, 0],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl"
+        />
+      </div>
+
+      {/* Hero Section - Left Side */}
+      <div className="hidden lg:flex lg:w-1/2 relative z-10 items-center justify-center p-12">
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-lg space-y-8"
+        >
+          {/* Logo */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+            className="flex items-center gap-3"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary via-accent to-primary flex items-center justify-center shadow-xl shadow-primary/50">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              CultureLens
+            </h1>
+          </motion.div>
+
+          {/* FlipWords Section */}
+          <div className="space-y-4">
+            <div className="text-6xl font-bold leading-tight">
+              <div className="text-foreground">Through Listening</div>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-foreground/80">Build</span>
+                <FlipWords words={flipWords} className="text-primary" />
+              </div>
+            </div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="text-xl text-muted-foreground leading-relaxed"
+            >
+              A consent-based conversation mirror with cultural awareness powered by AI
+            </motion.p>
+          </div>
+
+          {/* Feature pills */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="flex flex-wrap gap-3"
+          >
+            {["Real-time Analysis", "Cultural Insights", "Privacy First"].map(
+              (feature, index) => (
+                <motion.div
+                  key={feature}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8 + index * 0.1 }}
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-white/20 backdrop-blur-sm text-sm font-medium"
+                >
+                  {feature}
+                </motion.div>
+              )
+            )}
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Auth Card - Right Side */}
+      <div className="flex-1 flex items-center justify-center p-4 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-md"
+        >
+          <Card className="backdrop-blur-xl bg-background/80 border-white/20 shadow-2xl">
+            <CardHeader>
+              <CardTitle className="text-2xl">Sign In to CultureLens</CardTitle>
+              <CardDescription>
+                Choose your preferred sign-in method
+              </CardDescription>
+            </CardHeader>
         <CardContent>
           <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -274,21 +392,29 @@ export function Login() {
             </Alert>
           )}
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
+        <CardFooter className="flex flex-col space-y-2 border-t border-white/10 bg-background/50">
           <div className="text-sm text-muted-foreground">
             Don't have an account?{" "}
-            <a href="/auth/signup" className="underline">
+            <a
+              href="/auth/signup"
+              className="underline text-primary hover:text-accent transition-colors"
+            >
               Sign up
             </a>
           </div>
           <div className="text-sm text-muted-foreground">
             Forgot password?{" "}
-            <a href="/auth/reset-password" className="underline">
+            <a
+              href="/auth/reset-password"
+              className="underline text-primary hover:text-accent transition-colors"
+            >
               Reset it
             </a>
           </div>
         </CardFooter>
       </Card>
+        </motion.div>
+      </div>
     </div>
   );
 }
