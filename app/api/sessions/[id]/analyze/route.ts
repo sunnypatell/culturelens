@@ -247,8 +247,7 @@ export async function POST(
 
     // turn-taking balance insight
     const totalTalkTime = talkTimeA + talkTimeB;
-    const balanceRatio =
-      totalTalkTime > 0 ? talkTimeA / totalTalkTime : 0.5;
+    const balanceRatio = totalTalkTime > 0 ? talkTimeA / totalTalkTime : 0.5;
 
     if (balanceRatio < 0.3 || balanceRatio > 0.7) {
       insights.push({
@@ -272,8 +271,7 @@ export async function POST(
     // interruption pattern insight
     const totalInterruptions = interruptionCountA + interruptionCountB;
     if (totalInterruptions > 3) {
-      const dominant =
-        interruptionCountA > interruptionCountB ? "A" : "B";
+      const dominant = interruptionCountA > interruptionCountB ? "A" : "B";
       insights.push({
         id: "interruptions",
         category: "turnTaking",
