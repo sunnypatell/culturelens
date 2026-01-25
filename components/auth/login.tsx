@@ -1,0 +1,280 @@
+"use client";
+
+/**
+ * login component with multiple authentication methods
+ * supports email/password, passwordless email link, and phone authentication
+ */
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./auth-provider";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Mail, Phone, Lock } from "lucide-react";
+
+export function Login() {
+  const router = useRouter();
+  const { signIn, sendEmailLink, signInWithGoogle } = useAuth();
+
+  // email/password state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // passwordless email link state
+  const [emailLink, setEmailLink] = useState("");
+  const [emailLinkSent, setEmailLinkSent] = useState(false);
+
+  // common state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      await signIn(email, password);
+      setSuccess("signed in successfully!");
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("failed to sign in");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmailLinkSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      await sendEmailLink(emailLink);
+      setEmailLinkSent(true);
+      setSuccess("check your email for the signin link!");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("failed to send email link");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      await signInWithGoogle();
+      setSuccess("signed in with google!");
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("failed to sign in with google");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl">sign in to culturelens</CardTitle>
+          <CardDescription>choose your preferred signin method</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="email" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="email">
+                <Mail className="mr-2 h-4 w-4" />
+                email
+              </TabsTrigger>
+              <TabsTrigger value="passwordless">
+                <Lock className="mr-2 h-4 w-4" />
+                link
+              </TabsTrigger>
+              <TabsTrigger value="phone">
+                <Phone className="mr-2 h-4 w-4" />
+                phone
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Email/Password Tab */}
+            <TabsContent value="email">
+              <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  sign in
+                </Button>
+              </form>
+            </TabsContent>
+
+            {/* Passwordless Email Link Tab */}
+            <TabsContent value="passwordless">
+              {!emailLinkSent ? (
+                <form onSubmit={handleEmailLinkSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="emailLink">email</Label>
+                    <Input
+                      id="emailLink"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={emailLink}
+                      onChange={(e) => setEmailLink(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    send signin link
+                  </Button>
+                </form>
+              ) : (
+                <Alert>
+                  <Mail className="h-4 w-4" />
+                  <AlertDescription>
+                    check your email for the signin link. click it to complete
+                    signin.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </TabsContent>
+
+            {/* Phone Auth Tab */}
+            <TabsContent value="phone">
+              <Alert>
+                <Phone className="h-4 w-4" />
+                <AlertDescription>
+                  phone authentication requires recaptcha verification. use the
+                  dedicated{" "}
+                  <a href="/auth/phone" className="underline">
+                    phone signin page
+                  </a>
+                  .
+                </AlertDescription>
+              </Alert>
+            </TabsContent>
+          </Tabs>
+
+          {/* Google Sign-In */}
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  or continue with
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="mt-4 w-full"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+            >
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <svg
+                className="mr-2 h-4 w-4"
+                aria-hidden="true"
+                focusable="false"
+                data-prefix="fab"
+                data-icon="google"
+                role="img"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 488 512"
+              >
+                <path
+                  fill="currentColor"
+                  d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                ></path>
+              </svg>
+              sign in with google
+            </Button>
+          </div>
+
+          {/* Error/Success Messages */}
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert className="mt-4">
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-2">
+          <div className="text-sm text-muted-foreground">
+            don't have an account?{" "}
+            <a href="/auth/signup" className="underline">
+              sign up
+            </a>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            forgot password?{" "}
+            <a href="/auth/reset-password" className="underline">
+              reset it
+            </a>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
