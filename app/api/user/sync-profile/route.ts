@@ -44,36 +44,36 @@ export async function POST(request: Request) {
     } = body;
 
     try {
+      // filter out undefined values
+      const profileData: Record<string, any> = {
+        updatedAt: new Date().toISOString(),
+      };
+
+      if (email !== undefined) profileData.email = email;
+      if (displayName !== undefined) profileData.displayName = displayName;
+      if (phoneNumber !== undefined) profileData.phoneNumber = phoneNumber;
+      if (photoURL !== undefined) profileData.photoURL = photoURL;
+      if (emailVerified !== undefined)
+        profileData.emailVerified = emailVerified;
+      if (linkedProviders !== undefined)
+        profileData.linkedProviders = linkedProviders;
+
       // check if profile already exists
       const existingProfile = await getDocument(COLLECTIONS.USERS, userId);
 
       if (existingProfile) {
         console.log(`[API_SYNC_PROFILE] Updating existing profile:`, userId);
 
-        // update existing profile
-        await updateDocument(COLLECTIONS.USERS, userId, {
-          email,
-          displayName,
-          phoneNumber,
-          photoURL,
-          emailVerified,
-          linkedProviders,
-          updatedAt: new Date().toISOString(),
-        });
+        // update existing profile (only defined fields)
+        await updateDocument(COLLECTIONS.USERS, userId, profileData);
       } else {
         console.log(`[API_SYNC_PROFILE] Creating new profile:`, userId);
 
         // create new profile
         await createDocumentWithId(COLLECTIONS.USERS, userId, {
           uid: decodedToken.uid,
-          email,
-          displayName,
-          phoneNumber,
-          photoURL,
-          emailVerified,
-          linkedProviders,
+          ...profileData,
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         });
       }
 
