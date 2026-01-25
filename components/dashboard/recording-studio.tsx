@@ -26,7 +26,12 @@ type RecordingState =
 // delay for simulating processing time before showing results
 const PROCESSING_DELAY_MS = 3000;
 
-export function RecordingStudio() {
+interface RecordingStudioProps {
+  onNavigate?: (view: "home" | "record" | "library" | "insights" | "settings") => void;
+  onViewInsights?: (sessionId: string) => void;
+}
+
+export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioProps = {}) {
   const router = useRouter();
   const { getIdToken } = useAuth();
   const [state, setState] = useState<RecordingState>("setup");
@@ -439,11 +444,11 @@ export function RecordingStudio() {
               Back to Setup
             </Button>
             <Button
-              onClick={() =>
-                router.push(
-                  `/results${currentSessionId ? `?sessionId=${currentSessionId}` : ""}`
-                )
-              }
+              onClick={() => {
+                if (currentSessionId) {
+                  onViewInsights?.(currentSessionId);
+                }
+              }}
               disabled={!currentSessionId}
               className="px-6"
             >

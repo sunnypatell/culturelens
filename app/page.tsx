@@ -55,7 +55,15 @@ export default function Home() {
             }}
           />
         )}
-        {activeView === "record" && <RecordingStudio />}
+        {activeView === "record" && (
+          <RecordingStudio
+            onNavigate={setActiveView}
+            onViewInsights={(sessionId) => {
+              setSelectedSessionId(sessionId);
+              setActiveView("insights");
+            }}
+          />
+        )}
         {activeView === "library" && (
           <AnalysisLibrary
             onViewInsights={(sessionId) => {
