@@ -7,9 +7,9 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // routes that require authentication
+// NOTE: /results removed for hackathon demo (shows mock data)
 const protectedRoutes = [
   "/dashboard",
-  "/results",
   "/settings",
   "/profile",
   "/onboarding",
