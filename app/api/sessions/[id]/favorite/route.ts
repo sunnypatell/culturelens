@@ -1,29 +1,32 @@
-// session favorite toggle API endpoint
+// toggle session favorite status
 
 import {
   apiHandler,
   apiSuccess,
   AuthenticationError,
   AuthorizationError,
-  DatabaseError,
   NotFoundError,
+  DatabaseError,
   validateParams,
 } from "@/lib/api";
-import { verifyIdToken } from "@/lib/auth-server";
-import { getDocument, updateDocument } from "@/lib/firebase-server-utils";
-import { COLLECTIONS } from "@/lib/firestore-constants";
 import { SessionSchemas } from "@/lib/api/schemas";
+import { verifyIdToken } from "@/lib/auth-server";
+import {
+  getDocument,
+  updateDocument,
+} from "@/lib/firebase-server-utils";
+import { COLLECTIONS } from "@/lib/firestore-constants";
 
 /**
  * PATCH /api/sessions/[id]/favorite
- * toggles favorite status for a session
+ * toggles the favorite status of a session
  */
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_FAVORITE_PATCH] Toggling favorite`);
+    console.log(`[API_FAVORITE_PATCH] Toggling favorite status`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -38,7 +41,7 @@ export async function PATCH(
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
 
-    // check if session exists
+    // get session
     let session: any;
     try {
       session = await getDocument(COLLECTIONS.SESSIONS, id);
@@ -55,29 +58,37 @@ export async function PATCH(
 
     // verify ownership
     if (session.userId !== userId) {
+      console.error(
+        `[API_FAVORITE_PATCH] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
+      );
       throw new AuthorizationError("not authorized to access this session");
     }
 
     // toggle favorite status
     const newFavoriteStatus = !session.isFavorite;
 
-    // update session
     try {
       await updateDocument(COLLECTIONS.SESSIONS, id, {
         isFavorite: newFavoriteStatus,
-        updatedAt: new Date().toISOString(),
       });
     } catch (error) {
       throw new DatabaseError(
-        "favorite update",
+        "session update",
         error instanceof Error ? error.message : undefined
       );
     }
 
     console.log(
-      `[API_FAVORITE_PATCH] Session ${id} favorite status: ${newFavoriteStatus}`
+      `[API_FAVORITE_PATCH] Toggled favorite for session ${id}: ${newFavoriteStatus}`
     );
 
-    return apiSuccess({ isFavorite: newFavoriteStatus });
+    return apiSuccess(
+      { isFavorite: newFavoriteStatus },
+      {
+        message: newFavoriteStatus
+          ? "added to favorites"
+          : "removed from favorites",
+      }
+    );
   });
 }
