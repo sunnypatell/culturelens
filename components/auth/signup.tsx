@@ -5,7 +5,7 @@
  * supports email/password registration with email verification
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./auth-provider";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,12 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Mail, Check } from "lucide-react";
+import { Loader2, Mail, Check, CheckCircle2, XCircle } from "lucide-react";
+import {
+  checkPasswordStrength,
+  getStrengthColor,
+  getStrengthTextColor,
+} from "@/lib/password-strength";
 
 // delay before redirecting to onboarding after successful signup
 const SUCCESS_REDIRECT_DELAY_MS = 2000;
@@ -42,33 +47,59 @@ export function Signup() {
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
+    const newFormData = {
       ...formData,
       [e.target.id]: e.target.value,
+    };
+    setFormData(newFormData);
+
+    console.log(`[SIGNUP_FORM] Field changed:`, {
+      field: e.target.id,
+      value: e.target.id === 'password' ? '***' : e.target.value,
     });
   };
 
+  const passwordStrength = useMemo(
+    () => checkPasswordStrength(formData.password),
+    [formData.password]
+  );
+
   const validateForm = () => {
+    console.log(`[SIGNUP_VALIDATION] Starting form validation`);
+
     if (!formData.displayName.trim()) {
+      console.error(`[SIGNUP_VALIDATION] Validation failed: missing display name`);
       setError("Please enter your display name");
       return false;
     }
     if (!formData.email.trim()) {
+      console.error(`[SIGNUP_VALIDATION] Validation failed: missing email`);
       setError("Please enter your email");
       return false;
     }
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (!passwordStrength.isValid) {
+      console.error(`[SIGNUP_VALIDATION] Validation failed: password does not meet requirements`, {
+        strength: passwordStrength.strength,
+        score: passwordStrength.score,
+        unmetRequirements: passwordStrength.requirements
+          .filter((req) => !req.met)
+          .map((req) => req.label),
+      });
+      setError("Password does not meet all requirements");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
+      console.error(`[SIGNUP_VALIDATION] Validation failed: passwords do not match`);
       setError("Passwords do not match");
       return false;
     }
     if (!agreedToTerms) {
+      console.error(`[SIGNUP_VALIDATION] Validation failed: terms not agreed`);
       setError("Please agree to the Terms and Conditions");
       return false;
     }
+
+    console.log(`[SIGNUP_VALIDATION] Form validation successful`);
     return true;
   };
 
@@ -77,20 +108,33 @@ export function Signup() {
     setError("");
     setSuccess(false);
 
+    console.log(`[SIGNUP_SUBMIT] Form submission started`, {
+      displayName: formData.displayName,
+      email: formData.email,
+      passwordStrength: passwordStrength.strength,
+      agreedToTerms,
+    });
+
     if (!validateForm()) {
+      console.error(`[SIGNUP_SUBMIT] Form validation failed, aborting submission`);
       return;
     }
 
     setLoading(true);
+    console.log(`[SIGNUP_SUBMIT] Calling Firebase signUp...`);
 
     try {
       await signUp(formData.email, formData.password, formData.displayName);
+      console.log(`[SIGNUP_SUBMIT] Successfully created account for:`, formData.email);
       setSuccess(true);
+
       // redirect to onboarding to complete profile
+      console.log(`[SIGNUP_SUBMIT] Redirecting to onboarding in ${SUCCESS_REDIRECT_DELAY_MS}ms`);
       setTimeout(() => {
         router.push("/onboarding");
       }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
+      console.error(`[SIGNUP_SUBMIT] Failed to create account:`, err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -102,7 +146,7 @@ export function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-background via-primary/5 to-accent/10 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create Your Account</CardTitle>
@@ -149,9 +193,43 @@ export function Signup() {
                     required
                     disabled={loading}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Minimum 6 characters
-                  </p>
+
+                  {/* Password Strength Indicator */}
+                  {formData.password && (
+                    <div className="space-y-2">
+                      {/* Strength Bar */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium">Password Strength</span>
+                          <span className={`text-xs font-semibold ${getStrengthTextColor(passwordStrength.strength)}`}>
+                            {passwordStrength.strength.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-300 ${getStrengthColor(passwordStrength.strength)}`}
+                            style={{ width: `${passwordStrength.score}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Requirements Checklist */}
+                      <div className="space-y-1 pt-1">
+                        {passwordStrength.requirements.map((req, index) => (
+                          <div key={index} className="flex items-center gap-2 text-xs">
+                            {req.met ? (
+                              <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                            ) : (
+                              <XCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                            )}
+                            <span className={req.met ? "text-green-600" : "text-muted-foreground"}>
+                              {req.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>

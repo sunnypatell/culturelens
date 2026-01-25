@@ -50,7 +50,7 @@ export function ResetPassword() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-background via-primary/5 to-accent/10 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Reset Password</CardTitle>
