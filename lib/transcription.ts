@@ -13,7 +13,7 @@ import { Segment } from "./types";
  * @param audioBlob - The recorded audio (webm or wav)
  * @returns Array of transcript segments with timestamps and speaker IDs
  */
-export async function transcribeAudio(audioBlob: Blob): Promise<Segment[]> {
+export async function transcribeAudio(_audioBlob: Blob): Promise<Segment[]> {
   // TODO: implement transcription API call
   // 1. Convert blob to appropriate format if needed
   // 2. Send to transcription service

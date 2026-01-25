@@ -10,7 +10,7 @@ import { Footer } from "./footer";
 
 export function InsightsView() {
   const [mounted, setMounted] = useState(false);
-  const [selectedInsight, setSelectedInsight] = useState<number | null>(null);
+  const [_selectedInsight, _setSelectedInsight] = useState<number | null>(null);
   const [expandedInsight, setExpandedInsight] = useState<number | null>(null);
 
   useEffect(() => {
@@ -619,7 +619,7 @@ export function InsightsView() {
                     </span>
                   </div>
                   <div className="flex items-end justify-between gap-2 h-32">
-                    {trends.map((month, i) => (
+                    {trends.map((month) => (
                       <div
                         key={month.month}
                         className="flex-1 flex flex-col items-center gap-2 group"
@@ -655,7 +655,7 @@ export function InsightsView() {
                     </span>
                   </div>
                   <div className="flex items-end justify-between gap-2 h-32">
-                    {trends.map((month, i) => (
+                    {trends.map((month) => (
                       <div
                         key={month.month}
                         className="flex-1 flex flex-col items-center gap-2 group"

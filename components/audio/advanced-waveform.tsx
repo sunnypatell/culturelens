@@ -15,7 +15,7 @@ export function AdvancedWaveform({
 }: AdvancedWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const [bars, setBars] = useState<number[]>(Array(80).fill(0));
+  const [_bars, setBars] = useState<number[]>(Array(80).fill(0));
   const timeRef = useRef(0);
 
   useEffect(() => {

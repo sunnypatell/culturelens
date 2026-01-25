@@ -19,8 +19,8 @@ import { Metrics, Insight, Debrief } from "./types";
  * @returns The debrief text script with section markers
  */
 export function generateDebriefScript(
-  metrics: Metrics,
-  insights: Insight[]
+  _metrics: Metrics,
+  _insights: Insight[]
 ): Omit<Debrief, "audioUrl" | "durationMs"> {
   // TODO: implement script generation
   //
@@ -45,7 +45,7 @@ export function generateDebriefScript(
  * @returns Audio URL and duration
  */
 export async function generateDebriefAudio(
-  script: string
+  _script: string
 ): Promise<{ audioUrl: string; durationMs: number }> {
   // TODO: implement TTS call
   //
