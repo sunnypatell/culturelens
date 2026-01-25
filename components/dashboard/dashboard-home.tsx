@@ -9,6 +9,7 @@ import { Footer } from "./footer";
 import { useAuth } from "@/components/auth/auth-provider";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 import { GlassCard, GradientCard } from "@/components/ui/glass-card";
+import { BackendStatus } from "@/components/backend-status";
 import { Mic, Library, LineChart, Clock, Users, Sparkles, TrendingUp, ArrowRight } from "lucide-react";
 
 interface DashboardHomeProps {
@@ -217,17 +218,7 @@ export function DashboardHome({
           className="space-y-6"
         >
           <div className="flex items-center gap-3">
-            <Badge
-              variant="outline"
-              className="px-3 py-1.5 text-sm font-medium border-green-500/30 bg-green-500/10"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-2 h-2 rounded-full bg-green-500 mr-2"
-              />
-              All Systems Operational
-            </Badge>
+            <BackendStatus />
           </div>
 
           <div className="space-y-4">
