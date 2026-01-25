@@ -68,7 +68,23 @@ export function DashboardHome({
               : "0:00";
             const insights = session.analysisResult?.insights?.length || 0;
             const participants = session.settings?.participantCount || 2;
-            const createdDate = new Date(session.createdAt);
+
+            // handle firestore timestamp properly
+            let createdDate: Date;
+            if (session.createdAt?._seconds) {
+              // firestore timestamp from JSON
+              createdDate = new Date(session.createdAt._seconds * 1000);
+            } else if (session.createdAt) {
+              createdDate = new Date(session.createdAt);
+            } else {
+              createdDate = new Date(); // fallback to now
+            }
+
+            // validate date
+            if (isNaN(createdDate.getTime())) {
+              createdDate = new Date();
+            }
+
             const now = new Date();
             const diffMs = now.getTime() - createdDate.getTime();
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
