@@ -8,53 +8,49 @@
 // Docs: https://elevenlabs.io/docs/conversational-ai/api-reference/conversations/get-signed-url
 // Note: API key must have "Agents Write" (convai_write) permission scope.
 
-import { NextResponse } from "next/server";
+import {
+  apiHandler,
+  apiSuccess,
+  AuthenticationError,
+  ExternalServiceError,
+} from "@/lib/api";
 
 export async function GET() {
-  const apiKey = process.env.ELEVENLABS_API_KEY;
-  const agentId = process.env.ELEVENLABS_AGENT_ID;
+  return apiHandler(async () => {
+    const apiKey = process.env.ELEVENLABS_API_KEY;
+    const agentId = process.env.ELEVENLABS_AGENT_ID;
 
-  if (!apiKey || !agentId) {
-    return NextResponse.json(
-      {
-        error: "Missing ElevenLabs environment variables",
-        hint: "Set ELEVENLABS_API_KEY and ELEVENLABS_AGENT_ID in .env.local",
-      },
-      { status: 500 }
-    );
-  }
-
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(agentId)}`,
-    { headers: { "xi-api-key": apiKey } }
-  );
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    const detail = body?.detail;
-
-    // Provide actionable error messages
-    if (detail?.status === "missing_permissions") {
-      return NextResponse.json(
-        {
-          error: "API key missing required permission",
-          hint: "Regenerate your ElevenLabs API key with 'Agents Write' (convai_write) permission enabled. Or use NEXT_PUBLIC_ELEVENLABS_AGENT_ID for public agent mode instead.",
-          detail: detail.message,
-        },
-        { status: 401 }
+    if (!apiKey || !agentId) {
+      throw new ExternalServiceError(
+        "elevenlabs configuration",
+        "ELEVENLABS_API_KEY and ELEVENLABS_AGENT_ID environment variables must be set"
       );
     }
 
-    return NextResponse.json(
-      {
-        error: "Failed to get signed URL from ElevenLabs",
-        status: response.status,
-        detail: detail?.message || JSON.stringify(body),
-      },
-      { status: response.status }
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${encodeURIComponent(agentId)}`,
+      { headers: { "xi-api-key": apiKey } }
     );
-  }
 
-  const data = await response.json();
-  return NextResponse.json(data);
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      const detail = body?.detail;
+
+      // provide actionable error messages for permission issues
+      if (detail?.status === "missing_permissions") {
+        throw new AuthenticationError(
+          "API key missing required permission",
+          "regenerate your ElevenLabs API key with 'Agents Write' (convai_write) permission enabled. or use NEXT_PUBLIC_ELEVENLABS_AGENT_ID for public agent mode instead."
+        );
+      }
+
+      throw new ExternalServiceError(
+        "elevenlabs API",
+        detail?.message || `status ${response.status}: ${JSON.stringify(body)}`
+      );
+    }
+
+    const data = await response.json();
+    return apiSuccess(data);
+  });
 }
