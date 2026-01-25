@@ -25,7 +25,7 @@ import { Loader2, Phone, ShieldCheck } from "lucide-react";
 
 export function PhoneLogin() {
   const router = useRouter();
-  const { sendPhoneCode, verifyPhoneCode } = useAuth();
+  const { sendPhoneCode, verifyPhoneCode, user, loading: authLoading } = useAuth();
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -38,6 +38,13 @@ export function PhoneLogin() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [codeSent, setCodeSent] = useState(false);
+
+  // redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/");
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     // initialize recaptcha when component mounts
@@ -109,15 +116,14 @@ export function PhoneLogin() {
 
     try {
       await verifyPhoneCode(confirmationResult, verificationCode);
-      setSuccess("Signed in successfully!");
-      router.push("/");
+      setSuccess("Signed in successfully! Redirecting...");
+      // Don't manually redirect - let the auth state change handle it
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("Invalid verification code");
       }
-    } finally {
       setLoading(false);
     }
   };

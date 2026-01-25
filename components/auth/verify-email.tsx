@@ -26,7 +26,7 @@ const SUCCESS_REDIRECT_DELAY_MS = 2000;
 
 export function VerifyEmail() {
   const router = useRouter();
-  const { completeEmailLink } = useAuth();
+  const { completeEmailLink, user, loading: authLoading } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -34,15 +34,22 @@ export function VerifyEmail() {
   const [emailInput, setEmailInput] = useState("");
   const [needsEmail, setNeedsEmail] = useState(false);
 
+  // redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!authLoading && user && success) {
+      setTimeout(() => {
+        router.push("/");
+      }, SUCCESS_REDIRECT_DELAY_MS);
+    }
+  }, [user, authLoading, success, router]);
+
   useEffect(() => {
     // attempt to complete signin automatically
     const completeSignin = async () => {
       try {
         await completeEmailLink();
         setSuccess(true);
-        setTimeout(() => {
-          router.push("/");
-        }, SUCCESS_REDIRECT_DELAY_MS);
+        // Don't manually redirect - let the auth state change handle it
       } catch (err: unknown) {
         if (err instanceof Error && err.message.includes("email not found")) {
           setNeedsEmail(true);
@@ -69,9 +76,7 @@ export function VerifyEmail() {
     try {
       await completeEmailLink(emailInput);
       setSuccess(true);
-      setTimeout(() => {
-        router.push("/");
-      }, SUCCESS_REDIRECT_DELAY_MS);
+      // Don't manually redirect - let the auth state change handle it
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
