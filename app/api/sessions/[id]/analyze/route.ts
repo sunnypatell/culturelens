@@ -7,7 +7,12 @@ import {
   Insight,
   Debrief,
 } from "@/lib/types";
-import { updateDocument, getDocument } from "@/lib/firebase-server-utils";
+import {
+  updateDocument,
+  getDocument,
+  getDocuments,
+  whereEqual,
+} from "@/lib/firebase-server-utils";
 import {
   apiHandler,
   apiSuccess,
@@ -77,62 +82,188 @@ export async function POST(
       );
     }
 
-    // TODO: implement actual analysis pipeline
-    // for now, create mock analysis results
-    const mockSegments: Segment[] = [
-      {
-        startMs: 0,
-        endMs: 5000,
-        speaker: "A",
-        text: "Hello, how are you doing today?",
-        confidence: 0.95,
-      },
-      {
-        startMs: 5500,
-        endMs: 10000,
-        speaker: "B",
-        text: "I'm doing well, thank you. How about you?",
-        confidence: 0.92,
-      },
-    ];
+    // fetch transcript for this session
+    let transcript: any = null;
+    try {
+      const transcripts = await getDocuments(COLLECTIONS.TRANSCRIPTS, [
+        whereEqual("sessionId", id),
+      ]);
+      transcript = transcripts[0];
+    } catch (error) {
+      console.error(`[API_ANALYZE_POST] Failed to fetch transcript:`, error);
+    }
 
-    const mockMetrics: Metrics = {
-      talkTimeMs: { A: 5000, B: 4500 },
-      turnCount: { A: 1, B: 1 },
-      avgTurnLengthMs: { A: 5000, B: 4500 },
-      interruptionCount: { A: 0, B: 0 },
-      overlapEvents: [],
-      silenceEvents: [
+    // if no transcript, create basic mock data
+    if (!transcript || !transcript.transcript) {
+      console.warn(
+        `[API_ANALYZE_POST] No transcript found for session ${id}, using mock data`
+      );
+
+      const mockSegments: Segment[] = [
         {
-          startMs: 5000,
-          endMs: 5500,
-          afterSpeaker: "A",
+          startMs: 0,
+          endMs: 5000,
+          speaker: "A",
+          text: "conversation transcript not available",
+          confidence: 1.0,
         },
-      ],
+      ];
+
+      const mockMetrics: Metrics = {
+        talkTimeMs: { A: 5000, B: 0 },
+        turnCount: { A: 1, B: 0 },
+        avgTurnLengthMs: { A: 5000, B: 0 },
+        interruptionCount: { A: 0, B: 0 },
+        overlapEvents: [],
+        silenceEvents: [],
+        escalation: [],
+      };
+
+      const mockInsights: Insight[] = [
+        {
+          id: "1",
+          category: "culturalLens",
+          title: "transcript unavailable",
+          summary: "no transcript was found for this session",
+          confidence: "low",
+          evidence: [],
+          whyThisWasFlagged:
+            "analysis requires a transcript to generate insights",
+        },
+      ];
+
+      const mockDebrief: Debrief = {
+        text: "no transcript available for this session. please ensure the recording captured audio successfully.",
+        audioUrl: "",
+        durationMs: 0,
+        sections: [],
+      };
+
+      const analysisResult: AnalysisResult = {
+        session,
+        segments: mockSegments,
+        metrics: mockMetrics,
+        insights: mockInsights,
+        debrief: mockDebrief,
+      };
+
+      await updateDocument(COLLECTIONS.SESSIONS, id, {
+        status: "ready",
+        analysisResult,
+        analyzedAt: new Date().toISOString(),
+      });
+
+      return apiSuccess(analysisResult, {
+        message: "analysis completed with mock data (no transcript found)",
+      });
+    }
+
+    // parse transcript into segments
+    const transcriptText: string = transcript.transcript;
+    const lines = transcriptText.split("\n").filter((line) => line.trim());
+
+    const segments: Segment[] = lines
+      .map((line, index) => {
+        // try to extract timestamp and speaker from transcript format
+        // expected format: "[2024-01-25T12:34:56.789Z] speaker: text"
+        const timestampMatch = line.match(/\[([^\]]+)\]/);
+        const speakerMatch = line.match(/\]\s*([AB]|speaker\s*[AB]?):/i);
+        const textMatch = line.match(/:\s*(.+)$/);
+
+        const timestamp = timestampMatch
+          ? new Date(timestampMatch[1]).getTime()
+          : index * 5000;
+        const speaker = speakerMatch ? "A" : index % 2 === 0 ? "A" : "B";
+        const text = textMatch ? textMatch[1].trim() : line;
+
+        return {
+          startMs: timestamp,
+          endMs: timestamp + 3000, // assume 3 second duration per segment
+          speaker: speaker as "A" | "B" | "unknown",
+          text,
+          confidence: 0.9,
+        };
+      })
+      .filter((seg) => seg.text.length > 0);
+
+    // calculate metrics from segments
+    const talkTimeA = segments
+      .filter((s) => s.speaker === "A")
+      .reduce((sum, s) => sum + (s.endMs - s.startMs), 0);
+    const talkTimeB = segments
+      .filter((s) => s.speaker === "B")
+      .reduce((sum, s) => sum + (s.endMs - s.startMs), 0);
+
+    const turnCountA = segments.filter((s) => s.speaker === "A").length;
+    const turnCountB = segments.filter((s) => s.speaker === "B").length;
+
+    const metrics: Metrics = {
+      talkTimeMs: { A: talkTimeA, B: talkTimeB },
+      turnCount: { A: turnCountA, B: turnCountB },
+      avgTurnLengthMs: {
+        A: turnCountA > 0 ? talkTimeA / turnCountA : 0,
+        B: turnCountB > 0 ? talkTimeB / turnCountB : 0,
+      },
+      interruptionCount: { A: 0, B: 0 }, // TODO: detect interruptions
+      overlapEvents: [],
+      silenceEvents: [],
       escalation: [],
     };
 
-    const mockInsights: Insight[] = [];
+    // generate insights based on metrics
+    const insights: Insight[] = [];
 
-    const mockDebrief: Debrief = {
-      text: "This is a placeholder debrief. Analysis pipeline not yet implemented.",
-      audioUrl: "https://example.com/debrief.mp3",
-      durationMs: 30000,
+    // turn-taking balance insight
+    const totalTalkTime = talkTimeA + talkTimeB;
+    const balanceRatio =
+      totalTalkTime > 0 ? talkTimeA / totalTalkTime : 0.5;
+
+    if (balanceRatio < 0.3 || balanceRatio > 0.7) {
+      insights.push({
+        id: "balance",
+        category: "turnTaking",
+        title: "unbalanced participation",
+        summary: `participant ${balanceRatio > 0.5 ? "A" : "B"} dominated the conversation with ${Math.round(Math.max(balanceRatio, 1 - balanceRatio) * 100)}% of speaking time`,
+        confidence: "high",
+        evidence: [
+          {
+            startMs: 0,
+            endMs: segments[segments.length - 1]?.endMs || 0,
+            quote: "full conversation",
+          },
+        ],
+        whyThisWasFlagged:
+          "significant imbalance in speaking time can indicate power dynamics or engagement issues",
+      });
+    }
+
+    // generate debrief text
+    const debriefText = `conversation analysis complete.
+
+participated: ${turnCountA + turnCountB} total turns
+speaking time: participant A spoke for ${Math.round(talkTimeA / 1000)} seconds (${Math.round(balanceRatio * 100)}%), participant B spoke for ${Math.round(talkTimeB / 1000)} seconds (${Math.round((1 - balanceRatio) * 100)}%)
+
+${insights.length > 0 ? `key insights:\n${insights.map((i) => `- ${i.title}: ${i.summary}`).join("\n")}` : "no significant patterns detected"}`;
+
+    const debrief: Debrief = {
+      text: debriefText,
+      audioUrl: "", // TODO: generate audio via elevenlabs
+      durationMs: 0,
       sections: [
         {
-          title: "Introduction",
+          title: "overview",
           startChar: 0,
-          endChar: 50,
+          endChar: debriefText.indexOf("\n\n"),
         },
       ],
     };
 
     const analysisResult: AnalysisResult = {
       session,
-      segments: mockSegments,
-      metrics: mockMetrics,
-      insights: mockInsights,
-      debrief: mockDebrief,
+      segments,
+      metrics,
+      insights,
+      debrief,
     };
 
     // store analysis results in firestore
