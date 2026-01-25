@@ -51,6 +51,46 @@ export function SettingsView() {
     setDisplayName(user?.displayName || "");
   }, [user]);
 
+  // load settings from backend on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const token = await getIdToken();
+        if (!token) return;
+
+        const response = await fetch("/api/settings", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const settings = data.data;
+
+          // populate state with saved settings
+          if (settings.notifications !== undefined)
+            setNotificationsEnabled(settings.notifications);
+          if (settings.autoSave !== undefined)
+            setAutoSaveEnabled(settings.autoSave);
+          if (settings.culturalAnalysis !== undefined)
+            setCulturalAnalysis(settings.culturalAnalysis);
+          if (settings.dataRetention !== undefined)
+            setDataRetention(settings.dataRetention);
+          if (settings.sensitivityLevel !== undefined)
+            setSensitivityLevel([settings.sensitivityLevel * 20]);
+          if (settings.theme !== undefined) setTheme(settings.theme);
+          if (settings.organization !== undefined)
+            setOrganization(settings.organization);
+        }
+      } catch (error) {
+        console.error("[SettingsView] Failed to load settings:", error);
+      }
+    };
+
+    loadSettings();
+  }, [getIdToken, setTheme]);
+
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
