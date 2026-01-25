@@ -259,11 +259,13 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
 
         let responseData = await response.json();
 
-        // if analysis not complete, trigger it
-        if (
+        // if analysis not complete or not ready, trigger it via POST
+        const needsAnalysis =
           !response.ok &&
-          responseData.error?.message?.includes("analysis not complete")
-        ) {
+          (responseData.error?.message?.includes("analysis not complete") ||
+            responseData.error?.message?.includes("not ready for analysis"));
+
+        if (needsAnalysis) {
           console.log(
             "[useSessionInsights] Analysis not ready, triggering analysis..."
           );

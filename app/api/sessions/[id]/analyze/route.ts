@@ -76,12 +76,19 @@ export async function POST(
       throw new AuthorizationError("not authorized to access this session");
     }
 
-    if (session.status !== "processing") {
-      return ApiErrors.badRequest(
-        "session is not ready for analysis",
-        `current status: ${session.status}`
-      );
+    // allow analysis for sessions that haven't been analyzed yet
+    // or are in processing state - skip only if already "ready" with results
+    if (session.status === "ready" && session.analysisResult) {
+      console.log(`[API_ANALYZE_POST] Session ${id} already analyzed, returning existing results`);
+      return apiSuccess(session.analysisResult, {
+        message: "analysis already completed",
+      });
     }
+
+    // update status to processing
+    await updateDocument(COLLECTIONS.SESSIONS, id, {
+      status: "processing",
+    });
 
     // fetch transcript for this session
     let transcript: any = null;
