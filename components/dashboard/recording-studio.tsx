@@ -11,6 +11,9 @@ import { Slider } from "@/components/ui/slider";
 import { AdvancedWaveform } from "@/components/audio/advanced-waveform";
 import { VoiceAgent } from "@/components/voice-agent";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth/auth-provider";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 type RecordingState =
   | "setup"
@@ -25,14 +28,17 @@ const PROCESSING_DELAY_MS = 3000;
 
 export function RecordingStudio() {
   const router = useRouter();
+  const { getIdToken } = useAuth();
   const [state, setState] = useState<RecordingState>("setup");
   const [duration, setDuration] = useState(0);
   const [_waveformData, setWaveformData] = useState<number[]>(
     Array(60).fill(0)
   );
   const [mounted, setMounted] = useState(false);
+  const [creating, setCreating] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   // Session settings
   const [sessionTitle, setSessionTitle] = useState("");
@@ -93,6 +99,55 @@ export function RecordingStudio() {
     setTimeout(() => {
       setState("results");
     }, PROCESSING_DELAY_MS);
+  };
+
+  const handleStartSession = async () => {
+    try {
+      setCreating(true);
+      const token = await getIdToken();
+
+      const response = await fetch("/api/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          consent: {
+            personA: true,
+            personB: true,
+            timestamp: new Date().toISOString(),
+          },
+          settings: {
+            title: sessionTitle || `Session ${new Date().toLocaleDateString()}`,
+            sessionType,
+            participantCount: parseInt(numberOfParticipants.split(" ")[0]),
+            culturalContextTags: culturalContext,
+            sensitivityLevel: sensitivityLevel[0] / 20,
+            analysisMethod,
+            storageMode: "transcriptOnly",
+            voiceId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || "",
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("failed to create session");
+      }
+
+      const result = await response.json();
+      setCurrentSessionId(result.data.id);
+
+      console.log("[RecordingStudio] Session created:", result.data.id);
+      toast.success("session created successfully");
+
+      setState("agent");
+    } catch (error) {
+      console.error("[RecordingStudio] Session creation error:", error);
+      toast.error("failed to create session");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const toggleCulturalContext = (context: string) => {
@@ -341,9 +396,11 @@ export function RecordingStudio() {
             </Button>
             <Button
               size="lg"
-              onClick={() => setState("agent")}
+              onClick={handleStartSession}
+              disabled={creating}
               className="px-8"
             >
+              {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Start Session
             </Button>
           </div>
