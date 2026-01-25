@@ -10,7 +10,7 @@ export function generateRequestId(): string {
 }
 
 /**
- * logs API request details
+ * logs API request details (development only)
  */
 export function logRequest(
   request: NextRequest,
@@ -19,24 +19,26 @@ export function logRequest(
     userId?: string;
   }
 ): void {
-  const { requestId, userId } = options || {};
-  const { method, url } = request;
+  if (process.env.NODE_ENV !== "production") {
+    const { requestId, userId } = options || {};
+    const { method, url } = request;
 
-  console.log(`[API Request]`, {
-    requestId,
-    method,
-    url,
-    userId,
-    timestamp: new Date().toISOString(),
-    userAgent: request.headers.get("user-agent"),
-    ip:
-      request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip"),
-  });
+    console.log(`[API Request]`, {
+      requestId,
+      method,
+      url,
+      userId,
+      timestamp: new Date().toISOString(),
+      userAgent: request.headers.get("user-agent"),
+      ip:
+        request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip"),
+    });
+  }
 }
 
 /**
- * logs API response details
+ * logs API response details (development only)
  */
 export function logResponse(
   request: NextRequest,
@@ -49,18 +51,20 @@ export function logResponse(
     durationMs?: number;
   }
 ): void {
-  const { requestId, durationMs } = options || {};
-  const { method, url } = request;
+  if (process.env.NODE_ENV !== "production") {
+    const { requestId, durationMs } = options || {};
+    const { method, url } = request;
 
-  console.log(`[API Response]`, {
-    requestId,
-    method,
-    url,
-    status: response.status,
-    success: response.success,
-    durationMs,
-    timestamp: new Date().toISOString(),
-  });
+    console.log(`[API Response]`, {
+      requestId,
+      method,
+      url,
+      status: response.status,
+      success: response.success,
+      durationMs,
+      timestamp: new Date().toISOString(),
+    });
+  }
 }
 
 /**

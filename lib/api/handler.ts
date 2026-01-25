@@ -24,7 +24,11 @@ export function apiHandler<T = unknown>(
     // handle unexpected errors
     const errorMessage =
       error instanceof Error ? error.message : "unknown error";
-    console.error("[Unexpected API Error]", error);
+
+    // log unexpected errors (development only)
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[Unexpected API Error]", error);
+    }
 
     return apiError("INTERNAL_ERROR", "an unexpected error occurred", {
       status: 500,

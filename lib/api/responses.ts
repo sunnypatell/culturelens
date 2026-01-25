@@ -63,11 +63,13 @@ export function apiError(
 ): NextResponse<ApiErrorResponse> {
   const { details, hint, status = 500 } = options || {};
 
-  // log error for debugging
-  console.error(`[API Error ${status}] ${code}: ${message}`, {
-    details,
-    hint,
-  });
+  // log error for debugging (development only)
+  if (process.env.NODE_ENV !== "production") {
+    console.error(`[API Error ${status}] ${code}: ${message}`, {
+      details,
+      hint,
+    });
+  }
 
   return NextResponse.json(
     {
