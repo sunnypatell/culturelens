@@ -481,13 +481,8 @@ export function RecordingStudio({
             </Button>
             <Button
               onClick={() => {
-                // For demo: always navigate to results (shows mock data)
-                // Production code with sessionId check is preserved in comments
-                router.push(
-                  currentSessionId
-                    ? `/results?sessionId=${currentSessionId}`
-                    : "/results"
-                );
+                // For demo: force navigation to results page with mock data
+                window.location.href = "/results";
               }}
               className="px-6"
             >
