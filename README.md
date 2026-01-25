@@ -22,46 +22,85 @@ Built at [MLH HackHive 2026](https://mlh.io) | Ontario Tech University
 
 ### Setup
 
-#### 1. Clone Repository
+#### Quick Start (Recommended)
+
+**One command to install everything (works on Mac, Linux, and Windows):**
+
+```bash
+git clone https://github.com/sunnypatell/culturelens.git
+cd culturelens
+npm run setup
+```
+
+This will:
+- ✅ Install all frontend dependencies
+- ✅ Create Python virtual environment
+- ✅ Install all backend dependencies
+- ✅ Check your Python installation
+- ✅ Warn you if .env files are missing
+
+**Then configure your environment variables:**
+
+1. Copy `.env.example` to `.env` in the root directory
+2. Copy `backend/.env.example` to `backend/.env`
+3. Fill in your API keys (ask Sunny for values)
+
+```bash
+# Root .env
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_public_agent_id
+
+# backend/.env
+ELEVENLABS_API_KEY=your_elevenlabs_api_key
+OPENAI_API_KEY=your_openai_api_key
+```
+
+#### Manual Setup (Alternative)
+
+<details>
+<summary>Click to expand manual setup instructions</summary>
+
+**1. Clone Repository**
 
 ```bash
 git clone https://github.com/sunnypatell/culturelens.git
 cd culturelens
 ```
 
-#### 2. Frontend Setup
+**2. Frontend Setup**
 
 ```bash
 npm install
 cp .env.example .env
 ```
 
-Fill in your `.env` with the API keys (ask Sunny for the values):
+Fill in your `.env` with the API keys.
 
-```bash
-# backend api url
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-
-# elevenlabs credentials
-NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_public_agent_id
-```
-
-#### 3. Backend Setup
+**3. Backend Setup**
 
 ```bash
 cd backend
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Create virtual environment
+python3 -m venv venv  # Mac/Linux
+python -m venv venv   # Windows
+
+# Activate virtual environment
+source venv/bin/activate      # Mac/Linux
+venv\Scripts\activate         # Windows (CMD)
+venv\Scripts\Activate.ps1     # Windows (PowerShell)
+
+# Install dependencies
+pip install -r requirements.txt
 pip install -r requirements-dev.txt
+
+# Copy env file
 cp .env.example .env
 ```
 
-Fill in `backend/.env` with your API keys:
+Fill in `backend/.env` with your API keys.
 
-```bash
-ELEVENLABS_API_KEY=your_elevenlabs_api_key
-OPENAI_API_KEY=your_openai_api_key
-```
+</details>
 
 #### ElevenLabs Setup
 
@@ -82,18 +121,28 @@ Docs: [ElevenLabs React SDK](https://elevenlabs.io/docs/agents-platform/librarie
 
 ### Run Development Servers
 
-**Option 1: Single Command (Recommended)**
+**🚀 Single Command (Recommended) - Works on all platforms:**
 
 ```bash
 npm run dev:all
 ```
 
-This runs both frontend and backend concurrently in a single terminal.
+This runs both frontend and backend concurrently in a single terminal with color-coded logs:
+- **Frontend** (cyan): [http://localhost:3000](http://localhost:3000)
+- **Backend** (magenta): [http://localhost:8000/docs](http://localhost:8000/docs)
 
-- Frontend: [http://localhost:3000](http://localhost:3000)
-- Backend API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+The backend logs include helpful emojis for easy tracking:
+- 🚀 Startup
+- ✅ Success
+- ⚠️  Warnings
+- ❌ Errors
+- 💚 Health checks
+- 📝 Session operations
 
-**Option 2: Separate Terminals**
+**Alternative: Separate Terminals**
+
+<details>
+<summary>Click to expand separate terminal instructions</summary>
 
 **Terminal 1 - Frontend:**
 
@@ -107,13 +156,13 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ```bash
 npm run dev:backend
-# Or manually:
-cd backend
-source venv/bin/activate
-uvicorn app.main:app --reload --port 8000
 ```
 
 Backend API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+Both commands are cross-platform and work on Mac, Linux, and Windows.
+
+</details>
 
 ### Linting & Formatting
 
