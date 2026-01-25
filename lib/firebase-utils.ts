@@ -13,9 +13,6 @@ import {
   collection,
   doc,
   query,
-  where,
-  orderBy,
-  limit,
   onSnapshot,
 } from 'firebase/firestore';
 import { useState, useEffect } from 'react';

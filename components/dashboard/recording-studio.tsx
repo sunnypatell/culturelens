@@ -24,7 +24,7 @@ export function RecordingStudio() {
   const router = useRouter();
   const [state, setState] = useState<RecordingState>("setup");
   const [duration, setDuration] = useState(0);
-  const [waveformData, setWaveformData] = useState<number[]>(Array(60).fill(0));
+  const [_waveformData, setWaveformData] = useState<number[]>(Array(60).fill(0));
   const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
@@ -70,7 +70,7 @@ export function RecordingStudio() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const startRecording = () => {
+  const _startRecording = () => {
     setDuration(0);
     setState("recording");
   };

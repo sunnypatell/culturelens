@@ -47,7 +47,7 @@ async function setup() {
     const pythonCmd = platform === 'win32' ? 'python' : 'python3';
     try {
       await runCommand(pythonCmd, ['--version']);
-    } catch (_error) {
+    } catch {
       console.error('❌ Python not found. Please install Python 3.11 or higher.');
       process.exit(1);
     }
