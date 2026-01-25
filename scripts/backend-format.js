@@ -18,11 +18,17 @@ if (platform === "win32") {
   ruffPath = path.join(backendDir, "venv", "bin", "ruff");
 }
 
-const child = spawn(ruffPath, ["format", "."], {
+const spawnOptions = {
   cwd: backendDir,
   stdio: "inherit",
-  shell: true,
-});
+};
+
+// Only use shell on Windows to handle .cmd extensions
+if (platform === "win32") {
+  spawnOptions.shell = true;
+}
+
+const child = spawn(ruffPath, ["format", "."], spawnOptions);
 
 child.on("error", (error) => {
   console.error("❌ failed to run ruff:", error);

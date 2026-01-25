@@ -13,11 +13,19 @@ const backendDir = path.join(rootDir, "backend");
 function runCommand(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     console.log(`\n📦 Running: ${command} ${args.join(" ")}`);
-    const child = spawn(command, args, {
+
+    // On Windows, wrap the command in shell to handle .cmd extensions
+    // On Unix, use direct execution to handle paths with spaces
+    const spawnOptions = {
       stdio: "inherit",
-      shell: true, // Use shell for cross-platform compatibility
       ...options,
-    });
+    };
+
+    if (platform === "win32") {
+      spawnOptions.shell = true;
+    }
+
+    const child = spawn(command, args, spawnOptions);
 
     child.on("error", (error) => {
       reject(error);

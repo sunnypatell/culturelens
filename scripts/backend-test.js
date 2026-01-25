@@ -18,11 +18,17 @@ if (platform === "win32") {
   pytestPath = path.join(backendDir, "venv", "bin", "pytest");
 }
 
-const child = spawn(pytestPath, ["-v"], {
+const spawnOptions = {
   cwd: backendDir,
   stdio: "inherit",
-  shell: true,
-});
+};
+
+// Only use shell on Windows to handle .cmd extensions
+if (platform === "win32") {
+  spawnOptions.shell = true;
+}
+
+const child = spawn(pytestPath, ["-v"], spawnOptions);
 
 child.on("error", (error) => {
   console.error("❌ failed to run pytest:", error);

@@ -20,14 +20,20 @@ if (platform === "win32") {
 
 console.log("🚀 Starting backend server...");
 
+const spawnOptions = {
+  cwd: backendDir,
+  stdio: "inherit",
+};
+
+// Only use shell on Windows to handle .cmd extensions
+if (platform === "win32") {
+  spawnOptions.shell = true;
+}
+
 const child = spawn(
   uvicornPath,
   ["app.main:app", "--reload", "--port", "8000"],
-  {
-    cwd: backendDir,
-    stdio: "inherit",
-    shell: true, // Use shell for cross-platform compatibility
-  }
+  spawnOptions
 );
 
 child.on("error", (error) => {
