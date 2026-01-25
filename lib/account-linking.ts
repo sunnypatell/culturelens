@@ -56,18 +56,35 @@ export async function createOrUpdateUserProfile(
       }),
     });
 
+    // get response text first to handle both JSON and HTML responses
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error(`[ACCOUNT_LINKING] API error:`, {
-        status: response.status,
-        error: errorData,
-      });
+      let errorData: any = {};
+      try {
+        errorData = JSON.parse(responseText);
+      } catch {
+        console.error(`[ACCOUNT_LINKING] Received HTML instead of JSON:`, {
+          status: response.status,
+          responsePreview: responseText.substring(0, 200),
+        });
+      }
       throw new Error(
         errorData?.error?.message || "failed to sync user profile"
       );
     }
 
-    const result = await response.json();
+    // parse successful JSON response
+    let result: any;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error(`[ACCOUNT_LINKING] Failed to parse response:`, {
+        parseError,
+        responsePreview: responseText.substring(0, 200),
+      });
+      throw new Error("invalid response format from server");
+    }
 
     console.log(`[ACCOUNT_LINKING] User profile synced successfully`);
 
@@ -260,7 +277,19 @@ export async function getUserProfile(
       return null;
     }
 
-    const result = await response.json();
+    // get response text first to handle both JSON and HTML responses
+    const responseText = await response.text();
+
+    let result: any;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error(`[ACCOUNT_LINKING] Failed to parse GET response:`, {
+        parseError,
+        responsePreview: responseText.substring(0, 200),
+      });
+      return null;
+    }
 
     if (!result.data) {
       console.warn(`[ACCOUNT_LINKING] User profile not found for UID:`, uid);

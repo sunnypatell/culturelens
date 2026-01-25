@@ -6,7 +6,13 @@
  * handles automatic account linking for multiple auth providers
  */
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import * as authClient from "@/lib/auth-client";
@@ -48,6 +54,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const syncedUserRef = useRef<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -59,13 +66,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (user) {
-        // create or update user profile in Firestore
-        try {
-          await createOrUpdateUserProfile(user);
-          console.log(`[AUTH_PROVIDER] User profile synchronized`);
-        } catch (error) {
-          console.error(`[AUTH_PROVIDER] Failed to sync user profile:`, error);
+        // only sync profile if this is a new user or we haven't synced yet
+        // this prevents repeated syncs on every auth state change (token refresh, etc.)
+        if (syncedUserRef.current !== user.uid) {
+          try {
+            await createOrUpdateUserProfile(user);
+            syncedUserRef.current = user.uid;
+            console.log(`[AUTH_PROVIDER] User profile synchronized`);
+          } catch (error) {
+            console.error(
+              `[AUTH_PROVIDER] Failed to sync user profile:`,
+              error
+            );
+            // don't set syncedUserRef on error, so we can retry next time
+          }
         }
+      } else {
+        // user signed out, reset sync tracker
+        syncedUserRef.current = null;
       }
 
       setUser(user);
