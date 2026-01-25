@@ -13,6 +13,9 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
+// singleton pattern to ensure Firestore settings are only configured once
+let firestoreInstance: ReturnType<typeof getFirestore> | null = null;
+
 // initialize Firebase Admin SDK
 function initializeFirebaseAdmin() {
   // check if already initialized
@@ -36,12 +39,19 @@ function initializeFirebaseAdmin() {
   });
 }
 
+// initialize Firestore with settings (singleton pattern)
+function getFirestoreWithSettings() {
+  if (!firestoreInstance) {
+    firestoreInstance = getFirestore(adminApp);
+    // configure settings only on first initialization
+    firestoreInstance.settings({
+      ignoreUndefinedProperties: true, // prevents errors when undefined values are passed
+    });
+  }
+  return firestoreInstance;
+}
+
 export const adminApp = initializeFirebaseAdmin();
 export const adminAuth = getAuth(adminApp);
-export const adminDb = getFirestore(adminApp);
+export const adminDb = getFirestoreWithSettings();
 export const adminStorage = getStorage(adminApp);
-
-// configure Firestore settings
-adminDb.settings({
-  ignoreUndefinedProperties: true, // prevents errors when undefined values are passed
-});

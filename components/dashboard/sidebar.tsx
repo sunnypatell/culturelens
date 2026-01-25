@@ -55,7 +55,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
   return (
     <aside className="w-72 border-r border-white/10 bg-gradient-to-b from-background/95 via-background/80 to-background/95 backdrop-blur-xl flex flex-col relative overflow-hidden">
-      {/* Animated background gradient orbs */}
+      {/* Animated background gradient orbs - pointer-events-none to prevent blocking clicks */}
       <motion.div
         animate={{
           y: [0, -20, 0],
@@ -67,7 +67,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute top-20 left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl"
+        className="absolute top-20 left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{
@@ -81,7 +81,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           ease: "easeInOut",
           delay: 1,
         }}
-        className="absolute bottom-20 right-10 w-32 h-32 bg-accent/20 rounded-full blur-3xl"
+        className="absolute bottom-20 right-10 w-32 h-32 bg-accent/20 rounded-full blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{
@@ -93,7 +93,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 rounded-full blur-3xl"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"
       />
 
       {/* Header */}
