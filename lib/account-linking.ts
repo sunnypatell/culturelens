@@ -6,7 +6,6 @@ import {
   fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth } from "./firebase";
-import { generateUserIdFromUid } from "./firestore-constants";
 
 export interface UserProfile {
   id: string;
@@ -34,23 +33,8 @@ export async function createOrUpdateUserProfile(
     providers: user.providerData.map((p) => p.providerId),
   });
 
-  const userId = generateUserIdFromUid(user.uid);
-
   // extract linked providers from providerData
   const linkedProviders = user.providerData.map((p) => p.providerId);
-
-  const profile: UserProfile = {
-    id: userId,
-    uid: user.uid,
-    email: user.email,
-    displayName: user.displayName,
-    phoneNumber: user.phoneNumber,
-    photoURL: user.photoURL,
-    emailVerified: user.emailVerified,
-    linkedProviders,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
 
   try {
     // sync profile via API endpoint
@@ -255,8 +239,6 @@ export async function getUserProfile(
   token: string
 ): Promise<UserProfile | null> {
   console.log(`[ACCOUNT_LINKING] Fetching user profile for UID:`, uid);
-
-  const userId = generateUserIdFromUid(uid);
 
   try {
     const response = await fetch("/api/user/sync-profile", {

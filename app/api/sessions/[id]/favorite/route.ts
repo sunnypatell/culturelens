@@ -11,10 +11,7 @@ import {
 } from "@/lib/api";
 import { SessionSchemas } from "@/lib/api/schemas";
 import { verifyIdToken } from "@/lib/auth-server";
-import {
-  getDocument,
-  updateDocument,
-} from "@/lib/firebase-server-utils";
+import { getDocument, updateDocument } from "@/lib/firebase-server-utils";
 import { COLLECTIONS } from "@/lib/firestore-constants";
 
 /**
