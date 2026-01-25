@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
+import { useAuth } from "@/components/auth/auth-provider";
 
 interface DashboardHomeProps {
   onNavigate: (
@@ -14,6 +15,7 @@ interface DashboardHomeProps {
 }
 
 export function DashboardHome({ onNavigate }: DashboardHomeProps) {
+  const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [recentSessions, setRecentSessions] = useState<any[]>([]);
@@ -28,11 +30,22 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
   useEffect(() => {
     setMounted(true);
     fetchSessions();
-  }, []);
+  }, [getIdToken]);
 
   const fetchSessions = async () => {
     try {
-      const response = await fetch("/api/sessions");
+      const token = await getIdToken();
+      if (!token) {
+        console.error("no auth token available");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch("/api/sessions", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       if (response.ok && data.data) {
