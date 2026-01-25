@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
+import { useUserStats } from "@/lib/hooks/useUserStats";
 
 interface AnalysisLibraryProps {
   onViewInsights: () => void;
@@ -21,6 +22,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
   const [hoveredSession, setHoveredSession] = useState<number | null>(null);
   const [sessions, setSessions] = useState<any[]>([]);
   const [_loading, setLoading] = useState(true);
+  const { stats } = useUserStats();
 
   useEffect(() => {
     setMounted(true);
@@ -192,13 +194,13 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
             },
             {
               label: "This Week",
-              value: "5",
+              value: (stats?.sessionsThisWeek || 0).toString(),
               icon: CalendarIcon,
               color: "from-purple-500 to-pink-500",
             },
             {
               label: "Total Hours",
-              value: "12.5",
+              value: (stats?.totalHours || 0).toFixed(1),
               icon: ClockIcon,
               color: "from-orange-500 to-red-500",
             },
