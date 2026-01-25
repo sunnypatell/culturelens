@@ -33,10 +33,22 @@ export function ResetPassword() {
     e.preventDefault();
     setError("");
     setSuccess(false);
+
+    // validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setError("please enter your email address");
+      return;
+    }
+    if (!emailRegex.test(email.trim())) {
+      setError("please enter a valid email address");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await resetPassword(email);
+      await resetPassword(email.trim());
       setSuccess(true);
     } catch (err: unknown) {
       if (err instanceof Error) {
