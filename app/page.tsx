@@ -62,6 +62,7 @@ export default function Home() {
               setSelectedSessionId(sessionId);
               setActiveView("insights");
             }}
+            onNavigate={setActiveView}
           />
         )}
         {activeView === "insights" && (

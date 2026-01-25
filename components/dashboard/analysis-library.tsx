@@ -13,9 +13,10 @@ import { toast } from "sonner";
 
 interface AnalysisLibraryProps {
   onViewInsights: (sessionId: string) => void;
+  onNavigate?: (view: "home" | "record" | "library" | "insights" | "settings") => void;
 }
 
-export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
+export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryProps) {
   const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,6 +72,18 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
     } catch {
       toast.error("failed to update favorite");
     }
+  };
+
+  const handlePlayAudio = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.info("audio playback coming soon");
+    // TODO: implement audio playback with session audio URL
+  };
+
+  const handleMoreOptions = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast.info("more options coming soon");
+    // TODO: implement dropdown menu with delete, export, share options
   };
 
   const fetchSessions = async () => {
@@ -411,6 +424,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
                     size="sm"
                     variant="ghost"
                     className="flex-1 text-xs h-8"
+                    onClick={(e) => handlePlayAudio(session.id, e)}
                   >
                     <svg
                       className="w-3.5 h-3.5 mr-1.5"
@@ -423,7 +437,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
                     </svg>
                     Play Audio
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={(e) => handleMoreOptions(session.id, e)}>
                     <svg
                       className="w-3.5 h-3.5"
                       viewBox="0 0 24 24"
@@ -463,7 +477,7 @@ export function AnalysisLibrary({ onViewInsights }: AnalysisLibraryProps) {
             <p className="text-muted-foreground mb-6">
               Try adjusting your filters or start a new recording
             </p>
-            <Button>Start Recording</Button>
+            <Button onClick={() => onNavigate?.("record")}>Start Recording</Button>
           </Card>
         )}
       </div>
