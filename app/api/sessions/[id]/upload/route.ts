@@ -83,6 +83,33 @@ export async function POST(
       return ApiErrors.badRequest("no audio file provided");
     }
 
+    // validate file type - only allow audio files
+    const allowedMimeTypes = [
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/wav",
+      "audio/webm",
+      "audio/ogg",
+      "audio/m4a",
+      "audio/mp4",
+    ];
+
+    if (!allowedMimeTypes.includes(audioFile.type)) {
+      return ApiErrors.validationError(
+        "invalid file type",
+        `only audio files are allowed. received: ${audioFile.type}`
+      );
+    }
+
+    // validate file size - max 50MB
+    const maxSizeBytes = 50 * 1024 * 1024; // 50MB
+    if (audioFile.size > maxSizeBytes) {
+      return ApiErrors.validationError(
+        "file too large",
+        `maximum file size is 50MB. received: ${(audioFile.size / 1024 / 1024).toFixed(2)}MB`
+      );
+    }
+
     // upload to firebase storage
     const storagePath = `audio/${id}/${audioFile.name}`;
     let downloadURL: string;
