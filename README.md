@@ -476,21 +476,15 @@ vercel --prod
 - `FIREBASE_CLIENT_EMAIL`
 - `FIREBASE_PRIVATE_KEY`
 
-### backend (railway/render)
+### backend (local development)
 
-**railway:**
+for hackathon demonstration, the backend runs locally. use:
 
 ```bash
-railway login
-railway link
-railway up
+npm run dev:all  # runs both frontend and backend concurrently
 ```
 
-**render:**
-
-1. connect github repo
-2. set build command: `pip install -r requirements.txt`
-3. set start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+the python backend serves at http://localhost:8000 with auto-generated API docs at `/docs`.
 
 ### firebase
 
