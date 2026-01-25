@@ -25,7 +25,7 @@ export type LinguisticMarker = {
  * @param segments - Transcribed segments
  * @returns Array of detected linguistic markers with their locations
  */
-export function extractMarkers(segments: Segment[]): LinguisticMarker[] {
+export function extractMarkers(_segments: Segment[]): LinguisticMarker[] {
   // TODO: implement pattern matching
   //
   // For each category, define regex/keyword lists:

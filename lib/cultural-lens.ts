@@ -21,10 +21,10 @@ import { LinguisticMarker } from "./linguistic-markers";
  * @returns Array of Insight objects with hypotheses and evidence
  */
 export async function generateCulturalInsights(
-  segments: Segment[],
-  metrics: Metrics,
-  markers: LinguisticMarker[],
-  culturalContextTags: string[]
+  _segments: Segment[],
+  _metrics: Metrics,
+  _markers: LinguisticMarker[],
+  _culturalContextTags: string[]
 ): Promise<Insight[]> {
   // TODO: implement LLM call
   //

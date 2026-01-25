@@ -264,7 +264,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {recentSessions.map((session, index) => (
+            {recentSessions.map((session) => (
               <Card
                 key={session.id}
                 className="group relative overflow-hidden hover-lift cursor-pointer"

@@ -11,7 +11,7 @@ import { Segment, Metrics } from "./types";
  * @param segments - Transcribed segments with speaker labels and timestamps
  * @returns Computed metrics (talk time, turns, interruptions, silence, escalation)
  */
-export function computeMetrics(segments: Segment[]): Metrics {
+export function computeMetrics(_segments: Segment[]): Metrics {
   // TODO: implement metrics computation
   //
   // Talk time: sum of (endMs - startMs) per speaker

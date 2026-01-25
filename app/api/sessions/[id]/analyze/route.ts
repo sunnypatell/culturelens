@@ -14,17 +14,27 @@ export async function POST(
     const { id } = await params;
 
     // Check if session exists
-    const session = await getDocument("sessions", id) as any;
+    let session: any;
+    try {
+      session = await getDocument("sessions", id);
+    } catch (firestoreError) {
+      console.error("firestore error fetching session:", firestoreError);
+      return NextResponse.json(
+        { error: "database error while fetching session" },
+        { status: 503 }
+      );
+    }
+
     if (!session) {
       return NextResponse.json(
-        { error: "Session not found" },
+        { error: "session not found" },
         { status: 404 }
       );
     }
 
     if (session.status !== "processing") {
       return NextResponse.json(
-        { error: "Session is not ready for analysis" },
+        { error: "session is not ready for analysis" },
         { status: 400 }
       );
     }
@@ -88,17 +98,26 @@ export async function POST(
     };
 
     // Store analysis results in Firestore
-    await updateDocument("sessions", id, {
-      status: "ready",
-      analysisResult,
-      analyzedAt: new Date().toISOString(),
-    });
+    try {
+      await updateDocument("sessions", id, {
+        status: "ready",
+        analysisResult,
+        analyzedAt: new Date().toISOString(),
+      });
+    } catch (firestoreError) {
+      console.error("firestore error storing analysis:", firestoreError);
+      return NextResponse.json(
+        { error: "analysis completed but failed to store results" },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(analysisResult);
   } catch (error) {
-    console.error("Analysis error:", error);
+    console.error("analysis error:", error);
+    const errorMessage = error instanceof Error ? error.message : "unknown error";
     return NextResponse.json(
-      { error: "Failed to analyze session" },
+      { error: "failed to analyze session", details: errorMessage },
       { status: 500 }
     );
   }
@@ -111,26 +130,37 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const session = await getDocument("sessions", id) as any;
+    let session: any;
+    try {
+      session = await getDocument("sessions", id);
+    } catch (firestoreError) {
+      console.error("firestore error fetching session:", firestoreError);
+      return NextResponse.json(
+        { error: "database error while fetching session" },
+        { status: 503 }
+      );
+    }
+
     if (!session) {
       return NextResponse.json(
-        { error: "Session not found" },
+        { error: "session not found" },
         { status: 404 }
       );
     }
 
     if (session.status !== "ready" || !session.analysisResult) {
       return NextResponse.json(
-        { error: "Analysis not complete" },
+        { error: "analysis not complete" },
         { status: 202 }
       );
     }
 
     return NextResponse.json(session.analysisResult);
   } catch (error) {
-    console.error("Analysis retrieval error:", error);
+    console.error("analysis retrieval error:", error);
+    const errorMessage = error instanceof Error ? error.message : "unknown error";
     return NextResponse.json(
-      { error: "Failed to get analysis results" },
+      { error: "failed to get analysis results", details: errorMessage },
       { status: 500 }
     );
   }
