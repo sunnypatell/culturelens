@@ -42,6 +42,7 @@ export function SettingsView() {
   const [culturalAnalysis, setCulturalAnalysis] = useState(true);
   const [dataRetention, setDataRetention] = useState("90");
   const [sensitivityLevel, setSensitivityLevel] = useState([70]);
+  const [audioQuality, setAudioQuality] = useState("high");
 
   // password dialog state
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -82,6 +83,8 @@ export function SettingsView() {
           if (settings.theme !== undefined) setTheme(settings.theme);
           if (settings.organization !== undefined)
             setOrganization(settings.organization);
+          if (settings.audioQuality !== undefined)
+            setAudioQuality(settings.audioQuality);
         }
       } catch (error) {
         console.error("[SettingsView] Failed to load settings:", error);
@@ -139,6 +142,7 @@ export function SettingsView() {
           dataRetention,
           sensitivityLevel: sensitivityLevel[0] / 20,
           theme,
+          audioQuality,
         }),
       });
 
@@ -417,7 +421,7 @@ export function SettingsView() {
                     Higher quality means larger file sizes
                   </p>
                 </div>
-                <RadioGroup defaultValue="high">
+                <RadioGroup value={audioQuality} onValueChange={setAudioQuality}>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
                       {
