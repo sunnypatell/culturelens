@@ -21,7 +21,7 @@ if (platform === "win32") {
 const child = spawn(ruffPath, ["format", "."], {
   cwd: backendDir,
   stdio: "inherit",
-  shell: false,
+  shell: true,
 });
 
 child.on("error", (error) => {

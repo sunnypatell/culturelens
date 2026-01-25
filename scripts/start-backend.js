@@ -26,7 +26,7 @@ const child = spawn(
   {
     cwd: backendDir,
     stdio: "inherit",
-    shell: false, // Don't use shell to avoid path issues
+    shell: true, // Use shell for cross-platform compatibility
   }
 );
 

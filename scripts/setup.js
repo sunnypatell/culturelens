@@ -15,7 +15,7 @@ function runCommand(command, args, options = {}) {
     console.log(`\n📦 Running: ${command} ${args.join(" ")}`);
     const child = spawn(command, args, {
       stdio: "inherit",
-      shell: false, // Don't use shell to avoid path issues with spaces
+      shell: true, // Use shell for cross-platform compatibility
       ...options,
     });
 
