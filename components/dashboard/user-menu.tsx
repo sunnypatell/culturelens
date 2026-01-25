@@ -12,7 +12,12 @@ import { useRouter } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
 import { toast } from "sonner";
 
-export function UserMenu({ children }: { children: React.ReactNode }) {
+interface UserMenuProps {
+  children: React.ReactNode;
+  onNavigate?: (view: "home" | "record" | "library" | "insights" | "settings") => void;
+}
+
+export function UserMenu({ children, onNavigate }: UserMenuProps) {
   const { signOut, user } = useAuth();
   const router = useRouter();
 
@@ -36,7 +41,7 @@ export function UserMenu({ children }: { children: React.ReactNode }) {
           <p className="text-xs text-muted-foreground">{user?.email}</p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/?view=settings")}>
+        <DropdownMenuItem onClick={() => onNavigate?.("settings")}>
           <Settings className="mr-2 h-4 w-4" />
           settings
         </DropdownMenuItem>

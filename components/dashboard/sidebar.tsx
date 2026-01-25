@@ -192,7 +192,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
       {/* User Profile */}
       <div className="p-4 border-t border-border/50 backdrop-blur-sm relative z-10">
-        <UserMenu>
+        <UserMenu onNavigate={onViewChange}>
           <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary/60 transition-all duration-300 group">
             <div className="relative">
               <div className="w-9 h-9 rounded-full bg-linear-to-br from-primary via-accent to-primary shadow-md" />
