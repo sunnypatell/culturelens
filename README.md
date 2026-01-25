@@ -4,7 +4,7 @@
 
 # CultureLens
 
-**consent-based conversation analytics with cultural awareness**
+**Consent-Based Conversation Analytics with Cultural Awareness**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
@@ -13,7 +13,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.11-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-_real-time conversational ai • cultural communication analysis • privacy-first architecture_
+_Real-Time Conversational AI • Cultural Communication Analysis • Privacy-First Architecture_
 
 [Live Demo](https://culturelens.vercel.app) • [Documentation](#-architecture) • [Quick Start](#-quick-start)
 
@@ -21,11 +21,11 @@ _real-time conversational ai • cultural communication analysis • privacy-fir
 
 ---
 
-## 📖 overview
+## 📖 Overview
 
 CultureLens is a **production-grade conversation analytics platform** that provides real-time, culturally-aware insights into communication patterns. Built during **MLH HackHive 2026**, it combines cutting-edge voice AI with sophisticated analysis pipelines to deliver neutral, non-judgmental feedback on conversational dynamics.
 
-### key capabilities
+### Key Capabilities
 
 - **🎙️ Real-Time Voice Interaction** - ElevenLabs conversational AI with multi-voice support
 - **📊 Communication Metrics** - Turn-taking balance, interruption patterns, topic transitions
@@ -36,44 +36,44 @@ CultureLens is a **production-grade conversation analytics platform** that provi
 
 ---
 
-## 🏗️ architecture
+## 🏗️ Architecture
 
-### technology stack
+### Technology Stack
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-**frontend architecture**
+**Frontend Architecture**
 
-- **framework:** Next.js 16 (App Router, React Server Components)
-- **runtime:** React 19 with concurrent features
-- **language:** TypeScript 5 (strict mode, path aliases)
-- **styling:** Tailwind CSS 4 + CSS Variables theming
-- **components:** shadcn/ui (30+ Radix primitives)
-- **state:** React hooks + Firebase real-time subscriptions
-- **validation:** Zod schemas (runtime + compile-time safety)
-- **voice:** ElevenLabs React SDK (`@elevenlabs/react`)
+- **Framework:** Next.js 16 (App Router, React Server Components)
+- **Runtime:** React 19 with concurrent features
+- **Language:** TypeScript 5 (strict mode, path aliases)
+- **Styling:** Tailwind CSS 4 + CSS Variables theming
+- **Components:** shadcn/ui (30+ Radix primitives)
+- **State:** React hooks + Firebase real-time subscriptions
+- **Validation:** Zod schemas (runtime + compile-time safety)
+- **Voice:** ElevenLabs React SDK (`@elevenlabs/react`)
 
 </td>
 <td width="50%" valign="top">
 
-**backend architecture**
+**Backend Architecture**
 
-- **framework:** FastAPI (async/await, Pydantic v2)
-- **runtime:** Python 3.11+ (type hints, dataclasses)
-- **database:** Firebase Firestore (NoSQL, real-time)
-- **storage:** Firebase Storage (signed URLs, resumable uploads)
-- **auth:** Firebase Admin SDK (server-side verification)
-- **testing:** Pytest + asyncio fixtures
-- **linting:** Ruff (100x faster than Pylint)
-- **api docs:** OpenAPI/Swagger (auto-generated)
+- **Framework:** FastAPI (async/await, Pydantic v2)
+- **Runtime:** Python 3.11+ (type hints, dataclasses)
+- **Database:** Firebase Firestore (NoSQL, real-time)
+- **Storage:** Firebase Storage (signed URLs, resumable uploads)
+- **Auth:** Firebase Admin SDK (server-side verification)
+- **Testing:** Pytest + asyncio fixtures
+- **Linting:** Ruff (100x faster than Pylint)
+- **API Docs:** OpenAPI/Swagger (auto-generated)
 
 </td>
 </tr>
 </table>
 
-### component architecture
+### Component Architecture
 
 ```
 app/
@@ -180,9 +180,9 @@ backend/
 └── pyproject.toml               # ruff + pytest config
 ```
 
-### data flow architecture
+### Data Flow Architecture
 
-**session lifecycle:**
+**Session Lifecycle:**
 
 ```
 1. User initiates session
@@ -207,31 +207,31 @@ backend/
    └─> Real-time updates via firestore listeners
 ```
 
-### security architecture
+### Security Architecture
 
-- **authentication:** Firebase Auth with JWT verification
-- **authorization:** Firebase Admin SDK with per-user data filtering
-- **api security:** all endpoints require `Authorization: Bearer <token>` header
-- **ownership verification:** session.userId checked on every mutation
-- **rate limiting:** ElevenLabs TTS limited to 10 req/min per user
-- **firestore rules:** authenticated users can only access own data
-- **cors:** configured for vercel.app + localhost origins
-- **env separation:** client/server secrets properly scoped
+- **Authentication:** Firebase Auth with JWT verification
+- **Authorization:** Firebase Admin SDK with per-user data filtering
+- **API Security:** All endpoints require `Authorization: Bearer <token>` header
+- **Ownership Verification:** session.userId checked on every mutation
+- **Rate Limiting:** ElevenLabs TTS limited to 10 req/min per user
+- **Firestore Rules:** Authenticated users can only access own data
+- **CORS:** Configured for vercel.app + localhost origins
+- **Env Separation:** Client/server secrets properly scoped
 
 ---
 
-## 🚀 quick start
+## 🚀 Quick Start
 
-### prerequisites
+### Prerequisites
 
-| tool        | version | purpose          |
+| Tool        | Version | Purpose          |
 | ----------- | ------- | ---------------- |
-| **node.js** | 18+     | frontend runtime |
-| **python**  | 3.11+   | backend runtime  |
-| **npm**     | 9+      | package manager  |
-| **git**     | 2+      | version control  |
+| **Node.js** | 18+     | Frontend runtime |
+| **Python**  | 3.11+   | Backend runtime  |
+| **npm**     | 9+      | Package manager  |
+| **Git**     | 2+      | Version control  |
 
-### one-command setup
+### One-Command Setup
 
 ```bash
 git clone https://github.com/sunnypatell/culturelens.git
@@ -244,28 +244,28 @@ npm run setup
 - ✅ installs 74 npm packages (next.js, react, radix-ui, etc.)
 - ✅ creates python virtual environment
 - ✅ installs 15 python packages (fastapi, uvicorn, pytest, etc.)
-- ✅ validates python installation
-- ✅ checks for .env files
+- ✅ Validates Python installation
+- ✅ Checks for .env files
 
-### environment configuration
+### Environment Configuration
 
-**1. copy environment templates:**
+**1. Copy environment templates:**
 
 ```bash
 cp .env.example .env
 cp backend/.env.example backend/.env
 ```
 
-**2. configure frontend (.env):**
+**2. Configure frontend (.env):**
 
 ```env
-# backend api
+# Backend API
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 
-# elevenlabs (public agent, no server needed)
+# ElevenLabs (public agent, no server needed)
 NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_agent_id_here
 
-# firebase client SDK
+# Firebase Client SDK
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
@@ -274,31 +274,31 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
 NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:your_app_id
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-YOUR_MEASUREMENT_ID
 
-# firebase admin SDK (server-side)
+# Firebase Admin SDK (server-side)
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYourKey\n-----END PRIVATE KEY-----\n"
 ```
 
-**3. configure backend (backend/.env):**
+**3. Configure backend (backend/.env):**
 
 ```env
 ELEVENLABS_API_KEY=sk_your_api_key_here
 ```
 
-### run development servers
+### Run Development Servers
 
-**🔥 recommended: single command (works on all platforms)**
+**🔥 Recommended: Single command (works on all platforms)**
 
 ```bash
 npm run dev:all
 ```
 
-this starts both servers concurrently:
+This starts both servers concurrently:
 
-- **frontend:** http://localhost:3000 (cyan logs)
-- **backend:** http://localhost:8000/docs (magenta logs)
+- **Frontend:** http://localhost:3000 (cyan logs)
+- **Backend:** http://localhost:8000/docs (magenta logs)
 
-**alternative: separate terminals**
+**Alternative: Separate terminals**
 
 ```bash
 # terminal 1 - frontend
@@ -308,14 +308,14 @@ npm run dev
 npm run dev:backend
 ```
 
-**cross-platform compatibility:**
+**Cross-Platform Compatibility:**
 
-- ✅ **windows:** uses `shell: true` for .cmd/.exe handling
-- ✅ **mac/linux:** direct binary execution for better performance
-- ✅ **python detection:** auto-detects `python3` vs `python` command
-- ✅ **path spaces:** properly quoted paths throughout
+- ✅ **Windows:** Uses `shell: true` for .cmd/.exe handling
+- ✅ **Mac/Linux:** Direct binary execution for better performance
+- ✅ **Python Detection:** Auto-detects `python3` vs `python` command
+- ✅ **Path Spaces:** Properly quoted paths throughout
 
-### build for production
+### Build for Production
 
 ```bash
 npm run build
@@ -324,64 +324,64 @@ npm run start
 
 ---
 
-## 🎯 features
+## 🎯 Features
 
-### 🎙️ voice interaction
+### 🎙️ Voice Interaction
 
-- **multi-voice support:** 4 pre-configured voices (Rachel, Drew, Clyde, Elli)
-- **real-time streaming:** ElevenLabs conversational AI SDK
-- **agent customization:** system prompt tuning for cultural awareness
-- **transcript capture:** automatic conversation logging to firestore
+- **Multi-Voice Support:** 4 pre-configured voices (Rachel, Drew, Clyde, Elli)
+- **Real-Time Streaming:** ElevenLabs conversational AI SDK
+- **Agent Customization:** System prompt tuning for cultural awareness
+- **Transcript Capture:** Automatic conversation logging to Firestore
 
-### 📊 analysis pipeline
+### 📊 Analysis Pipeline
 
-- **turn-taking metrics:** speaking time distribution, balance analysis
-- **interruption detection:** overlap events, competitive vs. collaborative patterns
-- **silence tracking:** pause analysis, conversational flow
-- **cultural lens:** directness, formality, communication style insights
-- **key moments:** timestamp-indexed highlights with evidence quotes
+- **Turn-Taking Metrics:** Speaking time distribution, balance analysis
+- **Interruption Detection:** Overlap events, competitive vs. collaborative patterns
+- **Silence Tracking:** Pause analysis, conversational flow
+- **Cultural Lens:** Directness, formality, communication style insights
+- **Key Moments:** Timestamp-indexed highlights with evidence quotes
 
-### 🎨 user interface
+### 🎨 User Interface
 
-- **responsive design:** mobile-first, tablet, desktop layouts
-- **dark mode:** system preference detection + manual toggle
-- **accessibility:** WCAG 2.1 AA compliant, keyboard navigation
-- **animations:** framer-motion-inspired transitions
-- **real-time updates:** firestore listeners for live data sync
+- **Responsive Design:** Mobile-first, tablet, desktop layouts
+- **Dark Mode:** System preference detection + manual toggle
+- **Accessibility:** WCAG 2.1 AA compliant, keyboard navigation
+- **Animations:** Framer-motion-inspired transitions
+- **Real-Time Updates:** Firestore listeners for live data sync
 
-### 🔐 authentication
+### 🔐 Authentication
 
-- **5 auth methods:** email/password, Google OAuth, phone (SMS), passwordless email, password reset
-- **account linking:** automatic merging of multiple sign-in methods
-- **session management:** persistent auth state, auto-refresh tokens
-- **profile sync:** firebase auth ↔ firestore bidirectional sync
+- **5 Auth Methods:** Email/password, Google OAuth, phone (SMS), passwordless email, password reset
+- **Account Linking:** Automatic merging of multiple sign-in methods
+- **Session Management:** Persistent auth state, auto-refresh tokens
+- **Profile Sync:** Firebase Auth ↔ Firestore bidirectional sync
 
-### ⚙️ settings & data
+### ⚙️ Settings & Data
 
-- **user preferences:** notifications, auto-save, analysis depth
-- **data retention:** configurable (30/90/365 days, manual only)
-- **GDPR compliance:** full data export (JSON), cascade account deletion
-- **favorite sessions:** star important conversations for quick access
+- **User Preferences:** Notifications, auto-save, analysis depth
+- **Data Retention:** Configurable (30/90/365 days, manual only)
+- **GDPR Compliance:** Full data export (JSON), cascade account deletion
+- **Favorite Sessions:** Star important conversations for quick access
 
 ---
 
-## 🧪 testing & quality
+## 🧪 Testing & Quality
 
-### continuous integration
+### Continuous Integration
 
-github actions runs on every pull request:
+GitHub Actions runs on every pull request:
 
-| check                  | tool         | runtime |
+| Check                  | Tool         | Runtime |
 | ---------------------- | ------------ | ------- |
-| **frontend lint**      | eslint       | ~10s    |
-| **frontend typecheck** | typescript   | ~15s    |
-| **frontend format**    | prettier     | ~5s     |
-| **backend lint**       | ruff         | ~3s     |
-| **backend format**     | ruff format  | ~2s     |
-| **backend test**       | pytest       | ~5s     |
-| **firebase deploy**    | firebase CLI | ~20s    |
+| **Frontend Lint**      | ESLint       | ~10s    |
+| **Frontend Typecheck** | TypeScript   | ~15s    |
+| **Frontend Format**    | Prettier     | ~5s     |
+| **Backend Lint**       | Ruff         | ~3s     |
+| **Backend Format**     | Ruff Format  | ~2s     |
+| **Backend Test**       | Pytest       | ~5s     |
+| **Firebase Deploy**    | Firebase CLI | ~20s    |
 
-### local testing
+### Local Testing
 
 ```bash
 # frontend
@@ -395,27 +395,27 @@ npm run format:backend       # ruff format
 npm run test:backend         # pytest suite
 ```
 
-### code quality metrics
+### Code Quality Metrics
 
-- **typescript strict mode:** enabled
-- **eslint rules:** 50+ rules enforced
-- **prettier config:** consistent formatting
-- **test coverage:** backend endpoints covered
-- **type safety:** zod runtime validation + typescript compile-time checks
+- **TypeScript Strict Mode:** Enabled
+- **ESLint Rules:** 50+ rules enforced
+- **Prettier Config:** Consistent formatting
+- **Test Coverage:** Backend endpoints covered
+- **Type Safety:** Zod runtime validation + TypeScript compile-time checks
 
 ---
 
-## 📦 dependencies
+## 📦 Dependencies
 
-### production dependencies (74 packages)
+### Production Dependencies (74 packages)
 
-**react ecosystem:**
+**React Ecosystem:**
 
-- `next@16.1.4` - react framework with app router
-- `react@19.2.3` - ui library with concurrent features
-- `react-dom@19.2.3` - dom renderer
+- `next@16.1.4` - React framework with App Router
+- `react@19.2.3` - UI library with concurrent features
+- `react-dom@19.2.3` - DOM renderer
 
-**ui components (30 radix primitives):**
+**UI Components (30 Radix primitives):**
 
 - `@radix-ui/react-dialog` - accessible modals
 - `@radix-ui/react-dropdown-menu` - context menus
@@ -425,82 +425,82 @@ npm run test:backend         # pytest suite
 - `@radix-ui/react-toast` - notifications
 - _[24 more radix components]_
 
-**firebase:**
+**Firebase:**
 
-- `firebase@12.8.0` - client SDK (auth, firestore, storage)
-- `firebase-admin@13.6.0` - server SDK (bypasses security rules)
+- `firebase@12.8.0` - Client SDK (Auth, Firestore, Storage)
+- `firebase-admin@13.6.0` - Server SDK (bypasses security rules)
 
-**utilities:**
+**Utilities:**
 
-- `zod@3.25.76` - runtime schema validation
-- `class-variance-authority@0.7.1` - variant styling
-- `clsx@2.1.1` + `tailwind-merge@3.3.1` - class merging
-- `lucide-react@0.454.0` - icon library (1000+ icons)
-- `sonner@1.7.4` - toast notifications
-- `date-fns@4.1.0` - date manipulation
+- `zod@3.25.76` - Runtime schema validation
+- `class-variance-authority@0.7.1` - Variant styling
+- `clsx@2.1.1` + `tailwind-merge@3.3.1` - Class merging
+- `lucide-react@0.454.0` - Icon library (1000+ icons)
+- `sonner@1.7.4` - Toast notifications
+- `date-fns@4.1.0` - Date manipulation
 
-**voice ai:**
+**Voice AI:**
 
-- `@elevenlabs/react@0.13.0` - conversational ai hooks
-- `@elevenlabs/elevenlabs-js@2.32.0` - api client
+- `@elevenlabs/react@0.13.0` - Conversational AI hooks
+- `@elevenlabs/elevenlabs-js@2.32.0` - API client
 
-**charts:**
+**Charts:**
 
-- `recharts@2.15.4` - analytics visualization
+- `recharts@2.15.4` - Analytics visualization
 
-### development dependencies (12 packages)
+### Development Dependencies (12 packages)
 
-- `typescript@5` - type checking
-- `eslint@9.39.2` - linting
-- `prettier@3.8.1` - formatting
-- `tailwindcss@4.1.9` - css framework
-- `concurrently@9.2.1` - parallel script execution
+- `typescript@5` - Type checking
+- `eslint@9.39.2` - Linting
+- `prettier@3.8.1` - Formatting
+- `tailwindcss@4.1.9` - CSS framework
+- `concurrently@9.2.1` - Parallel script execution
 
 ---
 
-## 🌐 deployment
+## 🌐 Deployment
 
-### frontend (vercel)
+### Frontend (Vercel)
 
 ```bash
-# install vercel CLI
+# Install Vercel CLI
 npm i -g vercel
 
-# deploy
+# Deploy
 vercel --prod
 ```
 
-**environment variables to set:**
+**Environment variables to set:**
 
-- all `NEXT_PUBLIC_*` variables from .env
+- All `NEXT_PUBLIC_*` variables from .env
 - `FIREBASE_CLIENT_EMAIL`
 - `FIREBASE_PRIVATE_KEY`
 
-### backend (local development)
+### Backend (Local Development)
 
-for hackathon demonstration, the backend runs locally. use:
+For hackathon demonstration, the backend runs locally. Use:
 
 ```bash
-npm run dev:all  # runs both frontend and backend concurrently
+npm run dev:all  # Runs both frontend and backend concurrently
 ```
 
-the python backend serves at http://localhost:8000 with auto-generated API docs at `/docs`.
+The Python backend serves at http://localhost:8000 with auto-generated API docs at `/docs`.
 
-### firebase
+### Firebase
 
-**firestore rules:**
+**Firestore rules:**
 
 ```bash
 firebase deploy --only firestore:rules
 ```
 
-**firestore indexes:**
+**Firestore indexes:**
 
 ```bash
 firebase deploy --only firestore:indexes
 ```
 
-**storage rules:**
+**Storage rules:**
 
 ```bash
 firebase deploy --only storage
@@ -508,29 +508,29 @@ firebase deploy --only storage
 
 ---
 
-## 📚 documentation
+## 📚 Documentation
 
-- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - firebase configuration guide
-- **[AGENT_PROMPT.md](AGENT_PROMPT.md)** - voice agent system prompt
-- **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)** - elevenlabs integration
-- **[docs/VOICE_SELECTION.md](docs/VOICE_SELECTION.md)** - voice selection guide
-- **[docs/VOICE_SETTINGS_CHEATSHEET.md](docs/VOICE_SETTINGS_CHEATSHEET.md)** - quick reference
+- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Firebase configuration guide
+- **[AGENT_PROMPT.md](AGENT_PROMPT.md)** - Voice agent system prompt
+- **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)** - ElevenLabs integration
+- **[docs/VOICE_SELECTION.md](docs/VOICE_SELECTION.md)** - Voice selection guide
+- **[docs/VOICE_SETTINGS_CHEATSHEET.md](docs/VOICE_SETTINGS_CHEATSHEET.md)** - Quick reference
 
 ---
 
-## 👥 team
+## 👥 Team
 
-built at **MLH HackHive 2026** by:
+Built at **MLH HackHive 2026** by:
 
-| contributor             | github                                             | role                     |
+| Contributor             | GitHub                                             | Role                     |
 | ----------------------- | -------------------------------------------------- | ------------------------ |
-| **sunny patel**         | [@sunnypatell](https://github.com/sunnypatell)     | full-stack, architecture |
-| **daniyal lilani**      | [@daniyallilani](https://github.com/daniyallilani) | backend, ai/ml           |
-| **aryan kashefi-aazam** | [@aryan-ka](https://github.com/aryan-ka)           | frontend, ui/ux          |
+| **Sunny Patel**         | [@sunnypatell](https://github.com/sunnypatell)     | Full-Stack, Architecture |
+| **Daniyal Lilani**      | [@daniyallilani](https://github.com/daniyallilani) | Backend, AI/ML           |
+| **Aryan Kashefi-Aazam** | [@aryan-ka](https://github.com/aryan-ka)           | Frontend, UI/UX          |
 
 ---
 
-## 📄 license
+## 📄 License
 
 [MIT](LICENSE) © 2026 CultureLens Team
 
@@ -538,8 +538,8 @@ built at **MLH HackHive 2026** by:
 
 <div align="center">
 
-**[↑ back to top](#culturelens)**
+**[↑ Back to Top](#culturelens)**
 
-made with ❤️ at ontario tech university
+Made with ❤️ at Ontario Tech University
 
 </div>

@@ -341,6 +341,5 @@ const userId = decodedToken.uid;
 
 ---
 
-_prepared by: claude code_
 _session date: january 25, 2026_
 _hackathon: hackhive 2026 @ ontario tech university_
