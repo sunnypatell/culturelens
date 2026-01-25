@@ -3,16 +3,27 @@
 
 export type Session = {
   id: string;
+  userId: string;
   createdAt: string;
   consent: { personA: boolean; personB: boolean; timestamp: string };
   settings: {
+    title?: string;
+    sessionType?: string;
+    participantCount?: number;
     storageMode: "ephemeral" | "transcriptOnly";
     voiceId: string;
-    analysisDepth: "quick" | "standard" | "deep";
-    culturalContextTags: string[];
-    sensitivityLevel: number;
+    analysisMethod?: string;
+    analysisDepth?: "quick" | "standard" | "deep";
+    culturalContextTags?: string[];
+    sensitivityLevel?: number;
   };
   status: "recording" | "uploading" | "processing" | "ready" | "failed";
+  audioUrl?: string;
+  audioPath?: string;
+  analysisResult?: AnalysisResult;
+  analyzedAt?: string;
+  duration?: number;
+  isFavorite?: boolean;
 };
 
 export type Segment = {
