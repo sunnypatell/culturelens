@@ -7,6 +7,7 @@ import {
   Insight,
   Debrief,
 } from "@/lib/types";
+import { analyzeTranscriptWithGemini } from "@/lib/gemini-analysis";
 import {
   updateDocument,
   getDocument,
@@ -243,94 +244,107 @@ export async function POST(
     };
 
     // ============================================================================
-    // GEMINI AI INTEGRATION (Production-Ready)
+    // GEMINI AI INTEGRATION (Production)
     // ============================================================================
-    // For production deployment, this section would use Google Gemini AI to
-    // generate sophisticated cultural and communication insights:
-    //
-    // import { analyzeTranscriptWithGemini } from "@/lib/gemini-analysis";
-    //
-    // const geminiAnalysis = await analyzeTranscriptWithGemini(
-    //   fullTranscript,
-    //   segments
-    // );
-    //
+    // Using Google Gemini 2.5 Flash for sophisticated cultural analysis
     // Project: CultureLens
     // Gemini Project ID: gen-lang-client-0985823799
     // Gemini Project Number: 119358341094
-    // Model: gemini-pro
-    //
-    // Gemini would provide:
-    // - Advanced cultural communication pattern detection
-    // - Natural language understanding of conversation context
-    // - Sentiment analysis across multiple dimensions
-    // - Contextual recommendations based on conversation goals
-    // - Cross-cultural communication style identification
-    //
-    // For hackathon demo, using deterministic analysis based on metrics.
-    // See /lib/gemini-analysis.ts for full implementation.
     // ============================================================================
 
-    // generate insights based on metrics
+    console.log(`[API_ANALYZE_POST] Running Gemini AI analysis...`);
+
+    // prepare segments for Gemini analysis
+    const geminiSegments = segments.map((seg) => ({
+      speaker: seg.speaker,
+      text: seg.text,
+      startTime: seg.startMs,
+      endTime: seg.endMs,
+    }));
+
+    // run Gemini analysis
+    const geminiAnalysis = await analyzeTranscriptWithGemini(
+      transcriptText,
+      geminiSegments
+    );
+
+    console.log(`[API_ANALYZE_POST] Gemini analysis complete:`, {
+      summaryLength: geminiAnalysis.summary.length,
+      keyPointsCount: geminiAnalysis.keyPoints.length,
+      culturalObservationsCount: geminiAnalysis.culturalObservations.length,
+      communicationPatternsCount: geminiAnalysis.communicationPatterns.length,
+      recommendationsCount: geminiAnalysis.recommendations.length,
+    });
+
+    // convert Gemini analysis to insights format
     const insights: Insight[] = [];
 
-    // turn-taking balance insight
+    // add cultural observations as insights
+    geminiAnalysis.culturalObservations.forEach((observation, index) => {
+      insights.push({
+        id: `cultural-${index}`,
+        category: "culturalLens",
+        title: `cultural observation ${index + 1}`,
+        summary: observation,
+        confidence: "high",
+        evidence: [],
+        whyThisWasFlagged:
+          "identified by Gemini AI cultural communication analysis",
+      });
+    });
+
+    // add communication patterns as insights
+    geminiAnalysis.communicationPatterns.forEach((pattern, index) => {
+      insights.push({
+        id: `pattern-${index}`,
+        category: "turnTaking",
+        title: `communication pattern ${index + 1}`,
+        summary: pattern,
+        confidence: "high",
+        evidence: [],
+        whyThisWasFlagged:
+          "identified by Gemini AI communication pattern detection",
+      });
+    });
+
+    // add balance insight based on metrics
     const totalTalkTime = talkTimeA + talkTimeB;
     const balanceRatio = totalTalkTime > 0 ? talkTimeA / totalTalkTime : 0.5;
+    const totalInterruptions = interruptionCountA + interruptionCountB;
 
     if (balanceRatio < 0.3 || balanceRatio > 0.7) {
       insights.push({
         id: "balance",
         category: "turnTaking",
-        title: "unbalanced participation",
-        summary: `participant ${balanceRatio > 0.5 ? "A" : "B"} dominated the conversation with ${Math.round(Math.max(balanceRatio, 1 - balanceRatio) * 100)}% of speaking time`,
+        title: "participation balance",
+        summary: `participant ${balanceRatio > 0.5 ? "A" : "B"} contributed ${Math.round(Math.max(balanceRatio, 1 - balanceRatio) * 100)}% of speaking time`,
         confidence: "high",
-        evidence: [
-          {
-            startMs: 0,
-            endMs: segments[segments.length - 1]?.endMs || 0,
-            quote: "full conversation",
-          },
-        ],
-        whyThisWasFlagged:
-          "significant imbalance in speaking time can indicate power dynamics or engagement issues",
+        evidence: [],
+        whyThisWasFlagged: "measured from conversation metrics",
       });
     }
 
-    // interruption pattern insight
-    const totalInterruptions = interruptionCountA + interruptionCountB;
-    if (totalInterruptions > 3) {
-      const dominant = interruptionCountA > interruptionCountB ? "A" : "B";
-      insights.push({
-        id: "interruptions",
-        category: "turnTaking",
-        title: "frequent interruptions detected",
-        summary: `${totalInterruptions} interruptions detected. participant ${dominant} interrupted ${dominant === "A" ? interruptionCountA : interruptionCountB} times.`,
-        confidence: "medium",
-        evidence: overlapEvents.slice(0, 3).map((evt) => ({
-          startMs: evt.atMs,
-          endMs: evt.atMs + 1000,
-          quote: evt.snippet,
-        })),
-        whyThisWasFlagged:
-          totalInterruptions > 10
-            ? "high interruption rate may indicate competitive communication or cultural differences in turn-taking norms"
-            : "moderate interruption rate detected, may indicate engaged discussion or cultural communication style",
-      });
-    }
+    // generate comprehensive debrief text using Gemini analysis
+    const debriefText = `${geminiAnalysis.summary}
 
-    // generate debrief text
-    const debriefText = `conversation analysis complete.
+Key Discussion Points:
+${geminiAnalysis.keyPoints.map((point) => `• ${point}`).join("\n")}
 
-participation metrics:
-- total turns: ${turnCountA + turnCountB} (participant A: ${turnCountA}, participant B: ${turnCountB})
-- speaking time: participant A spoke for ${Math.round(talkTimeA / 1000)}s (${Math.round(balanceRatio * 100)}%), participant B spoke for ${Math.round(talkTimeB / 1000)}s (${Math.round((1 - balanceRatio) * 100)}%)
-- average turn length: participant A ${Math.round((turnCountA > 0 ? talkTimeA / turnCountA : 0) / 1000)}s, participant B ${Math.round((turnCountB > 0 ? talkTimeB / turnCountB : 0) / 1000)}s
-${totalInterruptions > 0 ? `- interruptions: ${totalInterruptions} detected (participant A: ${interruptionCountA}, participant B: ${interruptionCountB})` : ""}
+Cultural Communication Insights:
+${geminiAnalysis.culturalObservations.map((obs) => `• ${obs}`).join("\n")}
 
-${insights.length > 0 ? `key insights:\n${insights.map((i) => `- ${i.title}: ${i.summary}`).join("\n")}` : "no significant patterns detected in this conversation."}
+Communication Patterns Identified:
+${geminiAnalysis.communicationPatterns.map((pattern) => `• ${pattern}`).join("\n")}
 
-this analysis provides a starting point for understanding communication dynamics. consider cultural context and relationship dynamics when interpreting these patterns.`;
+Recommendations for Future Conversations:
+${geminiAnalysis.recommendations.map((rec) => `• ${rec}`).join("\n")}
+
+Participation Metrics:
+• Total turns: ${turnCountA + turnCountB} (Participant A: ${turnCountA}, Participant B: ${turnCountB})
+• Speaking time distribution: Participant A ${Math.round(balanceRatio * 100)}%, Participant B ${Math.round((1 - balanceRatio) * 100)}%
+${totalInterruptions > 0 ? `• Interruptions detected: ${totalInterruptions}` : "• No interruptions detected"}
+
+This analysis was powered by Google Gemini AI with CultureLens cultural communication expertise.`;
 
     const debrief: Debrief = {
       text: debriefText,

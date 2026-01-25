@@ -10,7 +10,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // Gemini configuration
 const GEMINI_PROJECT_ID = "gen-lang-client-0985823799";
 const GEMINI_PROJECT_NUMBER = "119358341094";
-const GEMINI_MODEL = "gemini-pro";
+const GEMINI_MODEL = "gemini-2.5-flash"; // Updated from deprecated gemini-pro
 
 interface TranscriptSegment {
   speaker: string;
@@ -85,43 +85,47 @@ function buildAnalysisPrompt(
       ? (segments[segments.length - 1].endTime / 1000).toFixed(1)
       : "0";
 
-  return `
-You are a cultural communication expert analyzing a conversation transcript.
+  return `You are a cultural communication expert analyzing a conversation transcript.
 
 CONVERSATION METADATA:
 - Duration: ${duration} seconds
-- Participants: ${speakerCount} speakers
+- Participants: ${speakerCount || 2} speakers
 - Context: Workplace conversation for conflict resolution
 
 TRANSCRIPT:
 ${transcript}
 
 ANALYSIS REQUIREMENTS:
-Provide a structured analysis in the following format:
+Provide a structured analysis in PLAIN TEXT format (NO markdown, NO asterisks, NO bold/italic formatting).
 
-SUMMARY: (2-3 sentences describing the conversation's overall tone and purpose)
+Use this EXACT format:
 
-KEY POINTS: (5-7 bullet points of main discussion topics)
-- Point 1
-- Point 2
-...
+SUMMARY: Write 2-3 sentences describing the conversation's overall tone and purpose.
 
-CULTURAL OBSERVATIONS: (3-5 insights about communication styles)
-- Observation 1
-- Observation 2
-...
+KEY POINTS:
+- First main discussion point
+- Second main discussion point
+- Third main discussion point
+- Fourth main discussion point
+- Fifth main discussion point
 
-COMMUNICATION PATTERNS: (4-6 patterns identified)
-- Pattern 1
-- Pattern 2
-...
+CULTURAL OBSERVATIONS:
+- First cultural insight about communication styles
+- Second cultural insight
+- Third cultural insight
 
-RECOMMENDATIONS: (3-4 actionable suggestions)
-- Recommendation 1
-- Recommendation 2
-...
+COMMUNICATION PATTERNS:
+- First pattern identified with evidence
+- Second pattern identified
+- Third pattern identified
+- Fourth pattern identified
 
-Focus on:
+RECOMMENDATIONS:
+- First actionable suggestion for improvement
+- Second suggestion
+- Third suggestion
+
+Focus your analysis on:
 - Turn-taking balance and interruption patterns
 - Directness vs. indirectness in communication
 - Formality levels and power dynamics
@@ -129,8 +133,7 @@ Focus on:
 - Conflict resolution approaches
 - Cultural communication preferences
 
-Provide specific evidence from the transcript to support observations.
-`;
+IMPORTANT: Use plain text only. Do not use asterisks (*), double asterisks (**), or any markdown formatting. Each bullet point should start with a single hyphen (-) followed by a space.`;
 }
 
 /**
@@ -145,12 +148,17 @@ function parseGeminiResponse(text: string): AnalysisResult {
     recommendations: [] as string[],
   };
 
-  // Extract summary
+  // Extract summary and clean markdown
   const summaryMatch = text.match(
     /SUMMARY:\s*([^\n]+(?:\n(?!KEY POINTS)[^\n]+)*)/i
   );
   if (summaryMatch) {
-    sections.summary = summaryMatch[1].trim();
+    let summary = summaryMatch[1].trim();
+    // Clean markdown formatting
+    summary = summary.replace(/\*\*([^*]+)\*\*/g, "$1");
+    summary = summary.replace(/\*([^*]+)\*/g, "$1");
+    summary = summary.replace(/\*/g, "");
+    sections.summary = summary;
   }
 
   // Extract key points
@@ -187,14 +195,26 @@ function parseGeminiResponse(text: string): AnalysisResult {
 }
 
 /**
- * Extracts bullet points from text block
+ * Extracts bullet points from text block and cleans markdown formatting
  */
 function extractBulletPoints(text: string): string[] {
   return text
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => line.startsWith("-") || line.match(/^\d+\./))
-    .map((line) => line.replace(/^[-\d.]\s*/, "").trim())
+    .filter(
+      (line) =>
+        line.startsWith("-") || line.startsWith("*") || line.match(/^\d+\./)
+    )
+    .map((line) => {
+      // Remove bullet point prefixes
+      let cleaned = line.replace(/^[-*\d.]+\s*/, "").trim();
+      // Remove markdown bold/italic formatting (** and *)
+      cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, "$1");
+      cleaned = cleaned.replace(/\*([^*]+)\*/g, "$1");
+      // Remove any remaining asterisks
+      cleaned = cleaned.replace(/\*/g, "");
+      return cleaned;
+    })
     .filter((line) => line.length > 0);
 }
 
