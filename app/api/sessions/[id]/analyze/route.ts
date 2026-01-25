@@ -1,46 +1,50 @@
-// CultureLens — Analysis Pipeline API
-// POST /api/sessions/[id]/analyze — trigger the full analysis pipeline
-// GET  /api/sessions/[id]/analyze — get analysis results
+// session analysis pipeline API endpoint
 
-import { NextResponse } from "next/server";
 import { AnalysisResult, Segment, Metrics, Insight, Debrief } from "@/lib/types";
 import { updateDocument, getDocument } from "@/lib/firebase-server-utils";
+import {
+  apiHandler,
+  apiSuccess,
+  ApiErrors,
+  DatabaseError,
+  NotFoundError,
+  validateParams,
+} from "@/lib/api";
+import { SessionSchemas } from "@/lib/api/schemas";
 
+/**
+ * POST /api/sessions/[id]/analyze
+ * triggers the full analysis pipeline for a session
+ */
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
+  return apiHandler(async () => {
+    // validate params
+    const { id } = validateParams(await params, SessionSchemas.params);
 
-    // Check if session exists
+    // check if session exists
     let session: any;
     try {
       session = await getDocument("sessions", id);
-    } catch (firestoreError) {
-      console.error("firestore error fetching session:", firestoreError);
-      return NextResponse.json(
-        { error: "database error while fetching session" },
-        { status: 503 }
-      );
+    } catch (error) {
+      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
     }
 
     if (!session) {
-      return NextResponse.json(
-        { error: "session not found" },
-        { status: 404 }
-      );
+      throw new NotFoundError("session", id);
     }
 
     if (session.status !== "processing") {
-      return NextResponse.json(
-        { error: "session is not ready for analysis" },
-        { status: 400 }
+      return ApiErrors.badRequest(
+        "session is not ready for analysis",
+        `current status: ${session.status}`
       );
     }
 
-    // TODO: Implement actual analysis pipeline
-    // For now, create mock analysis results
+    // TODO: implement actual analysis pipeline
+    // for now, create mock analysis results
     const mockSegments: Segment[] = [
       {
         startMs: 0,
@@ -74,7 +78,7 @@ export async function POST(
       escalation: [],
     };
 
-    const mockInsights: Insight[] = []; // Currently empty as requested
+    const mockInsights: Insight[] = [];
 
     const mockDebrief: Debrief = {
       text: "This is a placeholder debrief. Analysis pipeline not yet implemented.",
@@ -97,71 +101,56 @@ export async function POST(
       debrief: mockDebrief,
     };
 
-    // Store analysis results in Firestore
+    // store analysis results in firestore
     try {
       await updateDocument("sessions", id, {
         status: "ready",
         analysisResult,
         analyzedAt: new Date().toISOString(),
       });
-    } catch (firestoreError) {
-      console.error("firestore error storing analysis:", firestoreError);
-      return NextResponse.json(
-        { error: "analysis completed but failed to store results" },
-        { status: 503 }
+    } catch (error) {
+      throw new DatabaseError(
+        "analysis storage",
+        error instanceof Error ? error.message : undefined
       );
     }
 
-    return NextResponse.json(analysisResult);
-  } catch (error) {
-    console.error("analysis error:", error);
-    const errorMessage = error instanceof Error ? error.message : "unknown error";
-    return NextResponse.json(
-      { error: "failed to analyze session", details: errorMessage },
-      { status: 500 }
-    );
-  }
+    return apiSuccess(analysisResult, {
+      message: "analysis completed successfully",
+    });
+  });
 }
 
+/**
+ * GET /api/sessions/[id]/analyze
+ * retrieves analysis results for a session
+ */
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
+  return apiHandler(async () => {
+    // validate params
+    const { id } = validateParams(await params, SessionSchemas.params);
 
     let session: any;
     try {
       session = await getDocument("sessions", id);
-    } catch (firestoreError) {
-      console.error("firestore error fetching session:", firestoreError);
-      return NextResponse.json(
-        { error: "database error while fetching session" },
-        { status: 503 }
-      );
+    } catch (error) {
+      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
     }
 
     if (!session) {
-      return NextResponse.json(
-        { error: "session not found" },
-        { status: 404 }
-      );
+      throw new NotFoundError("session", id);
     }
 
     if (session.status !== "ready" || !session.analysisResult) {
-      return NextResponse.json(
-        { error: "analysis not complete" },
-        { status: 202 }
+      return ApiErrors.badRequest(
+        "analysis not complete",
+        `current status: ${session.status}`
       );
     }
 
-    return NextResponse.json(session.analysisResult);
-  } catch (error) {
-    console.error("analysis retrieval error:", error);
-    const errorMessage = error instanceof Error ? error.message : "unknown error";
-    return NextResponse.json(
-      { error: "failed to get analysis results", details: errorMessage },
-      { status: 500 }
-    );
-  }
+    return apiSuccess(session.analysisResult);
+  });
 }

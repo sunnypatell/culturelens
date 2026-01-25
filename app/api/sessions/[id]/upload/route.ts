@@ -1,94 +1,93 @@
-// CultureLens — Audio Upload API
-// POST /api/sessions/[id]/upload — receive recorded audio blob
+// session audio upload API endpoint
 
-import { NextResponse } from "next/server";
-import { uploadFile } from "@/lib/firebase-server-utils";
-import { updateDocument, getDocument } from "@/lib/firebase-server-utils";
+import { getDocument, updateDocument, uploadFile } from "@/lib/firebase-server-utils";
+import {
+  apiHandler,
+  apiSuccess,
+  ApiErrors,
+  DatabaseError,
+  ExternalServiceError,
+  NotFoundError,
+  validateParams,
+} from "@/lib/api";
+import { SessionSchemas } from "@/lib/api/schemas";
 
+/**
+ * POST /api/sessions/[id]/upload
+ * uploads audio file for a session and updates session status
+ */
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { id } = await params;
+  return apiHandler(async () => {
+    // validate params
+    const { id } = validateParams(await params, SessionSchemas.params);
 
-    // Check if session exists
+    // check if session exists
     let session: any;
     try {
       session = await getDocument("sessions", id);
-    } catch (firestoreError) {
-      console.error("firestore error fetching session:", firestoreError);
-      return NextResponse.json(
-        { error: "database error while fetching session" },
-        { status: 503 }
-      );
+    } catch (error) {
+      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
     }
 
     if (!session) {
-      return NextResponse.json(
-        { error: "session not found" },
-        { status: 404 }
-      );
+      throw new NotFoundError("session", id);
     }
 
     if (session.status !== "recording") {
-      return NextResponse.json(
-        { error: "session is not in recording state" },
-        { status: 400 }
+      return ApiErrors.badRequest(
+        "session is not in recording state",
+        `current status: ${session.status}`
       );
     }
 
+    // extract audio file from form data
     const formData = await request.formData();
     const audioFile = formData.get("audio") as File;
 
     if (!audioFile) {
-      return NextResponse.json(
-        { error: "no audio file provided" },
-        { status: 400 }
-      );
+      return ApiErrors.badRequest("no audio file provided");
     }
 
-    // Upload to Firebase Storage
+    // upload to firebase storage
     const storagePath = `audio/${id}/${audioFile.name}`;
     let downloadURL: string;
+
     try {
       const result = await uploadFile(audioFile, storagePath);
       downloadURL = result.downloadURL;
-    } catch (storageError) {
-      console.error("firebase storage error:", storageError);
-      return NextResponse.json(
-        { error: "failed to upload audio file to storage" },
-        { status: 503 }
+    } catch (error) {
+      throw new ExternalServiceError(
+        "firebase storage",
+        error instanceof Error ? error.message : undefined
       );
     }
 
-    // Update session status and add audio URL
+    // update session status and add audio url
     try {
       await updateDocument("sessions", id, {
         status: "processing",
         audioUrl: downloadURL,
         audioPath: storagePath,
       });
-    } catch (firestoreError) {
-      console.error("firestore error updating session:", firestoreError);
-      return NextResponse.json(
-        { error: "audio uploaded but failed to update session" },
-        { status: 503 }
+    } catch (error) {
+      throw new DatabaseError(
+        "session update",
+        error instanceof Error ? error.message : undefined
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      sessionId: id,
-      audioUrl: downloadURL,
-      message: "audio uploaded successfully",
-    });
-  } catch (error) {
-    console.error("audio upload error:", error);
-    const errorMessage = error instanceof Error ? error.message : "unknown error";
-    return NextResponse.json(
-      { error: "failed to upload audio", details: errorMessage },
-      { status: 500 }
+    return apiSuccess(
+      {
+        sessionId: id,
+        audioUrl: downloadURL,
+      },
+      {
+        message: "audio uploaded successfully",
+        status: 200,
+      }
     );
-  }
+  });
 }
