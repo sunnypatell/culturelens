@@ -541,7 +541,7 @@ export function RecordingStudio() {
                   patterns.
                 </p>
               </div>
-              <VoiceAgent />
+              <VoiceAgent sessionId={currentSessionId || undefined} />
               <p className="text-xs text-muted-foreground italic">
                 CultureLens provides reflection, not advice or therapy.
                 Interpretations are hypotheses, not facts.
