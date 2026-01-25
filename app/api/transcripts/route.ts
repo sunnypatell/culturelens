@@ -1,43 +1,45 @@
-// CultureLens — Transcript Management API
-// POST /api/transcripts — save conversation transcript
+// transcript management API endpoint
 
-import { NextResponse } from "next/server";
 import { createDocument } from "@/lib/firebase-server-utils";
+import {
+  apiHandler,
+  apiSuccess,
+  DatabaseError,
+  validateRequest,
+} from "@/lib/api";
+import { TranscriptSchemas } from "@/lib/api/schemas";
 
+/**
+ * POST /api/transcripts
+ * saves a conversation transcript
+ */
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { sessionId, transcript, timestamp, segments } = body;
-
-    if (!sessionId || !transcript) {
-      return NextResponse.json(
-        { error: "missing sessionId or transcript" },
-        { status: 400 }
-      );
-    }
+  return apiHandler(async () => {
+    // validate request body
+    const body = await validateRequest(request, TranscriptSchemas.create);
 
     // store transcript in firestore
-    const transcriptId = await createDocument("transcripts", {
-      sessionId,
-      transcript,
-      timestamp: timestamp || new Date().toISOString(),
-      segments: segments || [],
-    });
+    let transcriptId: string;
+    try {
+      transcriptId = await createDocument("transcripts", {
+        sessionId: body.sessionId,
+        transcript: body.transcript,
+        timestamp: body.timestamp || new Date().toISOString(),
+        segments: body.segments || [],
+      });
+    } catch (error) {
+      throw new DatabaseError("transcript save", error instanceof Error ? error.message : undefined);
+    }
 
-    return NextResponse.json(
+    return apiSuccess(
       {
-        success: true,
         transcriptId,
-        sessionId,
-        message: "transcript saved successfully",
+        sessionId: body.sessionId,
       },
-      { status: 201 }
+      {
+        message: "transcript saved successfully",
+        status: 201,
+      }
     );
-  } catch (error) {
-    console.error("transcript save error:", error);
-    return NextResponse.json(
-      { error: "failed to save transcript" },
-      { status: 500 }
-    );
-  }
+  });
 }

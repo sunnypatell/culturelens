@@ -4,33 +4,32 @@
 // Uses ElevenLabs TTS API to generate the audio debrief.
 // Requires ELEVENLABS_API_KEY env var.
 
-import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import {
+  apiHandler,
+  apiSuccess,
+  ExternalServiceError,
+  validateRequest,
+} from "@/lib/api";
+import { ElevenLabsSchemas } from "@/lib/api/schemas";
 
 export async function POST(request: Request) {
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  return apiHandler(async () => {
+    const apiKey = process.env.ELEVENLABS_API_KEY;
 
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: "Missing ELEVENLABS_API_KEY" },
-      { status: 500 }
-    );
-  }
-
-  try {
-    // 1. Parse request body: { text: string, voiceId?: string }
-    const body = await request.json();
-    const { text, voiceId = "21m00Tcm4TlvDq8ikWAM" } = body; // Default to Rachel voice
-
-    if (!text || typeof text !== "string") {
-      return NextResponse.json(
-        { error: "Missing or invalid 'text' field" },
-        { status: 400 }
+    if (!apiKey) {
+      throw new ExternalServiceError(
+        "elevenlabs configuration",
+        "ELEVENLABS_API_KEY environment variable is not set"
       );
     }
 
-    // 2. Call ElevenLabs TTS API
+    // validate request body
+    const body = await validateRequest(request, ElevenLabsSchemas.tts);
+    const { text, voiceId = "21m00Tcm4TlvDq8ikWAM" } = body; // default to rachel voice
+
+    // call elevenlabs TTS API
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
@@ -54,38 +53,46 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: `ElevenLabs API error: ${response.status} - ${errorData?.detail || response.statusText}` },
-        { status: response.status }
+      throw new ExternalServiceError(
+        "elevenlabs API",
+        `${response.status} - ${errorData?.detail || response.statusText}`
       );
     }
 
-    // 3. Receive audio stream (mpeg)
+    // receive audio stream (mpeg)
     const audioBuffer = await response.arrayBuffer();
 
-    // 4. Store/cache the audio file
-    const audioDir = path.join(process.cwd(), "public", "audio");
-    await fs.mkdir(audioDir, { recursive: true });
-
+    // upload to firebase storage
     const fileName = `tts-${Date.now()}-${Math.random().toString(36).substring(2)}.mp3`;
-    const filePath = path.join(audioDir, fileName);
-    await fs.writeFile(filePath, Buffer.from(audioBuffer));
+    const storagePath = `audio/tts/${fileName}`;
+    const storageRef = ref(storage, storagePath);
 
-    // 5. Return { audioUrl, durationMs }
-    // Note: Duration estimation (rough calculation: ~150 words per minute)
+    let downloadURL: string;
+    try {
+      const snapshot = await uploadBytes(storageRef, audioBuffer, {
+        contentType: "audio/mpeg",
+      });
+      downloadURL = await getDownloadURL(snapshot.ref);
+    } catch (error) {
+      throw new ExternalServiceError(
+        "firebase storage",
+        error instanceof Error ? error.message : undefined
+      );
+    }
+
+    // calculate duration estimate (~150 words per minute)
     const wordCount = text.split(/\s+/).length;
-    const estimatedDurationMs = Math.max(3000, (wordCount / 150) * 60 * 1000); // Minimum 3 seconds
+    const estimatedDurationMs = Math.max(3000, (wordCount / 150) * 60 * 1000); // minimum 3 seconds
 
-    return NextResponse.json({
-      audioUrl: `/audio/${fileName}`,
-      durationMs: Math.round(estimatedDurationMs),
-      wordCount,
-    });
-  } catch (error) {
-    console.error("TTS API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error during TTS generation" },
-      { status: 500 }
+    return apiSuccess(
+      {
+        audioUrl: downloadURL,
+        durationMs: Math.round(estimatedDurationMs),
+        wordCount,
+      },
+      {
+        message: "audio generated successfully",
+      }
     );
-  }
+  });
 }

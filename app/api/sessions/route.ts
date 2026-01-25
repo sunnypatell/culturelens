@@ -1,76 +1,77 @@
-// CultureLens — Session Management API
-// POST /api/sessions — create a new recording session
-// GET  /api/sessions — list sessions (for analysis library)
+// session management API endpoints
 
-import { NextResponse } from "next/server";
 import { Session } from "@/lib/types";
 import { createDocument, getDocuments, orderByField } from "@/lib/firebase-server-utils";
+import {
+  apiHandler,
+  apiSuccess,
+  ApiErrors,
+  DatabaseError,
+  validateRequest,
+} from "@/lib/api";
+import { SessionSchemas } from "@/lib/api/schemas";
 
+/**
+ * POST /api/sessions
+ * creates a new conversation session with consent and settings
+ */
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { consent, settings } = body;
+  return apiHandler(async () => {
+    // validate request body
+    const body = await validateRequest(request, SessionSchemas.create);
 
-    if (!consent || !settings) {
-      return NextResponse.json(
-        { error: "missing consent or settings" },
-        { status: 400 }
+    // validate dual consent
+    if (!(body.consent.personA && body.consent.personB)) {
+      return ApiErrors.validationError(
+        "both participants must consent",
+        "consent.personA and consent.personB must both be true"
       );
     }
 
-    // Validate dual consent
-    if (!(consent.personA && consent.personB)) {
-      return NextResponse.json(
-        { error: "both participants must consent" },
-        { status: 400 }
-      );
-    }
-
-    // Generate unique session ID
+    // generate unique session id
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const session: Session = {
       id: sessionId,
       createdAt: new Date().toISOString(),
-      consent,
-      settings,
+      consent: {
+        ...body.consent,
+        timestamp: body.consent.timestamp || new Date().toISOString(),
+      },
+      settings: body.settings,
       status: "recording",
     };
 
-    // Store in Firestore
+    // store in firestore
     try {
       await createDocument("sessions", session);
-    } catch (firestoreError) {
-      console.error("firestore error creating session:", firestoreError);
-      return NextResponse.json(
-        { error: "database error while creating session" },
-        { status: 503 }
-      );
+    } catch (error) {
+      throw new DatabaseError("session creation", error instanceof Error ? error.message : undefined);
     }
 
-    return NextResponse.json(session, { status: 201 });
-  } catch (error) {
-    console.error("session creation error:", error);
-    const errorMessage = error instanceof Error ? error.message : "unknown error";
-    return NextResponse.json(
-      { error: "failed to create session", details: errorMessage },
-      { status: 500 }
-    );
-  }
+    return apiSuccess(session, {
+      message: "session created successfully",
+      status: 201,
+    });
+  });
 }
 
+/**
+ * GET /api/sessions
+ * retrieves all sessions, ordered by creation date (most recent first)
+ */
 export async function GET() {
-  try {
-    // Get all sessions from Firestore, ordered by createdAt desc
-    const sessions = await getDocuments("sessions", [orderByField("createdAt", "desc")]);
+  return apiHandler(async () => {
+    try {
+      const sessions = await getDocuments("sessions", [
+        orderByField("createdAt", "desc"),
+      ]);
 
-    return NextResponse.json(sessions);
-  } catch (error) {
-    console.error("session listing error:", error);
-    const errorMessage = error instanceof Error ? error.message : "unknown error";
-    return NextResponse.json(
-      { error: "failed to list sessions", details: errorMessage },
-      { status: 500 }
-    );
-  }
+      return apiSuccess(sessions, {
+        meta: { total: sessions.length },
+      });
+    } catch (error) {
+      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
+    }
+  });
 }
