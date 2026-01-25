@@ -2,15 +2,15 @@
 
 import { NextResponse } from "next/server";
 import { ApiError } from "./errors";
-import { apiError } from "./responses";
+import { apiError, ApiSuccessResponse, ApiErrorResponse } from "./responses";
 
 /**
  * wraps API route handlers with unified error handling
  * automatically catches and formats errors
  */
 export function apiHandler<T = unknown>(
-  handler: () => Promise<NextResponse<T>>
-): Promise<NextResponse<T>> {
+  handler: () => Promise<NextResponse<ApiSuccessResponse<T> | ApiErrorResponse>>
+): Promise<NextResponse<ApiSuccessResponse<T> | ApiErrorResponse>> {
   return handler().catch((error: unknown) => {
     // handle custom API errors
     if (error instanceof ApiError) {
@@ -18,7 +18,7 @@ export function apiHandler<T = unknown>(
         status: error.status,
         details: error.details,
         hint: error.hint,
-      }) as NextResponse<T>;
+      });
     }
 
     // handle unexpected errors
@@ -28,11 +28,13 @@ export function apiHandler<T = unknown>(
     return apiError("INTERNAL_ERROR", "an unexpected error occurred", {
       status: 500,
       details: errorMessage,
-    }) as NextResponse<T>;
+    });
   });
 }
 
 /**
  * type helper for API route handlers
  */
-export type ApiRouteHandler<T = unknown> = () => Promise<NextResponse<T>>;
+export type ApiRouteHandler<T = unknown> = () => Promise<
+  NextResponse<ApiSuccessResponse<T> | ApiErrorResponse>
+>;
