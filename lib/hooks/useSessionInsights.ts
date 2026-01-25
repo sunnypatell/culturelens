@@ -250,23 +250,51 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
           throw new Error("Not authenticated");
         }
 
-        // fetch analysis results
-        const response = await fetch(`/api/sessions/${sessionId}/analyze`, {
+        // try to fetch existing analysis results
+        let response = await fetch(`/api/sessions/${sessionId}/analyze`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        let responseData = await response.json();
+
+        // if analysis not complete, trigger it
+        if (
+          !response.ok &&
+          responseData.error?.message?.includes("analysis not complete")
+        ) {
+          console.log(
+            "[useSessionInsights] Analysis not ready, triggering analysis..."
+          );
+
+          // trigger analysis via POST
+          const triggerResponse = await fetch(
+            `/api/sessions/${sessionId}/analyze`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!triggerResponse.ok) {
+            const triggerData = await triggerResponse.json();
+            throw new Error(
+              triggerData.error?.message || "Failed to trigger analysis"
+            );
+          }
+
+          responseData = await triggerResponse.json();
+        } else if (!response.ok) {
           throw new Error(
-            errorData.error?.message ||
+            responseData.error?.message ||
               `Failed to fetch insights: ${response.status}`
           );
         }
 
-        const result: { data: AnalysisResult } = await response.json();
-        const analysisResult = result.data;
+        const analysisResult = responseData.data as AnalysisResult;
 
         // transform data for UI
         const communicationPatterns = transformToCommunicationPatterns(

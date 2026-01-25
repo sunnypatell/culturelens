@@ -13,8 +13,11 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
-// singleton pattern to ensure Firestore settings are only configured once
-let firestoreInstance: ReturnType<typeof getFirestore> | null = null;
+// global singleton to survive hot-reload in development
+const globalForFirebase = globalThis as unknown as {
+  firestoreInstance: ReturnType<typeof getFirestore> | undefined;
+  firestoreSettingsApplied: boolean | undefined;
+};
 
 // initialize Firebase Admin SDK
 function initializeFirebaseAdmin() {
@@ -39,16 +42,26 @@ function initializeFirebaseAdmin() {
   });
 }
 
-// initialize Firestore with settings (singleton pattern)
+// initialize Firestore with settings (using globalThis to survive hot-reload)
 function getFirestoreWithSettings() {
-  if (!firestoreInstance) {
-    firestoreInstance = getFirestore(adminApp);
-    // configure settings only on first initialization
-    firestoreInstance.settings({
-      ignoreUndefinedProperties: true, // prevents errors when undefined values are passed
-    });
+  if (!globalForFirebase.firestoreInstance) {
+    globalForFirebase.firestoreInstance = getFirestore(adminApp);
   }
-  return firestoreInstance;
+
+  // only apply settings once ever (tracked separately to handle edge cases)
+  if (!globalForFirebase.firestoreSettingsApplied) {
+    try {
+      globalForFirebase.firestoreInstance.settings({
+        ignoreUndefinedProperties: true,
+      });
+      globalForFirebase.firestoreSettingsApplied = true;
+    } catch {
+      // settings already applied, ignore error
+      globalForFirebase.firestoreSettingsApplied = true;
+    }
+  }
+
+  return globalForFirebase.firestoreInstance;
 }
 
 export const adminApp = initializeFirebaseAdmin();

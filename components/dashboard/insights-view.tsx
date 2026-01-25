@@ -127,17 +127,24 @@ export function InsightsView({
     );
   }
 
-  // show error state
+  // show error state - handle "no session" specially
   if (error) {
+    const isNoSession = error.includes("No session ID");
     return (
       <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
-        <Card className="p-8 max-w-md">
-          <h2 className="text-2xl font-bold text-destructive mb-4">
-            error loading insights
+        <Card className="p-8 max-w-md text-center">
+          <h2
+            className={`text-2xl font-bold mb-4 ${isNoSession ? "text-foreground" : "text-destructive"}`}
+          >
+            {isNoSession ? "select a session" : "error loading insights"}
           </h2>
-          <p className="text-muted-foreground mb-6">{error}</p>
+          <p className="text-muted-foreground mb-6">
+            {isNoSession
+              ? "choose a session from the library to view its insights and analysis"
+              : error}
+          </p>
           <Button onClick={() => onNavigate?.("library")}>
-            back to library
+            {isNoSession ? "go to library" : "back to library"}
           </Button>
         </Card>
       </div>
