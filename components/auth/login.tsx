@@ -5,7 +5,7 @@
  * supports email/password, passwordless email link, and phone authentication
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "./auth-provider";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import { Loader2, Mail, Phone, Lock } from "lucide-react";
 
 export function Login() {
   const router = useRouter();
-  const { signIn, sendEmailLink, signInWithGoogle } = useAuth();
+  const { signIn, sendEmailLink, signInWithGoogle, user, loading: authLoading } = useAuth();
 
   // email/password state
   const [email, setEmail] = useState("");
@@ -40,6 +40,13 @@ export function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/");
+    }
+  }, [user, authLoading, router]);
+
   const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -48,15 +55,14 @@ export function Login() {
 
     try {
       await signIn(email, password);
-      setSuccess("Signed in successfully!");
-      router.push("/");
+      setSuccess("Signed in successfully! Redirecting...");
+      // Don't manually redirect - let the auth state change handle it
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("Failed to sign in");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -89,15 +95,15 @@ export function Login() {
 
     try {
       await signInWithGoogle();
-      setSuccess("Signed in with Google!");
-      router.push("/");
+      setSuccess("Signed in with Google! Redirecting...");
+      // Don't manually redirect - let the auth state change handle it
+      // The main page will automatically redirect when user is authenticated
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("Failed to sign in with Google");
       }
-    } finally {
       setLoading(false);
     }
   };
