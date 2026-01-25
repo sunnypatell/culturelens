@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: "CultureLens — Understanding Through Listening",
   description:
     "A consent-based conversation mirror that analyzes communication patterns with cultural awareness, delivering neutral audio insights without judgment.",
-  generator: "v0.app",
   icons: {
     icon: [
       {

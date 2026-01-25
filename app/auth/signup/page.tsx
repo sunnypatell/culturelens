@@ -1,8 +1,8 @@
 import { Signup } from "@/components/auth/signup";
 
 export const metadata = {
-  title: "sign up - culturelens",
-  description: "create your culturelens account",
+  title: "Sign Up - CultureLens",
+  description: "Create your CultureLens account",
 };
 
 export default function SignupPage() {

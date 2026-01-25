@@ -1,8 +1,8 @@
 import { ResetPassword } from "@/components/auth/reset-password";
 
 export const metadata = {
-  title: "reset password - culturelens",
-  description: "reset your culturelens password",
+  title: "Reset Password - CultureLens",
+  description: "Reset your CultureLens password",
 };
 
 export default function ResetPasswordPage() {

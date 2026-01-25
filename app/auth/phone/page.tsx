@@ -1,8 +1,8 @@
 import { PhoneLogin } from "@/components/auth/phone-login";
 
 export const metadata = {
-  title: "phone signin - culturelens",
-  description: "sign in with your phone number",
+  title: "Phone Sign-In - CultureLens",
+  description: "Sign in with your phone number",
 };
 
 export default function PhonePage() {
