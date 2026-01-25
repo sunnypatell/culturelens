@@ -17,8 +17,10 @@ pip install -r requirements-dev.txt
 
 ```bash
 cp .env.example .env
-# edit .env with your api keys
+# contact the project maintainer for API keys
 ```
+
+**note:** the project uses shared API credentials. do not generate your own keys.
 
 ### 3. run development server
 

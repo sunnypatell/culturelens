@@ -37,9 +37,10 @@ Examples:
 Rules:
 
 - Lowercase everything (except code references like `UserAuth`, `API_KEY`)
-- Imperative mood ("added", "removed" not "add", "remove")
+- Past tense ("added", "removed", "fixed" not "add", "remove", "fix")
 - Keep the first line under 72 characters
 - Use `!` for breaking changes: `feat(api)!: changed response format`
+- Reference commit SHAs when relevant (e.g., `revert: undid changes from a1b2c3d`)
 
 ## PR Process
 
