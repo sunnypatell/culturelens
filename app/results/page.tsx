@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2, FileText, Brain, Users } from "lucide-react";
 import Link from "next/link";
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { motion } from "framer-motion";
+import { AnalysisLoader } from "@/components/ui/analysis-loader";
 
 interface AnalysisResult {
   sessionId: string;
@@ -128,75 +127,13 @@ function ResultsContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center relative overflow-hidden">
-        {/* animated floating orbs */}
-        <motion.div
-          animate={{
-            y: [0, -25, 0],
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/4 left-1/3 w-80 h-80 bg-primary/20 rounded-full blur-3xl pointer-events-none"
+      <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
+        <AnalysisLoader
+          currentStep={2}
+          totalSteps={5}
+          showSteps={true}
+          className="w-full max-w-xl"
         />
-        <motion.div
-          animate={{
-            y: [0, 25, 0],
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 9,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1.5,
-          }}
-          className="absolute bottom-1/4 right-1/3 w-80 h-80 bg-accent/20 rounded-full blur-3xl pointer-events-none"
-        />
-
-        <div className="relative z-10 flex flex-col items-center gap-8 max-w-2xl px-6">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="relative flex items-center gap-3"
-          >
-            <Brain className="w-12 h-12 text-primary" />
-            <Loader2 className="w-12 h-12 animate-spin text-primary absolute -right-4 -top-4 opacity-50" />
-          </motion.div>
-
-          <TextGenerateEffect
-            words="processing conversation insights and cultural observations"
-            className="text-center text-foreground"
-          />
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex gap-2"
-          >
-            <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-              className="w-2 h-2 rounded-full bg-primary"
-            />
-            <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-              className="w-2 h-2 rounded-full bg-primary"
-            />
-            <motion.div
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-              className="w-2 h-2 rounded-full bg-primary"
-            />
-          </motion.div>
-        </div>
       </div>
     );
   }
