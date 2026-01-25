@@ -7,7 +7,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // routes that require authentication
-const protectedRoutes = ["/dashboard", "/results", "/settings", "/profile"];
+const protectedRoutes = [
+  "/dashboard",
+  "/results",
+  "/settings",
+  "/profile",
+  "/onboarding",
+];
 
 // routes that should redirect to dashboard if already authenticated
 const authRoutes = ["/auth/login", "/auth/signup"];
