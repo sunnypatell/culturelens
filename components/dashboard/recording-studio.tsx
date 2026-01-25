@@ -460,7 +460,7 @@ export function RecordingStudio({
               Voice Agent Session
             </h1>
             <p className="text-lg text-muted-foreground">
-              Interact with your ElevenLabs agent for culturally-aware
+              Interact with your ElevenLabs agent for
               communication analysis.
             </p>
           </div>
@@ -481,16 +481,12 @@ export function RecordingStudio({
               Back to Setup
             </Button>
             <Button
-              onClick={() => {
-                if (currentSessionId) {
-                  onViewInsights?.(currentSessionId);
-                }
-              }}
-              disabled={!currentSessionId}
-              className="px-6"
-            >
-              View Analysis Results
-            </Button>
+  onClick={() => router.push("/mock-results")}
+  className="px-6"
+>
+  View Analysis Results
+</Button>
+
           </div>
         </div>
       </div>
