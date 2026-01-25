@@ -11,7 +11,7 @@ CultureLens integrates with Google Gemini AI for advanced transcript analysis an
 - **Project Name:** CultureLens
 - **Project ID:** `gen-lang-client-0985823799`
 - **Project Number:** `119358341094`
-- **Model:** `gemini-pro`
+- **Model:** `gemini-2.5-flash` (upgraded from deprecated gemini-pro)
 
 ## Architecture
 
@@ -222,7 +222,7 @@ Solution: Implement exponential backoff or reduce request frequency
 **Issue:** "Model not found"
 
 ```
-Solution: Verify gemini-pro is available in your project region
+Solution: Verify gemini-2.5-flash is available in your project region. The old gemini-pro model has been deprecated.
 ```
 
 ## Resources
@@ -241,6 +241,7 @@ For Gemini integration questions:
 
 ---
 
-**Integration Status:** Production-ready with fallback support
+**Integration Status:** ✅ LIVE - Production deployment active
+**Model:** Gemini 2.5 Flash
 **Last Updated:** January 25, 2026
 **Project:** CultureLens @ MLH HackHive 2026
