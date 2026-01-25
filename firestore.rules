@@ -3,15 +3,56 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // NOTE: These rules are intentionally permissive since we're using
-    // Firebase Admin SDK for backend authentication and authorization.
-    // The Admin SDK bypasses these rules, so they mainly protect
-    // against unauthorized client-side access.
+    // NOTE: While the Admin SDK bypasses these rules for backend operations,
+    // these rules protect against unauthorized client-side Firestore access.
+    // All client SDK calls must respect these security rules.
 
-    // allow authenticated users to read/write any document
-    // authorization is enforced in API routes via Admin SDK
+    // users collection - users can only access their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // sessions collection - users can only access their own sessions
+    match /sessions/{sessionId} {
+      allow read, delete: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    // transcripts collection - read-only access if session is owned by user
+    match /transcripts/{transcriptId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        get(/databases/$(database)/documents/sessions/$(request.resource.data.sessionId)).data.userId == request.auth.uid;
+    }
+
+    // analysis_results collection - read-only access if session is owned by user
+    match /analysis_results/{resultId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        get(/databases/$(database)/documents/sessions/$(request.resource.data.sessionId)).data.userId == request.auth.uid;
+    }
+
+    // audio_files collection - users can only access their own audio files
+    match /audio_files/{audioId} {
+      allow read, delete: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+    }
+
+    // settings collection - users can only access their own settings
+    match /settings/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // admin operations via Admin SDK bypass all rules
+    // deny all other access
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
