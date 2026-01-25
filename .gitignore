@@ -21,6 +21,9 @@ firestore-debug.log
 ui-debug.log
 database-debug.log
 pubsub-debug.log
+firebase-adminsdk-key.json
+*-firebase-adminsdk-*.json
+service-account-key.json
 
 # env files
 .env

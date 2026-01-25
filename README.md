@@ -10,7 +10,10 @@ Built at [MLH HackHive 2026](https://mlh.io) | Ontario Tech University
 - **UI:** Tailwind CSS 4 + shadcn/ui (Radix primitives)
 - **Voice:** ElevenLabs Conversational AI
 - **Backend:** Python FastAPI
-- **Deployment:** Vercel (frontend) + Railway/Render (backend)
+- **Database:** Firebase Firestore
+- **Storage:** Firebase Storage
+- **Validation:** Zod (runtime type checking)
+- **Deployment:** Vercel (frontend) + Railway/Render (backend) + Firebase (data)
 
 ## Getting Started
 
@@ -33,6 +36,7 @@ npm run setup
 ```
 
 This will:
+
 - ✅ Install all frontend dependencies
 - ✅ Create Python virtual environment
 - ✅ Install all backend dependencies
@@ -43,17 +47,36 @@ This will:
 
 1. Copy `.env.example` to `.env` in the root directory
 2. Copy `backend/.env.example` to `backend/.env`
-3. Fill in your API keys (ask Sunny for values)
+3. Fill in your API keys
 
 ```bash
 # Root .env
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_public_agent_id
 
+# Firebase (get from firebase console → project settings → your apps)
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
+
 # backend/.env
 ELEVENLABS_API_KEY=your_elevenlabs_api_key
 OPENAI_API_KEY=your_openai_api_key
 ```
+
+**Firebase Setup:**
+
+see [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for detailed firebase configuration.
+
+**quick firebase setup:**
+
+1. download `firebase-adminsdk-key.json` from [firebase console](https://console.firebase.google.com/project/culturelens-2dd38/settings/serviceaccounts/adminsdk)
+2. place in project root (already in .gitignore)
+3. enable firebase storage: https://console.firebase.google.com/project/culturelens-2dd38/storage
 
 #### Manual Setup (Alternative)
 
@@ -128,13 +151,15 @@ npm run dev:all
 ```
 
 This runs both frontend and backend concurrently in a single terminal with color-coded logs:
+
 - **Frontend** (cyan): [http://localhost:3000](http://localhost:3000)
 - **Backend** (magenta): [http://localhost:8000/docs](http://localhost:8000/docs)
 
 The backend logs include helpful emojis for easy tracking:
+
 - 🚀 Startup
 - ✅ Success
-- ⚠️  Warnings
+- ⚠️ Warnings
 - ❌ Errors
 - 💚 Health checks
 - 📝 Session operations
@@ -253,6 +278,13 @@ GitHub Actions run on every pull request:
 - ✅ **Backend Lint** - Ruff check
 - ✅ **Backend Format** - Ruff format check
 - ✅ **Backend Test** - Pytest
+- 🔥 **Firebase Deploy** - auto-deploys firestore/storage rules on push to main
+
+**firebase auto-deployment:**
+when you push changes to `firestore.rules`, `firestore.indexes.json`, or `storage.rules` on the `main` branch, github actions automatically deploys them to firebase.
+
+setup: add `FIREBASE_SERVICE_ACCOUNT` secret to github repo settings.
+see [.github/FIREBASE_DEPLOY_SETUP.md](.github/FIREBASE_DEPLOY_SETUP.md) for details.
 
 Each check runs separately so you can see which specific test failed.
 
