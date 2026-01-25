@@ -16,10 +16,15 @@ import { Clock, Users, Sparkles, Star, ArrowRight } from "lucide-react";
 
 interface AnalysisLibraryProps {
   onViewInsights: (sessionId: string) => void;
-  onNavigate?: (view: "home" | "record" | "library" | "insights" | "settings") => void;
+  onNavigate?: (
+    view: "home" | "record" | "library" | "insights" | "settings"
+  ) => void;
 }
 
-export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryProps) {
+export function AnalysisLibrary({
+  onViewInsights,
+  onNavigate,
+}: AnalysisLibraryProps) {
   const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -153,7 +158,9 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
 
             return {
               id: session.id,
-              title: session.settings?.title || `Session ${data.data.length - index}`,
+              title:
+                session.settings?.title ||
+                `Session ${data.data.length - index}`,
               date: createdDate.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -163,7 +170,10 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
               duration,
               participants,
               insights,
-              type: session.settings?.sessionType || session.settings?.culturalContext?.[0] || "Personal",
+              type:
+                session.settings?.sessionType ||
+                session.settings?.culturalContext?.[0] ||
+                "Personal",
               gradientColors: gradients[index % gradients.length],
               isFavorite: session.isFavorite || false,
             };
@@ -425,7 +435,9 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
                         <Sparkles className="w-3 h-3" />
                         <span className="text-xs">Insights</span>
                       </div>
-                      <p className="font-medium text-primary">{session.insights || 0}</p>
+                      <p className="font-medium text-primary">
+                        {session.insights || 0}
+                      </p>
                     </div>
                   </div>
 
@@ -434,7 +446,10 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
                       {session.type}
                     </Badge>
                     {session.isFavorite && (
-                      <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-600">
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-yellow-500 text-yellow-600"
+                      >
                         <Star className="w-3 h-3 mr-1 fill-current" />
                         Favorite
                       </Badge>
@@ -476,7 +491,9 @@ export function AnalysisLibrary({ onViewInsights, onNavigate }: AnalysisLibraryP
             <p className="text-muted-foreground mb-6">
               Try adjusting your filters or start a new recording
             </p>
-            <Button onClick={() => onNavigate?.("record")}>Start Recording</Button>
+            <Button onClick={() => onNavigate?.("record")}>
+              Start Recording
+            </Button>
           </Card>
         )}
       </div>

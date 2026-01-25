@@ -431,7 +431,10 @@ export function SettingsView() {
                     Higher quality means larger file sizes
                   </p>
                 </div>
-                <RadioGroup value={audioQuality} onValueChange={setAudioQuality}>
+                <RadioGroup
+                  value={audioQuality}
+                  onValueChange={setAudioQuality}
+                >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
                       {

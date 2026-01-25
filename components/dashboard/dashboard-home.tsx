@@ -10,7 +10,16 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 import { GlassCard, GradientCard } from "@/components/ui/glass-card";
 import { BackendStatus } from "@/components/backend-status";
-import { Mic, Library, LineChart, Clock, Users, Sparkles, TrendingUp, ArrowRight } from "lucide-react";
+import {
+  Mic,
+  Library,
+  LineChart,
+  Clock,
+  Users,
+  Sparkles,
+  TrendingUp,
+  ArrowRight,
+} from "lucide-react";
 
 interface DashboardHomeProps {
   onNavigate: (
@@ -27,10 +36,30 @@ export function DashboardHome({
   const [mounted, setMounted] = useState(false);
   const [recentSessions, setRecentSessions] = useState<any[]>([]);
   const [stats, setStats] = useState([
-    { label: "Total Sessions", value: "0", icon: Library, gradient: ["#6366f1", "#8b5cf6"] },
-    { label: "Hours Analyzed", value: "0", icon: Clock, gradient: ["#8b5cf6", "#d946ef"] },
-    { label: "Insights Generated", value: "0", icon: Sparkles, gradient: ["#d946ef", "#f43f5e"] },
-    { label: "Avg. Session Length", value: "0m", icon: TrendingUp, gradient: ["#f43f5e", "#fb923c"] },
+    {
+      label: "Total Sessions",
+      value: "0",
+      icon: Library,
+      gradient: ["#6366f1", "#8b5cf6"],
+    },
+    {
+      label: "Hours Analyzed",
+      value: "0",
+      icon: Clock,
+      gradient: ["#8b5cf6", "#d946ef"],
+    },
+    {
+      label: "Insights Generated",
+      value: "0",
+      icon: Sparkles,
+      gradient: ["#d946ef", "#f43f5e"],
+    },
+    {
+      label: "Avg. Session Length",
+      value: "0m",
+      icon: TrendingUp,
+      gradient: ["#f43f5e", "#fb923c"],
+    },
   ]);
   const [_loading, setLoading] = useState(true);
 
@@ -98,7 +127,8 @@ export function DashboardHome({
 
             return {
               id: session.id,
-              title: session.settings?.title || `Session ${sessions.length - index}`,
+              title:
+                session.settings?.title || `Session ${sessions.length - index}`,
               date: dateStr,
               duration,
               participants,
@@ -127,10 +157,30 @@ export function DashboardHome({
             : 0;
 
         setStats([
-          { label: "Total Sessions", value: String(totalSessions), icon: Library, gradient: ["#6366f1", "#8b5cf6"] },
-          { label: "Hours Analyzed", value: totalHours, icon: Clock, gradient: ["#8b5cf6", "#d946ef"] },
-          { label: "Insights Generated", value: String(totalInsights), icon: Sparkles, gradient: ["#d946ef", "#f43f5e"] },
-          { label: "Avg. Session Length", value: `${avgDuration}m`, icon: TrendingUp, gradient: ["#f43f5e", "#fb923c"] },
+          {
+            label: "Total Sessions",
+            value: String(totalSessions),
+            icon: Library,
+            gradient: ["#6366f1", "#8b5cf6"],
+          },
+          {
+            label: "Hours Analyzed",
+            value: totalHours,
+            icon: Clock,
+            gradient: ["#8b5cf6", "#d946ef"],
+          },
+          {
+            label: "Insights Generated",
+            value: String(totalInsights),
+            icon: Sparkles,
+            gradient: ["#d946ef", "#f43f5e"],
+          },
+          {
+            label: "Avg. Session Length",
+            value: `${avgDuration}m`,
+            icon: TrendingUp,
+            gradient: ["#f43f5e", "#fb923c"],
+          },
         ]);
       }
     } catch (error) {
@@ -226,8 +276,8 @@ export function DashboardHome({
               Welcome Back
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
-              Your conversation analytics dashboard. Track patterns, gain insights,
-              and improve communication with cultural awareness.
+              Your conversation analytics dashboard. Track patterns, gain
+              insights, and improve communication with cultural awareness.
             </p>
           </div>
         </motion.div>
@@ -308,7 +358,9 @@ export function DashboardHome({
 
                         <CardItem translateZ={60} className="space-y-2 mt-6">
                           <h3 className="text-2xl font-bold">{action.label}</h3>
-                          <p className="text-muted-foreground">{action.description}</p>
+                          <p className="text-muted-foreground">
+                            {action.description}
+                          </p>
                         </CardItem>
 
                         <CardItem translateZ={40} className="mt-6">
@@ -382,7 +434,9 @@ export function DashboardHome({
                           <Sparkles className="w-3.5 h-3.5" />
                           <span className="text-xs">Insights</span>
                         </div>
-                        <p className="font-medium text-primary">{session.insights}</p>
+                        <p className="font-medium text-primary">
+                          {session.insights}
+                        </p>
                       </div>
                     </div>
 

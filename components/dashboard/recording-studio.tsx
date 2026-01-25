@@ -29,11 +29,16 @@ type RecordingState =
 const PROCESSING_DELAY_MS = 3000;
 
 interface RecordingStudioProps {
-  onNavigate?: (view: "home" | "record" | "library" | "insights" | "settings") => void;
+  onNavigate?: (
+    view: "home" | "record" | "library" | "insights" | "settings"
+  ) => void;
   onViewInsights?: (sessionId: string) => void;
 }
 
-export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioProps = {}) {
+export function RecordingStudio({
+  onNavigate,
+  onViewInsights,
+}: RecordingStudioProps = {}) {
   const router = useRouter();
   const { getIdToken } = useAuth();
   const [state, setState] = useState<RecordingState>("setup");
@@ -578,7 +583,8 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
                 transition={{ delay: 1.5, duration: 0.5 }}
                 className="text-lg text-muted-foreground"
               >
-                Our AI is processing your recording to extract meaningful insights and cultural observations
+                Our AI is processing your recording to extract meaningful
+                insights and cultural observations
               </motion.p>
             </div>
 
@@ -604,7 +610,11 @@ export function RecordingStudio({ onNavigate, onViewInsights }: RecordingStudioP
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                     className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full"
                   />
                   {step}

@@ -11,7 +11,11 @@ import {
   validateRequest,
 } from "@/lib/api";
 import { verifyIdToken } from "@/lib/auth-server";
-import { getDocument, updateDocument, deleteDocument } from "@/lib/firebase-server-utils";
+import {
+  getDocument,
+  updateDocument,
+  deleteDocument,
+} from "@/lib/firebase-server-utils";
 import { COLLECTIONS } from "@/lib/firestore-constants";
 import { SessionSchemas } from "@/lib/api/schemas";
 import { z } from "zod";

@@ -14,7 +14,9 @@ import { toast } from "sonner";
 
 interface UserMenuProps {
   children: React.ReactNode;
-  onNavigate?: (view: "home" | "record" | "library" | "insights" | "settings") => void;
+  onNavigate?: (
+    view: "home" | "record" | "library" | "insights" | "settings"
+  ) => void;
 }
 
 export function UserMenu({ children, onNavigate }: UserMenuProps) {

@@ -241,7 +241,9 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-xs font-medium text-muted-foreground">Sessions This Month</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                Sessions This Month
+              </span>
             </div>
             <motion.span
               key={stats?.sessionsThisMonth}
@@ -267,7 +269,9 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-white/10">
-            <span className="text-xs text-muted-foreground">Total Insights</span>
+            <span className="text-xs text-muted-foreground">
+              Total Insights
+            </span>
             <motion.span
               key={stats?.totalInsights}
               initial={{ scale: 1.5, opacity: 0 }}
