@@ -3,10 +3,9 @@
  * uses admin SDK for user management and token verification
  */
 
-import { getAuth } from "firebase-admin/auth";
-import { adminApp } from "./firebase-server-utils";
+import { adminAuth } from "./firebase-admin";
 
-const auth = getAuth(adminApp);
+const auth = adminAuth;
 
 export interface CreateUserData {
   email: string;

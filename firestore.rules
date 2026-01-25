@@ -8,35 +8,46 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // test: verifying firebase admin permissions
-
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && request.auth.token.role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
     }
 
     // sessions collection
     // sessions contain conversation data with dual consent
     match /sessions/{sessionId} {
-      // allow server-side access (from API routes)
-      allow read, write: if true;
+      // read: authenticated users only
+      allow read: if isAuthenticated();
 
-      // TODO: once auth is implemented, restrict to:
-      // allow read: if isAuthenticated();
-      // allow create: if isAuthenticated() && request.resource.data.consent.personA && request.resource.data.consent.personB;
-      // allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      // allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // create: authenticated users with dual consent
+      allow create: if isAuthenticated()
+        && request.resource.data.consent.personA == true
+        && request.resource.data.consent.personB == true;
+
+      // update/delete: owner or admin only
+      allow update, delete: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // transcripts collection
     // stores conversation transcripts
     match /transcripts/{transcriptId} {
-      // allow server-side access (from API routes)
-      allow read, write: if true;
+      // read: authenticated users only
+      allow read: if isAuthenticated();
 
-      // TODO: once auth is implemented, restrict to:
-      // allow read: if isAuthenticated();
-      // allow create: if isAuthenticated();
-      // allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // create: authenticated users only
+      allow create: if isAuthenticated();
+
+      // update/delete: owner or admin only
+      allow update, delete: if isAuthenticated()
+        && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // audio files collection (firestore storage workaround)
