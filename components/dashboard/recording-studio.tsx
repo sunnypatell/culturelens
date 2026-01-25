@@ -480,7 +480,13 @@ export function RecordingStudio({
               Back to Setup
             </Button>
             <Button
-              onClick={() => router.push("/mock-results")}
+              onClick={() =>
+                router.push(
+                  currentSessionId
+                    ? `/results?sessionId=${currentSessionId}`
+                    : "/results"
+                )
+              }
               className="px-6"
             >
               View Analysis Results
