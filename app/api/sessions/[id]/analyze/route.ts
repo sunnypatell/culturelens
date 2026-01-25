@@ -79,7 +79,9 @@ export async function POST(
     // allow analysis for sessions that haven't been analyzed yet
     // or are in processing state - skip only if already "ready" with results
     if (session.status === "ready" && session.analysisResult) {
-      console.log(`[API_ANALYZE_POST] Session ${id} already analyzed, returning existing results`);
+      console.log(
+        `[API_ANALYZE_POST] Session ${id} already analyzed, returning existing results`
+      );
       return apiSuccess(session.analysisResult, {
         message: "analysis already completed",
       });

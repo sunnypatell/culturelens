@@ -238,16 +238,28 @@ export function InsightsView({
                 "animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100"
             )}
           >
-            <TabsTrigger value="patterns" className="flex-1 py-3 text-sm whitespace-nowrap">
+            <TabsTrigger
+              value="patterns"
+              className="flex-1 py-3 text-sm whitespace-nowrap"
+            >
               Patterns
             </TabsTrigger>
-            <TabsTrigger value="cultural" className="flex-1 py-3 text-sm whitespace-nowrap">
+            <TabsTrigger
+              value="cultural"
+              className="flex-1 py-3 text-sm whitespace-nowrap"
+            >
               Cultural
             </TabsTrigger>
-            <TabsTrigger value="moments" className="flex-1 py-3 text-sm whitespace-nowrap">
+            <TabsTrigger
+              value="moments"
+              className="flex-1 py-3 text-sm whitespace-nowrap"
+            >
               Moments
             </TabsTrigger>
-            <TabsTrigger value="trends" className="flex-1 py-3 text-sm whitespace-nowrap">
+            <TabsTrigger
+              value="trends"
+              className="flex-1 py-3 text-sm whitespace-nowrap"
+            >
               Trends
             </TabsTrigger>
           </TabsList>
@@ -258,123 +270,123 @@ export function InsightsView({
               {communicationPatterns
                 .filter((p) => !p.title.toLowerCase().includes("unavailable"))
                 .map((pattern, index) => (
-                <Card
-                  key={pattern.id}
-                  className={cn(
-                    "overflow-hidden hover-lift cursor-pointer transition-all duration-300",
-                    expandedInsight === pattern.id && "ring-2 ring-primary",
-                    mounted &&
-                      "animate-in fade-in slide-in-from-bottom-4 duration-500"
-                  )}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() =>
-                    setExpandedInsight(
-                      expandedInsight === pattern.id ? null : pattern.id
-                    )
-                  }
-                >
-                  {/* Gradient accent bar */}
-                  <div
-                    className={cn("h-1.5 bg-gradient-to-r", pattern.color)}
-                  />
+                  <Card
+                    key={pattern.id}
+                    className={cn(
+                      "overflow-hidden hover-lift cursor-pointer transition-all duration-300",
+                      expandedInsight === pattern.id && "ring-2 ring-primary",
+                      mounted &&
+                        "animate-in fade-in slide-in-from-bottom-4 duration-500"
+                    )}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                    onClick={() =>
+                      setExpandedInsight(
+                        expandedInsight === pattern.id ? null : pattern.id
+                      )
+                    }
+                  >
+                    {/* Gradient accent bar */}
+                    <div
+                      className={cn("h-1.5 bg-gradient-to-r", pattern.color)}
+                    />
 
-                  <div className="p-6 space-y-4">
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1 flex-1">
-                        <div className="flex items-center gap-3">
-                          <h3 className="text-2xl font-bold text-foreground">
-                            {pattern.title}
-                          </h3>
-                          <Badge
-                            variant={
-                              pattern.confidence === "high"
-                                ? "default"
-                                : "secondary"
-                            }
-                          >
-                            {pattern.confidence} confidence
-                          </Badge>
-                          <Badge variant="outline">{pattern.category}</Badge>
-                        </div>
-                        <p className="text-lg text-muted-foreground">
-                          {pattern.description}
-                        </p>
-                      </div>
-                      <svg
-                        className={cn(
-                          "w-6 h-6 text-muted-foreground transition-transform duration-300",
-                          expandedInsight === pattern.id && "rotate-180"
-                        )}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </div>
-
-                    {/* Insight */}
-                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <svg
-                            className="w-4 h-4 text-primary"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                            <polyline points="2 17 12 22 22 17" />
-                            <polyline points="2 12 12 17 22 12" />
-                          </svg>
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-foreground mb-1">
-                            Key Insight
-                          </p>
-                          <p className="text-muted-foreground">
-                            {pattern.insight}
+                    <div className="p-6 space-y-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center gap-3">
+                            <h3 className="text-2xl font-bold text-foreground">
+                              {pattern.title}
+                            </h3>
+                            <Badge
+                              variant={
+                                pattern.confidence === "high"
+                                  ? "default"
+                                  : "secondary"
+                              }
+                            >
+                              {pattern.confidence} confidence
+                            </Badge>
+                            <Badge variant="outline">{pattern.category}</Badge>
+                          </div>
+                          <p className="text-lg text-muted-foreground">
+                            {pattern.description}
                           </p>
                         </div>
+                        <svg
+                          className={cn(
+                            "w-6 h-6 text-muted-foreground transition-transform duration-300",
+                            expandedInsight === pattern.id && "rotate-180"
+                          )}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
                       </div>
-                    </div>
 
-                    {/* Expanded content */}
-                    {expandedInsight === pattern.id && (
-                      <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="pt-4 border-t border-border">
-                          <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                      {/* Insight */}
+                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <svg
-                              className="w-4 h-4"
+                              className="w-4 h-4 text-primary"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="currentColor"
                               strokeWidth="2"
                             >
-                              <polyline points="20 6 9 17 4 12" />
+                              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                              <polyline points="2 17 12 22 22 17" />
+                              <polyline points="2 12 12 17 22 12" />
                             </svg>
-                            Evidence from Conversation
-                          </h4>
-                          <ul className="space-y-2">
-                            {pattern.evidence.map((item, i) => (
-                              <li
-                                key={i}
-                                className="flex items-start gap-3 text-sm text-muted-foreground"
-                              >
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-foreground mb-1">
+                              Key Insight
+                            </p>
+                            <p className="text-muted-foreground">
+                              {pattern.insight}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </Card>
-              ))}
+
+                      {/* Expanded content */}
+                      {expandedInsight === pattern.id && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                          <div className="pt-4 border-t border-border">
+                            <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                              <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                              Evidence from Conversation
+                            </h4>
+                            <ul className="space-y-2">
+                              {pattern.evidence.map((item, i) => (
+                                <li
+                                  key={i}
+                                  className="flex items-start gap-3 text-sm text-muted-foreground"
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
               {communicationPatterns.filter(
                 (p) => !p.title.toLowerCase().includes("unavailable")
               ).length === 0 && (

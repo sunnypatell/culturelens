@@ -750,11 +750,9 @@ export function SettingsView() {
             </div>
           </div>
         </Card>
-
       </div>
 
       <Footer />
     </div>
   );
 }
-

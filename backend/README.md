@@ -29,6 +29,7 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 api will be available at:
+
 - http://localhost:8000
 - docs: http://localhost:8000/docs
 - redoc: http://localhost:8000/redoc
@@ -58,10 +59,12 @@ pytest
 ## api endpoints
 
 ### health
+
 - `GET /health` - health check
 - `GET /health/ready` - readiness check
 
 ### sessions (v1)
+
 - `POST /api/v1/sessions` - created new session
 - `GET /api/v1/sessions` - list all sessions
 - `GET /api/v1/sessions/{id}` - get session by id
