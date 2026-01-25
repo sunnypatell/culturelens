@@ -10,11 +10,11 @@
     "build": "next build",
     "start": "next start",
     "lint:frontend": "eslint . --ext .ts,.tsx",
-    "lint:backend": "cd backend && source venv/bin/activate && ruff check .",
+    "lint:backend": "node scripts/backend-lint.js",
     "format:frontend": "prettier --write .",
-    "format:backend": "cd backend && source venv/bin/activate && ruff format .",
+    "format:backend": "node scripts/backend-format.js",
     "format:check": "prettier --check .",
-    "test:backend": "cd backend && source venv/bin/activate && pytest -v",
+    "test:backend": "node scripts/backend-test.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
