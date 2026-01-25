@@ -1,6 +1,10 @@
 // session audio upload API endpoint
 
-import { getDocument, updateDocument, uploadFile } from "@/lib/firebase-server-utils";
+import {
+  getDocument,
+  updateDocument,
+  uploadFile,
+} from "@/lib/firebase-server-utils";
 import {
   apiHandler,
   apiSuccess,
@@ -29,7 +33,10 @@ export async function POST(
     try {
       session = await getDocument("sessions", id);
     } catch (error) {
-      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
+      throw new DatabaseError(
+        "session retrieval",
+        error instanceof Error ? error.message : undefined
+      );
     }
 
     if (!session) {

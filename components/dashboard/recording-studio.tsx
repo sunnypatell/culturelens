@@ -24,7 +24,9 @@ export function RecordingStudio() {
   const router = useRouter();
   const [state, setState] = useState<RecordingState>("setup");
   const [duration, setDuration] = useState(0);
-  const [_waveformData, setWaveformData] = useState<number[]>(Array(60).fill(0));
+  const [_waveformData, setWaveformData] = useState<number[]>(
+    Array(60).fill(0)
+  );
   const [mounted, setMounted] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
@@ -356,7 +358,8 @@ export function RecordingStudio() {
               Voice Agent Session
             </h1>
             <p className="text-lg text-muted-foreground">
-              Interact with your ElevenLabs agent for culturally-aware communication analysis.
+              Interact with your ElevenLabs agent for culturally-aware
+              communication analysis.
             </p>
           </div>
 
@@ -373,7 +376,11 @@ export function RecordingStudio() {
               Back to Setup
             </Button>
             <Button
-              onClick={() => router.push(`/results${agentSessionId ? `?sessionId=${agentSessionId}` : ""}`)}
+              onClick={() =>
+                router.push(
+                  `/results${agentSessionId ? `?sessionId=${agentSessionId}` : ""}`
+                )
+              }
               disabled={!agentSessionId}
               className="px-6"
             >

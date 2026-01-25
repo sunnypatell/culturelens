@@ -1,6 +1,12 @@
 // session analysis pipeline API endpoint
 
-import { AnalysisResult, Segment, Metrics, Insight, Debrief } from "@/lib/types";
+import {
+  AnalysisResult,
+  Segment,
+  Metrics,
+  Insight,
+  Debrief,
+} from "@/lib/types";
 import { updateDocument, getDocument } from "@/lib/firebase-server-utils";
 import {
   apiHandler,
@@ -29,7 +35,10 @@ export async function POST(
     try {
       session = await getDocument("sessions", id);
     } catch (error) {
-      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
+      throw new DatabaseError(
+        "session retrieval",
+        error instanceof Error ? error.message : undefined
+      );
     }
 
     if (!session) {
@@ -137,7 +146,10 @@ export async function GET(
     try {
       session = await getDocument("sessions", id);
     } catch (error) {
-      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
+      throw new DatabaseError(
+        "session retrieval",
+        error instanceof Error ? error.message : undefined
+      );
     }
 
     if (!session) {

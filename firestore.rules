@@ -37,6 +37,20 @@ service cloud.firestore {
       // allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
+    // audio files collection (firestore storage workaround)
+    // stores base64-encoded audio files (free tier workaround instead of firebase storage)
+    match /audioFiles/{audioId} {
+      // allow public read for audio playback
+      allow read: if true;
+
+      // allow server-side write from API routes
+      allow write: if true;
+
+      // TODO: once auth is implemented, consider:
+      // allow read: if true; // keep public for audio playback
+      // allow write: if isAuthenticated(); // restrict writes to authenticated users
+    }
+
     // deny all other collections by default
     match /{document=**} {
       allow read, write: if false;

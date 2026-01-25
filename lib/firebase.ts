@@ -1,9 +1,9 @@
 // Firebase configuration and initialization
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { getAnalytics } from 'firebase/analytics';
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,7 +16,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase (prevent double initialization in Next.js)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 // Initialize Firebase services
 export const auth = getAuth(app);
@@ -25,7 +26,7 @@ export const storage = getStorage(app);
 
 // Analytics should only be initialized on the client side
 let analytics: any = null;
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   analytics = getAnalytics(app);
 }
 export { analytics };

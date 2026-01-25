@@ -1,7 +1,11 @@
 // session management API endpoints
 
 import { Session } from "@/lib/types";
-import { createDocument, getDocuments, orderByField } from "@/lib/firebase-server-utils";
+import {
+  createDocument,
+  getDocuments,
+  orderByField,
+} from "@/lib/firebase-server-utils";
 import {
   apiHandler,
   apiSuccess,
@@ -46,7 +50,10 @@ export async function POST(request: Request) {
     try {
       await createDocument("sessions", session);
     } catch (error) {
-      throw new DatabaseError("session creation", error instanceof Error ? error.message : undefined);
+      throw new DatabaseError(
+        "session creation",
+        error instanceof Error ? error.message : undefined
+      );
     }
 
     return apiSuccess(session, {
@@ -71,7 +78,10 @@ export async function GET() {
         meta: { total: sessions.length },
       });
     } catch (error) {
-      throw new DatabaseError("session retrieval", error instanceof Error ? error.message : undefined);
+      throw new DatabaseError(
+        "session retrieval",
+        error instanceof Error ? error.message : undefined
+      );
     }
   });
 }

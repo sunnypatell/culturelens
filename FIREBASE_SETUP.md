@@ -12,26 +12,26 @@ this document explains how firebase is configured for the culturelens project.
 
 ### 1. firestore database
 
-- **purpose:** stores sessions and transcripts
+- **purpose:** stores sessions, transcripts, and audio files
 - **collections:**
   - `sessions` - conversation sessions with dual consent
   - `transcripts` - conversation transcripts
+  - `audioFiles` - base64-encoded audio files (free tier workaround for storage)
 - **rules:** defined in `firestore.rules`
 - **indexes:** defined in `firestore.indexes.json`
 
-### 2. firebase storage
+### 2. audio storage (firestore workaround)
 
 - **purpose:** stores audio files (TTS generated, session recordings)
-- **storage paths:**
-  - `audio/tts/` - text-to-speech generated audio files
-  - `audio/sessions/` - (future) uploaded session recordings
-- **rules:** defined in `storage.rules`
-
-⚠️ **action required:** firebase storage must be enabled in the console
-
-- go to: https://console.firebase.google.com/project/culturelens-2dd38/storage
-- click "get started" to enable storage
-- choose production mode and default location
+- **implementation:** firestore-based storage using base64 encoding (free tier workaround)
+- **collection:** `audioFiles`
+- **why not firebase storage?** firebase storage requires paid plan (blaze)
+- **storage method:**
+  - audio files converted to base64 and stored in firestore documents
+  - max size: ~900KB per file (firestore 1MB doc limit with base64 overhead)
+  - auto-expiration: 7 days by default
+  - served via `/api/audio/[id]` endpoint
+- **rules:** defined in `firestore.rules` (audioFiles collection)
 
 ### 3. firebase authentication
 
@@ -44,15 +44,10 @@ this document explains how firebase is configured for the culturelens project.
 
 currently allows full server-side access for API routes. once authentication is implemented, rules will be updated to:
 
-- require authentication for all operations
+- require authentication for all operations (except audioFiles public read)
 - verify dual consent for session creation
 - restrict updates/deletes to resource owners
-
-### storage rules (`storage.rules`)
-
-- allows public read for audio playback
-- allows server-side write for API routes
-- will be restricted to authenticated writes once auth is implemented
+- audioFiles: public read for playback, authenticated write for creation
 
 ## environment variables
 
@@ -140,9 +135,6 @@ when you push changes to these files:
 # deploy firestore rules and indexes
 firebase deploy --only firestore:rules,firestore:indexes
 
-# deploy storage rules (after enabling storage)
-firebase deploy --only storage:rules
-
 # deploy everything
 firebase deploy
 ```
@@ -189,24 +181,20 @@ curl http://localhost:3000/api/sessions
 2. ✅ environment variables configured
 3. ✅ firestore rules deployed
 4. ✅ firestore indexes deployed
-5. ⏳ enable firebase storage in console
-6. ⏳ deploy storage rules
-7. ⏳ implement firebase authentication
-8. ⏳ update security rules for auth
-9. ⏳ set up firebase emulators for local development
+5. ✅ firestore-based audio storage implemented (free tier workaround)
+6. ⏳ implement firebase authentication
+7. ⏳ update security rules for auth
+8. ⏳ set up firebase emulators for local development
+9. ⏳ implement audio cleanup job for expired files
 
 ## troubleshooting
-
-### "firebase storage not enabled" error
-
-go to https://console.firebase.google.com/project/culturelens-2dd38/storage and click "get started"
 
 ### "permission denied" errors
 
 check that security rules are properly deployed:
 
 ```bash
-firebase deploy --only firestore:rules,storage:rules
+firebase deploy --only firestore:rules,firestore:indexes
 ```
 
 ### connection timeouts
@@ -216,3 +204,7 @@ verify environment variables are set correctly in `.env` file
 ### missing indexes
 
 firestore will automatically create simple single-field indexes. composite indexes are defined in `firestore.indexes.json`.
+
+### "audio file too large" error
+
+audio files are stored in firestore with a ~900KB limit (firestore 1MB document limit with base64 overhead). if you encounter this error, the audio file exceeds the limit and must be shortened or compressed.

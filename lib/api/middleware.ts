@@ -29,7 +29,9 @@ export function logRequest(
     userId,
     timestamp: new Date().toISOString(),
     userAgent: request.headers.get("user-agent"),
-    ip: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip"),
+    ip:
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip"),
   });
 }
 

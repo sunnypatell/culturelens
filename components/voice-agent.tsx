@@ -62,18 +62,18 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
 
   const conversation = useConversation({
     onConnect: () => {
-      console.log('Voice agent connected');
+      console.log("Voice agent connected");
       setStatus("connected");
     },
     onDisconnect: () => {
-      console.log('Voice agent disconnected, saving transcript');
-      console.log('Transcript length:', transcriptRef.current.length);
+      console.log("Voice agent disconnected, saving transcript");
+      console.log("Transcript length:", transcriptRef.current.length);
       setStatus("idle");
       // Save final transcript when disconnecting
       saveTranscript();
     },
     onError: (e) => {
-      console.error('Voice agent error:', e);
+      console.error("Voice agent error:", e);
       setError(
         typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error")
       );
@@ -81,9 +81,13 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
     },
     onMessage: (message) => {
       // Capture conversation messages
-      const messageText = typeof message === 'string' ? message : JSON.stringify(message);
-      console.log('Received message:', messageText);
-      setTranscript(prev => [...prev, `[${new Date().toISOString()}] ${messageText}`]);
+      const messageText =
+        typeof message === "string" ? message : JSON.stringify(message);
+      console.log("Received message:", messageText);
+      setTranscript((prev) => [
+        ...prev,
+        `[${new Date().toISOString()}] ${messageText}`,
+      ]);
     },
   });
 
@@ -96,21 +100,27 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
 
   const saveTranscript = useCallback(async () => {
     const currentTranscript = transcriptRef.current;
-    console.log('saveTranscript called, transcript length:', currentTranscript.length);
+    console.log(
+      "saveTranscript called, transcript length:",
+      currentTranscript.length
+    );
     if (currentTranscript.length === 0) {
-      console.log('No transcript to save');
+      console.log("No transcript to save");
       return;
     }
 
     try {
-      const transcriptText = currentTranscript.join('\n\n');
-      console.log('Saving transcript via API:', transcriptText.substring(0, 100) + '...');
+      const transcriptText = currentTranscript.join("\n\n");
+      console.log(
+        "Saving transcript via API:",
+        transcriptText.substring(0, 100) + "..."
+      );
 
       // Use our API endpoint instead of direct Firestore calls
-      const response = await fetch('/api/transcripts', {
-        method: 'POST',
+      const response = await fetch("/api/transcripts", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           sessionId: sessionId,
@@ -125,9 +135,9 @@ export function VoiceAgent({ onSessionId }: VoiceAgentProps) {
       }
 
       const result = await response.json();
-      console.log('Transcript saved successfully:', result);
+      console.log("Transcript saved successfully:", result);
     } catch (error) {
-      console.error('Failed to save transcript:', error);
+      console.error("Failed to save transcript:", error);
     }
   }, [sessionId]);
 

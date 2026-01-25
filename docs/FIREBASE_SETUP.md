@@ -18,6 +18,7 @@ This guide will help you set up Firebase for the CultureLens application.
 ## Step 2: Enable Firebase Services
 
 ### Authentication
+
 1. In your Firebase project, go to "Authentication" in the left sidebar
 2. Click "Get started"
 3. Go to the "Sign-in method" tab
@@ -26,6 +27,7 @@ This guide will help you set up Firebase for the CultureLens application.
    - Google (optional, but recommended)
 
 ### Firestore Database
+
 1. Go to "Firestore Database" in the left sidebar
 2. Click "Create database"
 3. Choose "Start in test mode" (you can change this later for production)
@@ -33,6 +35,7 @@ This guide will help you set up Firebase for the CultureLens application.
 5. Click "Done"
 
 ### Storage
+
 1. Go to "Storage" in the left sidebar
 2. Click "Get started"
 3. Choose "Start in test mode" (you can change this later for production)
@@ -73,17 +76,20 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_actual_measurement_id
 ## Firebase Services Available
 
 ### Authentication (`auth`)
+
 - User sign up/sign in with email/password
 - Google authentication
 - User profile management
 
 ### Firestore Database (`db`)
+
 - Store user sessions
 - Save analysis results
 - Store user preferences
 - Real-time data synchronization
 
 ### Storage (`storage`)
+
 - Upload audio recordings
 - Store generated transcripts
 - Save analysis files
@@ -91,8 +97,9 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_actual_measurement_id
 ## Usage Examples
 
 ### Authentication
+
 ```typescript
-import { signIn, signUp, logout, useAuth } from '@/lib/firebase-utils';
+import { signIn, signUp, logout, useAuth } from "@/lib/firebase-utils";
 
 // In a component
 const { user, loading } = useAuth();
@@ -101,34 +108,39 @@ const handleSignIn = async () => {
   try {
     await signIn(email, password);
   } catch (error) {
-    console.error('Sign in failed:', error);
+    console.error("Sign in failed:", error);
   }
 };
 ```
 
 ### Firestore
+
 ```typescript
-import { createDocument, useCollection } from '@/lib/firebase-utils';
+import { createDocument, useCollection } from "@/lib/firebase-utils";
 
 // Create a session
-const sessionId = await createDocument('sessions', {
-  title: 'Team Meeting',
+const sessionId = await createDocument("sessions", {
+  title: "Team Meeting",
   participants: 3,
   userId: user.uid,
 });
 
 // Get real-time sessions
-const { data: sessions, loading } = useCollection('sessions',
-  [whereEqual('userId', user.uid)]
-);
+const { data: sessions, loading } = useCollection("sessions", [
+  whereEqual("userId", user.uid),
+]);
 ```
 
 ### Storage
+
 ```typescript
-import { uploadFile } from '@/lib/firebase-utils';
+import { uploadFile } from "@/lib/firebase-utils";
 
 // Upload an audio file
-const { downloadURL, path } = await uploadFile(audioFile, `audio/${sessionId}/recording.wav`);
+const { downloadURL, path } = await uploadFile(
+  audioFile,
+  `audio/${sessionId}/recording.wav`
+);
 ```
 
 ## Security Rules
@@ -136,6 +148,7 @@ const { downloadURL, path } = await uploadFile(audioFile, `audio/${sessionId}/re
 For production, make sure to set up proper security rules for Firestore and Storage:
 
 ### Firestore Rules Example
+
 ```
 rules_version = '2';
 service cloud.firestore {
@@ -148,6 +161,7 @@ service cloud.firestore {
 ```
 
 ### Storage Rules Example
+
 ```
 rules_version = '2';
 service firebase.storage {

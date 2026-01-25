@@ -16,11 +16,10 @@ export async function validateRequest<T extends ZodSchema>(
     return schema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => `${err.path.join(".")}: ${err.message}`);
-      throw new ValidationError(
-        "request validation failed",
-        errors.join(", ")
+      const errors = error.errors.map(
+        (err) => `${err.path.join(".")}: ${err.message}`
       );
+      throw new ValidationError("request validation failed", errors.join(", "));
     }
     throw new ValidationError("invalid request body");
   }
@@ -38,7 +37,9 @@ export function validateParams<T extends ZodSchema>(
     return schema.parse(params);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => `${err.path.join(".")}: ${err.message}`);
+      const errors = error.errors.map(
+        (err) => `${err.path.join(".")}: ${err.message}`
+      );
       throw new ValidationError(
         "parameter validation failed",
         errors.join(", ")
@@ -61,7 +62,9 @@ export function validateQuery<T extends ZodSchema>(
     return schema.parse(query);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map((err) => `${err.path.join(".")}: ${err.message}`);
+      const errors = error.errors.map(
+        (err) => `${err.path.join(".")}: ${err.message}`
+      );
       throw new ValidationError(
         "query parameter validation failed",
         errors.join(", ")

@@ -22,7 +22,8 @@ export function apiHandler<T = unknown>(
     }
 
     // handle unexpected errors
-    const errorMessage = error instanceof Error ? error.message : "unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "unknown error";
     console.error("[Unexpected API Error]", error);
 
     return apiError("INTERNAL_ERROR", "an unexpected error occurred", {

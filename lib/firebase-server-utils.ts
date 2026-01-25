@@ -14,14 +14,14 @@ import {
   orderBy,
   limit,
   Timestamp,
-} from 'firebase/firestore';
+} from "firebase/firestore";
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
-} from 'firebase/storage';
-import { db, storage } from './firebase';
+} from "firebase/storage";
+import { db, storage } from "./firebase";
 
 // Firestore utility functions for server-side use
 export const createDocument = async (collectionName: string, data: any) => {
@@ -33,7 +33,11 @@ export const createDocument = async (collectionName: string, data: any) => {
   return docRef.id;
 };
 
-export const updateDocument = async (collectionName: string, docId: string, data: any) => {
+export const updateDocument = async (
+  collectionName: string,
+  docId: string,
+  data: any
+) => {
   const docRef = doc(db, collectionName, docId);
   await updateDoc(docRef, {
     ...data,
@@ -51,10 +55,13 @@ export const getDocument = async (collectionName: string, docId: string) => {
   return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
 };
 
-export const getDocuments = async (collectionName: string, constraints: any[] = []) => {
+export const getDocuments = async (
+  collectionName: string,
+  constraints: any[] = []
+) => {
   const q = query(collection(db, collectionName), ...constraints);
   const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 // Storage utility functions for server-side use
@@ -76,7 +83,12 @@ export const getFileURL = async (path: string) => {
 };
 
 // Common queries
-export const whereEqual = (field: string, value: any) => where(field, '==', value);
-export const whereIn = (field: string, values: any[]) => where(field, 'in', values);
-export const orderByField = (field: string, direction: 'asc' | 'desc' = 'asc') => orderBy(field, direction);
+export const whereEqual = (field: string, value: any) =>
+  where(field, "==", value);
+export const whereIn = (field: string, values: any[]) =>
+  where(field, "in", values);
+export const orderByField = (
+  field: string,
+  direction: "asc" | "desc" = "asc"
+) => orderBy(field, direction);
 export const limitResults = (count: number) => limit(count);

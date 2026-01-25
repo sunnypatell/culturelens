@@ -8,15 +8,10 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
-} from 'firebase/auth';
-import {
-  collection,
-  doc,
-  query,
-  onSnapshot,
-} from 'firebase/firestore';
-import { useState, useEffect } from 'react';
-import { auth, db } from './firebase';
+} from "firebase/auth";
+import { collection, doc, query, onSnapshot } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { auth, db } from "./firebase";
 
 // Re-export server-side utilities from firebase-server-utils
 // This avoids code duplication while maintaining a clean API
@@ -33,7 +28,7 @@ export {
   whereIn,
   orderByField,
   limitResults,
-} from './firebase-server-utils';
+} from "./firebase-server-utils";
 
 // Authentication hooks and functions
 export const useAuth = () => {
@@ -56,7 +51,11 @@ export const signIn = async (email: string, password: string) => {
   return await signInWithEmailAndPassword(auth, email, password);
 };
 
-export const signUp = async (email: string, password: string, displayName: string) => {
+export const signUp = async (
+  email: string,
+  password: string,
+  displayName: string
+) => {
   const result = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(result.user, { displayName });
   return result;
@@ -72,14 +71,17 @@ export const logout = async () => {
 };
 
 // Real-time listeners
-export const useCollection = (collectionName: string, constraints: any[] = []) => {
+export const useCollection = (
+  collectionName: string,
+  constraints: any[] = []
+) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const q = query(collection(db, collectionName), ...constraints);
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const documents = querySnapshot.docs.map(doc => ({
+      const documents = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));

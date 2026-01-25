@@ -3,16 +3,19 @@
 //
 // Uses ElevenLabs TTS API to generate the audio debrief.
 // Requires ELEVENLABS_API_KEY env var.
+//
+// NOTE: stores audio in firestore as base64 (free tier workaround)
+// instead of firebase storage
 
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "@/lib/firebase";
 import {
   apiHandler,
   apiSuccess,
   ExternalServiceError,
+  DatabaseError,
   validateRequest,
 } from "@/lib/api";
 import { ElevenLabsSchemas } from "@/lib/api/schemas";
+import { storeAudioInFirestore } from "@/lib/audio-storage-server";
 
 export async function POST(request: Request) {
   return apiHandler(async () => {
@@ -62,20 +65,14 @@ export async function POST(request: Request) {
     // receive audio stream (mpeg)
     const audioBuffer = await response.arrayBuffer();
 
-    // upload to firebase storage
-    const fileName = `tts-${Date.now()}-${Math.random().toString(36).substring(2)}.mp3`;
-    const storagePath = `audio/tts/${fileName}`;
-    const storageRef = ref(storage, storagePath);
-
-    let downloadURL: string;
+    // store in firestore (free tier workaround instead of firebase storage)
+    let audioId: string;
     try {
-      const snapshot = await uploadBytes(storageRef, audioBuffer, {
-        contentType: "audio/mpeg",
-      });
-      downloadURL = await getDownloadURL(snapshot.ref);
+      const stored = await storeAudioInFirestore(audioBuffer, "audio/mpeg", 7); // 7 day expiration
+      audioId = stored.id;
     } catch (error) {
-      throw new ExternalServiceError(
-        "firebase storage",
+      throw new DatabaseError(
+        "audio storage",
         error instanceof Error ? error.message : undefined
       );
     }
@@ -84,9 +81,12 @@ export async function POST(request: Request) {
     const wordCount = text.split(/\s+/).length;
     const estimatedDurationMs = Math.max(3000, (wordCount / 150) * 60 * 1000); // minimum 3 seconds
 
+    // return API route URL to serve the audio
+    const audioUrl = `/api/audio/${audioId}`;
+
     return apiSuccess(
       {
-        audioUrl: downloadURL,
+        audioUrl,
         durationMs: Math.round(estimatedDurationMs),
         wordCount,
       },

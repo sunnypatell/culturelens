@@ -107,11 +107,10 @@ export const ApiErrors = {
 
   // 404 errors
   notFound: (resource: string, id?: string) =>
-    apiError(
-      "NOT_FOUND",
-      `${resource} not found`,
-      { status: 404, details: id ? `${resource} with id ${id}` : undefined }
-    ),
+    apiError("NOT_FOUND", `${resource} not found`, {
+      status: 404,
+      details: id ? `${resource} with id ${id}` : undefined,
+    }),
 
   // 409 errors
   conflict: (message: string, details?: string) =>
@@ -123,23 +122,23 @@ export const ApiErrors = {
 
   // 503 errors
   serviceUnavailable: (service: string, details?: string) =>
-    apiError(
-      "SERVICE_UNAVAILABLE",
-      `${service} is currently unavailable`,
-      { status: 503, details, hint: "please try again later" }
-    ),
+    apiError("SERVICE_UNAVAILABLE", `${service} is currently unavailable`, {
+      status: 503,
+      details,
+      hint: "please try again later",
+    }),
 
   databaseError: (operation: string, details?: string) =>
-    apiError(
-      "DATABASE_ERROR",
-      `database error during ${operation}`,
-      { status: 503, details, hint: "please try again later" }
-    ),
+    apiError("DATABASE_ERROR", `database error during ${operation}`, {
+      status: 503,
+      details,
+      hint: "please try again later",
+    }),
 
   externalServiceError: (service: string, details?: string) =>
-    apiError(
-      "EXTERNAL_SERVICE_ERROR",
-      `error communicating with ${service}`,
-      { status: 503, details, hint: "please try again later" }
-    ),
+    apiError("EXTERNAL_SERVICE_ERROR", `error communicating with ${service}`, {
+      status: 503,
+      details,
+      hint: "please try again later",
+    }),
 } as const;
