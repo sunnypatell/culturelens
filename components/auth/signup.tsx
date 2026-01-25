@@ -336,7 +336,7 @@ export function Signup() {
                 Check your inbox
               </div>
               <p className="text-xs text-muted-foreground pt-4">
-                Redirecting to dashboard...
+                Redirecting to onboarding...
               </p>
             </div>
           </CardContent>
