@@ -16,9 +16,13 @@ export const SessionSchemas = {
     settings: z.object({
       storageMode: z.enum(["ephemeral", "transcriptOnly"]),
       voiceId: z.string(),
-      analysisDepth: z.enum(["quick", "standard", "deep"]),
-      culturalContextTags: z.array(z.string()),
-      sensitivityLevel: z.number().min(0).max(100),
+      title: z.string().optional(),
+      sessionType: z.string().optional(),
+      participantCount: z.number().optional(),
+      analysisMethod: z.enum(["quick", "standard", "deep"]).optional(),
+      analysisDepth: z.enum(["quick", "standard", "deep"]).optional(),
+      culturalContextTags: z.array(z.string()).optional(),
+      sensitivityLevel: z.number().min(0).max(5).optional(),
     }),
   }),
 
