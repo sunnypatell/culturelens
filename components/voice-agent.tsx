@@ -65,10 +65,21 @@ export function VoiceAgent({
   const [selectedVoice, setSelectedVoice] = useState(VOICES[0].id); // Default to Rachel
   const [useAgentVoice, setUseAgentVoice] = useState(true); // Use agent's preset voice by default
   const [transcript, setTranscript] = useState<string[]>([]);
-  const [sessionId] = useState(
+  // use provided sessionId directly, or generate fallback only if truly not provided
+  const [sessionId, setSessionId] = useState(
     () => providedSessionId || `session-${Date.now()}`
   );
   const transcriptRef = useRef<string[]>([]);
+
+  // sync sessionId when providedSessionId changes (important for proper transcript saving)
+  useEffect(() => {
+    if (providedSessionId && providedSessionId !== sessionId) {
+      console.log(
+        `[VoiceAgent] Syncing sessionId: ${sessionId} -> ${providedSessionId}`
+      );
+      setSessionId(providedSessionId);
+    }
+  }, [providedSessionId, sessionId]);
 
   // Keep the ref in sync with the state
   useEffect(() => {

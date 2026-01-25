@@ -480,13 +480,20 @@ export function RecordingStudio({
               Back to Setup
             </Button>
             <Button
-              onClick={() =>
-                router.push(
+              onClick={() => {
+                console.log(
+                  "[RecordingStudio] View Analysis clicked, sessionId:",
                   currentSessionId
-                    ? `/results?sessionId=${currentSessionId}`
-                    : "/results"
-                )
-              }
+                );
+                if (currentSessionId) {
+                  router.push(`/results?sessionId=${currentSessionId}`);
+                } else {
+                  console.error(
+                    "[RecordingStudio] No sessionId available for results!"
+                  );
+                  toast.error("session not found - please try recording again");
+                }
+              }}
               className="px-6"
             >
               View Analysis Results

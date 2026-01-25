@@ -46,6 +46,7 @@ function ResultsContent() {
   const fetchAnalysis = async (id: string) => {
     try {
       setLoading(true);
+      console.log("[Results] Fetching analysis for session:", id);
 
       // get auth token
       const auth = (await import("@/lib/firebase")).auth;
@@ -55,16 +56,20 @@ function ResultsContent() {
       }
 
       // first try to fetch existing analysis
+      console.log("[Results] Attempting GET /api/sessions/${id}/analyze...");
       let response = await fetch(`/api/sessions/${id}/analyze`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       let data = await response.json();
+      console.log("[Results] GET response:", response.status, data);
 
       // if analysis doesn't exist but session is processing, trigger analysis
       if (!response.ok && data.error?.code === "BAD_REQUEST") {
-        console.log("[Results] Analysis not ready, triggering analysis...");
+        console.log(
+          "[Results] Analysis not ready, triggering POST analysis..."
+        );
 
         // trigger analysis
         const triggerResponse = await fetch(`/api/sessions/${id}/analyze`, {
