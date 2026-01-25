@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     if (!consent || !settings) {
       return NextResponse.json(
-        { error: "Missing consent or settings" },
+        { error: "missing consent or settings" },
         { status: 400 }
       );
     }
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     // Validate dual consent
     if (!(consent.personA && consent.personB)) {
       return NextResponse.json(
-        { error: "Both participants must consent" },
+        { error: "both participants must consent" },
         { status: 400 }
       );
     }
@@ -38,13 +38,22 @@ export async function POST(request: Request) {
     };
 
     // Store in Firestore
-    await createDocument("sessions", session);
+    try {
+      await createDocument("sessions", session);
+    } catch (firestoreError) {
+      console.error("firestore error creating session:", firestoreError);
+      return NextResponse.json(
+        { error: "database error while creating session" },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(session, { status: 201 });
   } catch (error) {
-    console.error("Session creation error:", error);
+    console.error("session creation error:", error);
+    const errorMessage = error instanceof Error ? error.message : "unknown error";
     return NextResponse.json(
-      { error: "Failed to create session" },
+      { error: "failed to create session", details: errorMessage },
       { status: 500 }
     );
   }
@@ -57,9 +66,10 @@ export async function GET() {
 
     return NextResponse.json(sessions);
   } catch (error) {
-    console.error("Session listing error:", error);
+    console.error("session listing error:", error);
+    const errorMessage = error instanceof Error ? error.message : "unknown error";
     return NextResponse.json(
-      { error: "Failed to list sessions" },
+      { error: "failed to list sessions", details: errorMessage },
       { status: 500 }
     );
   }
