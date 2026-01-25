@@ -93,13 +93,19 @@ export function VoiceAgent({
       setStatus("idle");
     },
     onMessage: (message) => {
-      // Capture conversation messages
+      // Capture conversation messages with speaker attribution
       const messageText =
         typeof message === "string" ? message : JSON.stringify(message);
-      setTranscript((prev) => [
-        ...prev,
-        `[${new Date().toISOString()}] ${messageText}`,
-      ]);
+
+      setTranscript((prev) => {
+        // Alternate speakers: user (A) speaks first, then agent (B)
+        // This assumes a conversational pattern where speakers alternate
+        const speaker = prev.length % 2 === 0 ? "A" : "B";
+        return [
+          ...prev,
+          `[${new Date().toISOString()}] ${speaker}: ${messageText}`,
+        ];
+      });
     },
   });
 
