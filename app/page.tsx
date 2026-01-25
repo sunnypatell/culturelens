@@ -46,7 +46,15 @@ export default function Home() {
     <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
       <main className="flex-1 overflow-auto">
-        {activeView === "home" && <DashboardHome onNavigate={setActiveView} />}
+        {activeView === "home" && (
+          <DashboardHome
+            onNavigate={setActiveView}
+            onViewInsights={(sessionId) => {
+              setSelectedSessionId(sessionId);
+              setActiveView("insights");
+            }}
+          />
+        )}
         {activeView === "record" && <RecordingStudio />}
         {activeView === "library" && (
           <AnalysisLibrary

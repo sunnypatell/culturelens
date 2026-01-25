@@ -12,9 +12,13 @@ interface DashboardHomeProps {
   onNavigate: (
     view: "home" | "record" | "library" | "insights" | "settings"
   ) => void;
+  onViewInsights?: (sessionId: string) => void;
 }
 
-export function DashboardHome({ onNavigate }: DashboardHomeProps) {
+export function DashboardHome({
+  onNavigate,
+  onViewInsights,
+}: DashboardHomeProps) {
   const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
@@ -339,7 +343,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
                 className="group relative overflow-hidden hover-lift cursor-pointer"
                 onMouseEnter={() => setHoveredCard(session.id)}
                 onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => onNavigate("insights")}
+                onClick={() => onViewInsights?.(session.id)}
               >
                 {/* Gradient header */}
                 <div

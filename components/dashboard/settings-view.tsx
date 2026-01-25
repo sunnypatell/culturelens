@@ -21,12 +21,14 @@ import { cn } from "@/lib/utils";
 import { Footer } from "./footer";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 export function SettingsView() {
   const { user, getIdToken, signOut } = useAuth();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +42,6 @@ export function SettingsView() {
   const [culturalAnalysis, setCulturalAnalysis] = useState(true);
   const [dataRetention, setDataRetention] = useState("90");
   const [sensitivityLevel, setSensitivityLevel] = useState([70]);
-  const [theme, setTheme] = useState("system");
 
   // password dialog state
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
