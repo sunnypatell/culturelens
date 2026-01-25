@@ -67,7 +67,7 @@ export function PhoneLogin() {
     setLoading(true);
 
     if (!recaptchaVerifier) {
-      setError("recaptcha not initialized");
+      setError("reCAPTCHA not initialized");
       setLoading(false);
       return;
     }
@@ -77,12 +77,12 @@ export function PhoneLogin() {
       const result = await sendPhoneCode(formattedPhone, recaptchaVerifier);
       setConfirmationResult(result);
       setCodeSent(true);
-      setSuccess("verification code sent!");
+      setSuccess("Verification code sent!");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("failed to send verification code");
+        setError("Failed to send verification code");
       }
       // reset recaptcha on error
       if (recaptchaVerifier) {
@@ -102,20 +102,20 @@ export function PhoneLogin() {
     setLoading(true);
 
     if (!confirmationResult) {
-      setError("no confirmation result found");
+      setError("No confirmation result found");
       setLoading(false);
       return;
     }
 
     try {
       await verifyPhoneCode(confirmationResult, verificationCode);
-      setSuccess("signed in successfully!");
+      setSuccess("Signed in successfully!");
       router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("invalid verification code");
+        setError("Invalid verification code");
       }
     } finally {
       setLoading(false);
@@ -126,16 +126,16 @@ export function PhoneLogin() {
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">sign in with phone</CardTitle>
+          <CardTitle className="text-2xl">Sign In with Phone</CardTitle>
           <CardDescription>
-            enter your phone number to receive a verification code
+            Enter your phone number to receive a verification code
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!codeSent ? (
             <form onSubmit={handleSendCode} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">phone number</Label>
+                <Label htmlFor="phone">Phone Number</Label>
                 <div className="flex">
                   <Input
                     id="phone"
@@ -149,7 +149,7 @@ export function PhoneLogin() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  include country code (e.g., +1 for US)
+                  Include country code (e.g., +1 for US)
                 </p>
               </div>
 
@@ -159,7 +159,7 @@ export function PhoneLogin() {
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <Phone className="mr-2 h-4 w-4" />
-                send verification code
+                Send Verification Code
               </Button>
             </form>
           ) : (
@@ -167,12 +167,12 @@ export function PhoneLogin() {
               <Alert>
                 <Phone className="h-4 w-4" />
                 <AlertDescription>
-                  verification code sent to {phoneNumber}
+                  Verification code sent to {phoneNumber}
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
-                <Label htmlFor="code">verification code</Label>
+                <Label htmlFor="code">Verification Code</Label>
                 <Input
                   id="code"
                   type="text"
@@ -188,7 +188,7 @@ export function PhoneLogin() {
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <ShieldCheck className="mr-2 h-4 w-4" />
-                verify and sign in
+                Verify and Sign In
               </Button>
 
               <Button
@@ -207,7 +207,7 @@ export function PhoneLogin() {
                 }}
                 disabled={loading}
               >
-                use different number
+                Use Different Number
               </Button>
             </form>
           )}
@@ -226,9 +226,9 @@ export function PhoneLogin() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-muted-foreground">
-            prefer email?{" "}
+            Prefer email?{" "}
             <a href="/auth/login" className="underline">
-              sign in with email
+              Sign in with email
             </a>
           </div>
         </CardFooter>

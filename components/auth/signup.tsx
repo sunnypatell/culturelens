@@ -50,23 +50,23 @@ export function Signup() {
 
   const validateForm = () => {
     if (!formData.displayName.trim()) {
-      setError("please enter your display name");
+      setError("Please enter your display name");
       return false;
     }
     if (!formData.email.trim()) {
-      setError("please enter your email");
+      setError("Please enter your email");
       return false;
     }
     if (formData.password.length < 6) {
-      setError("password must be at least 6 characters");
+      setError("Password must be at least 6 characters");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError("passwords do not match");
+      setError("Passwords do not match");
       return false;
     }
     if (!agreedToTerms) {
-      setError("please agree to the terms and conditions");
+      setError("Please agree to the Terms and Conditions");
       return false;
     }
     return true;
@@ -94,7 +94,7 @@ export function Signup() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("failed to create account");
+        setError("Failed to create account");
       }
     } finally {
       setLoading(false);
@@ -105,9 +105,9 @@ export function Signup() {
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">create your account</CardTitle>
+          <CardTitle className="text-2xl">Create Your Account</CardTitle>
           <CardDescription>
-            join culturelens and start your journey
+            Join CultureLens and start your journey
           </CardDescription>
         </CardHeader>
         {!success ? (
@@ -115,11 +115,11 @@ export function Signup() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="displayName">display name</Label>
+                  <Label htmlFor="displayName">Display Name</Label>
                   <Input
                     id="displayName"
                     type="text"
-                    placeholder="john doe"
+                    placeholder="John Doe"
                     value={formData.displayName}
                     onChange={handleChange}
                     required
@@ -127,7 +127,7 @@ export function Signup() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -139,7 +139,7 @@ export function Signup() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">password</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -150,11 +150,11 @@ export function Signup() {
                     disabled={loading}
                   />
                   <p className="text-xs text-muted-foreground">
-                    minimum 6 characters
+                    Minimum 6 characters
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">confirm password</Label>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -178,9 +178,9 @@ export function Signup() {
                     htmlFor="terms"
                     className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    i agree to the{" "}
+                    I agree to the{" "}
                     <a href="/terms" className="underline" target="_blank">
-                      terms and conditions
+                      Terms and Conditions
                     </a>
                   </Label>
                 </div>
@@ -191,15 +191,15 @@ export function Signup() {
                 )}
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  create account
+                  Create Account
                 </Button>
               </form>
             </CardContent>
             <CardFooter>
               <div className="text-sm text-muted-foreground">
-                already have an account?{" "}
+                Already have an account?{" "}
                 <a href="/auth/login" className="underline">
-                  sign in
+                  Sign in
                 </a>
               </div>
             </CardFooter>
@@ -210,16 +210,16 @@ export function Signup() {
               <Check className="h-8 w-8 text-white" />
             </div>
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-semibold">account created!</h3>
+              <h3 className="text-xl font-semibold">Account Created!</h3>
               <p className="text-sm text-muted-foreground">
-                verification email sent to {formData.email}
+                Verification email sent to {formData.email}
               </p>
               <div className="flex items-center justify-center text-sm text-muted-foreground">
                 <Mail className="mr-2 h-4 w-4" />
-                check your inbox
+                Check your inbox
               </div>
               <p className="text-xs text-muted-foreground pt-4">
-                redirecting to dashboard...
+                Redirecting to dashboard...
               </p>
             </div>
           </CardContent>

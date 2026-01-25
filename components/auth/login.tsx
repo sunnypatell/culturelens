@@ -48,13 +48,13 @@ export function Login() {
 
     try {
       await signIn(email, password);
-      setSuccess("signed in successfully!");
+      setSuccess("Signed in successfully!");
       router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("failed to sign in");
+        setError("Failed to sign in");
       }
     } finally {
       setLoading(false);
@@ -70,12 +70,12 @@ export function Login() {
     try {
       await sendEmailLink(emailLink);
       setEmailLinkSent(true);
-      setSuccess("check your email for the signin link!");
+      setSuccess("Check your email for the sign-in link!");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("failed to send email link");
+        setError("Failed to send email link");
       }
     } finally {
       setLoading(false);
@@ -89,13 +89,13 @@ export function Login() {
 
     try {
       await signInWithGoogle();
-      setSuccess("signed in with google!");
+      setSuccess("Signed in with Google!");
       router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("failed to sign in with google");
+        setError("Failed to sign in with Google");
       }
     } finally {
       setLoading(false);
@@ -106,23 +106,23 @@ export function Login() {
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">sign in to culturelens</CardTitle>
-          <CardDescription>choose your preferred signin method</CardDescription>
+          <CardTitle className="text-2xl">Sign In to CultureLens</CardTitle>
+          <CardDescription>Choose your preferred sign-in method</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="email">
                 <Mail className="mr-2 h-4 w-4" />
-                email
+                Email
               </TabsTrigger>
               <TabsTrigger value="passwordless">
                 <Lock className="mr-2 h-4 w-4" />
-                link
+                Link
               </TabsTrigger>
               <TabsTrigger value="phone">
                 <Phone className="mr-2 h-4 w-4" />
-                phone
+                Phone
               </TabsTrigger>
             </TabsList>
 
@@ -130,7 +130,7 @@ export function Login() {
             <TabsContent value="email">
               <form onSubmit={handleEmailPasswordSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -142,7 +142,7 @@ export function Login() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">password</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -155,7 +155,7 @@ export function Login() {
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  sign in
+                  Sign In
                 </Button>
               </form>
             </TabsContent>
@@ -165,7 +165,7 @@ export function Login() {
               {!emailLinkSent ? (
                 <form onSubmit={handleEmailLinkSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="emailLink">email</Label>
+                    <Label htmlFor="emailLink">Email</Label>
                     <Input
                       id="emailLink"
                       type="email"
@@ -180,15 +180,15 @@ export function Login() {
                     {loading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    send signin link
+                    Send Sign-In Link
                   </Button>
                 </form>
               ) : (
                 <Alert>
                   <Mail className="h-4 w-4" />
                   <AlertDescription>
-                    check your email for the signin link. click it to complete
-                    signin.
+                    Check your email for the sign-in link. Click it to complete
+                    sign-in.
                   </AlertDescription>
                 </Alert>
               )}
@@ -199,10 +199,10 @@ export function Login() {
               <Alert>
                 <Phone className="h-4 w-4" />
                 <AlertDescription>
-                  phone authentication requires recaptcha verification. use the
+                  Phone authentication requires reCAPTCHA verification. Use the
                   dedicated{" "}
                   <a href="/auth/phone" className="underline">
-                    phone signin page
+                    phone sign-in page
                   </a>
                   .
                 </AlertDescription>
@@ -218,7 +218,7 @@ export function Login() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  or continue with
+                  Or Continue With
                 </span>
               </div>
             </div>
@@ -244,7 +244,7 @@ export function Login() {
                   d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
                 ></path>
               </svg>
-              sign in with google
+              Sign In with Google
             </Button>
           </div>
 
@@ -262,15 +262,15 @@ export function Login() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-muted-foreground">
-            don't have an account?{" "}
+            Don't have an account?{" "}
             <a href="/auth/signup" className="underline">
-              sign up
+              Sign up
             </a>
           </div>
           <div className="text-sm text-muted-foreground">
-            forgot password?{" "}
+            Forgot password?{" "}
             <a href="/auth/reset-password" className="underline">
-              reset it
+              Reset it
             </a>
           </div>
         </CardFooter>

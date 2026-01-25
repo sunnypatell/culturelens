@@ -42,7 +42,7 @@ export function ResetPassword() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("failed to send reset email");
+        setError("Failed to send reset email");
       }
     } finally {
       setLoading(false);
@@ -53,9 +53,9 @@ export function ResetPassword() {
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">reset password</CardTitle>
+          <CardTitle className="text-2xl">Reset Password</CardTitle>
           <CardDescription>
-            enter your email to receive a password reset link
+            Enter your email to receive a password reset link
           </CardDescription>
         </CardHeader>
         {!success ? (
@@ -63,7 +63,7 @@ export function ResetPassword() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -82,15 +82,15 @@ export function ResetPassword() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   <Mail className="mr-2 h-4 w-4" />
-                  send reset link
+                  Send Reset Link
                 </Button>
               </form>
             </CardContent>
             <CardFooter>
               <div className="text-sm text-muted-foreground">
-                remember your password?{" "}
+                Remember your password?{" "}
                 <a href="/auth/login" className="underline">
-                  sign in
+                  Sign in
                 </a>
               </div>
             </CardFooter>
@@ -101,17 +101,17 @@ export function ResetPassword() {
               <Check className="h-8 w-8 text-white" />
             </div>
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-semibold">email sent!</h3>
+              <h3 className="text-xl font-semibold">Email Sent!</h3>
               <p className="text-sm text-muted-foreground">
-                check {email} for password reset instructions
+                Check {email} for password reset instructions
               </p>
               <div className="flex items-center justify-center text-sm text-muted-foreground">
                 <Mail className="mr-2 h-4 w-4" />
-                check your inbox
+                Check your inbox
               </div>
             </div>
             <Button asChild variant="outline" className="mt-4">
-              <a href="/auth/login">back to sign in</a>
+              <a href="/auth/login">Back to Sign In</a>
             </Button>
           </CardContent>
         )}
