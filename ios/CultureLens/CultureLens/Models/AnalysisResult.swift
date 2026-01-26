@@ -9,11 +9,62 @@ import Foundation
 
 // MARK: - Analysis Result
 struct AnalysisResult: Codable, Equatable {
-    let session: Session
+    // Note: sessionId instead of full Session to avoid circular reference
+    // When embedded in Session.analysisResult, access session from parent
+    let sessionId: String?
     let segments: [Segment]
     let metrics: Metrics
     let insights: [Insight]
     let debrief: Debrief
+
+    // Custom coding keys to handle API response with full session object
+    enum CodingKeys: String, CodingKey {
+        case session
+        case sessionId
+        case segments
+        case metrics
+        case insights
+        case debrief
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        segments = try container.decode([Segment].self, forKey: .segments)
+        metrics = try container.decode(Metrics.self, forKey: .metrics)
+        insights = try container.decode([Insight].self, forKey: .insights)
+        debrief = try container.decode(Debrief.self, forKey: .debrief)
+
+        // Handle both sessionId string and full session object from API
+        if let id = try? container.decode(String.self, forKey: .sessionId) {
+            sessionId = id
+        } else if let sessionContainer = try? container.nestedContainer(keyedBy: SessionIdKey.self, forKey: .session) {
+            sessionId = try? sessionContainer.decode(String.self, forKey: .id)
+        } else {
+            sessionId = nil
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(sessionId, forKey: .sessionId)
+        try container.encode(segments, forKey: .segments)
+        try container.encode(metrics, forKey: .metrics)
+        try container.encode(insights, forKey: .insights)
+        try container.encode(debrief, forKey: .debrief)
+    }
+
+    private enum SessionIdKey: String, CodingKey {
+        case id
+    }
+
+    // Memberwise initializer for creating in code
+    init(sessionId: String?, segments: [Segment], metrics: Metrics, insights: [Insight], debrief: Debrief) {
+        self.sessionId = sessionId
+        self.segments = segments
+        self.metrics = metrics
+        self.insights = insights
+        self.debrief = debrief
+    }
 }
 
 // MARK: - Segment

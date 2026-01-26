@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - Session
-struct Session: Codable, Identifiable, Equatable {
+struct Session: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let userId: String
     let createdAt: String
@@ -21,6 +21,11 @@ struct Session: Codable, Identifiable, Equatable {
     var analyzedAt: String?
     var duration: Int?
     var isFavorite: Bool?
+
+    // Custom Hashable - hash by unique ID only
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 
     // Computed properties for UI
     var createdDate: Date? {

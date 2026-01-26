@@ -68,7 +68,8 @@ struct ShakeModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .offset(x: shakeOffset)
-            .onChange(of: trigger) { _, _ in
+            .onChange(of: trigger) { newValue in
+                guard newValue else { return }
                 withAnimation(.default.repeatCount(3).speed(6)) {
                     shakeOffset = 10
                 }
@@ -129,22 +130,24 @@ extension View {
 struct AsyncButtonStyle: ButtonStyle {
     let isLoading: Bool
 
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .opacity(isLoading ? 0 : 1)
-            .overlay {
-                if isLoading {
-                    ProgressView()
-                        .tint(.white)
-                }
+    @ViewBuilder
+    func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+        ZStack {
+            configuration.label
+                .opacity(isLoading ? 0 : 1)
+
+            if isLoading {
+                ProgressView()
+                    .tint(.white)
             }
-            .opacity(configuration.isPressed ? 0.7 : 1)
+        }
+        .opacity(configuration.isPressed ? 0.7 : 1)
     }
 }
 
-extension ButtonStyle where Self == AsyncButtonStyle {
-    static func async(isLoading: Bool) -> AsyncButtonStyle {
-        AsyncButtonStyle(isLoading: isLoading)
+extension View {
+    func asyncButtonStyle(isLoading: Bool) -> some View {
+        self.buttonStyle(AsyncButtonStyle(isLoading: isLoading))
     }
 }
 

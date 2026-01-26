@@ -59,7 +59,7 @@ final class AuthService: ObservableObject {
     // MARK: - API Client Token Provider
     private func setupAPIClientTokenProvider() {
         Task {
-            await APIClient.shared.tokenProvider = { [weak self] in
+            await APIClient.shared.setTokenProvider { [weak self] in
                 await self?.getIdToken()
             }
         }
@@ -215,10 +215,12 @@ final class AuthService: ObservableObject {
 
     // MARK: - Error Mapping
     private func mapFirebaseError(_ error: NSError) -> AuthError {
-        let code = AuthErrorCode(rawValue: error.code)
+        guard let code = AuthErrorCode.Code(rawValue: error.code) else {
+            return .unknown(error.localizedDescription)
+        }
 
         switch code {
-        case .wrongPassword, .invalidEmail, .userNotFound:
+        case .wrongPassword, .invalidEmail, .userNotFound, .invalidCredential:
             return .invalidCredentials
         case .emailAlreadyInUse:
             return .emailAlreadyInUse

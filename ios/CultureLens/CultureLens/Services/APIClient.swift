@@ -19,7 +19,12 @@ actor APIClient {
     private let encoder: JSONEncoder
 
     // Token provider closure - set by AuthService
-    var tokenProvider: (() async -> String?)?
+    private var tokenProvider: (() async -> String?)?
+
+    // Method to set token provider from external actors
+    func setTokenProvider(_ provider: @escaping () async -> String?) {
+        self.tokenProvider = provider
+    }
 
     // MARK: - Initialization
     private init() {

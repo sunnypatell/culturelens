@@ -7,12 +7,12 @@
 
 import Foundation
 
-enum Environment {
+enum AppEnvironment {
     case development
     case staging
     case production
 
-    static var current: Environment {
+    static var current: AppEnvironment {
         #if DEBUG
         return .development
         #else
@@ -24,7 +24,7 @@ enum Environment {
 struct Configuration {
     // MARK: - API Configuration
     static var apiBaseURL: URL {
-        switch Environment.current {
+        switch AppEnvironment.current {
         case .development:
             return URL(string: "http://localhost:3000/api")!
         case .staging:

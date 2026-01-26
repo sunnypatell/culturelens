@@ -186,94 +186,117 @@ struct OrbVisualization: View {
 
     var body: some View {
         ZStack {
-            // Outer glow layers
-            ForEach(0..<3) { index in
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.theme.orbPrimary.opacity(0.3 - Double(index) * 0.1),
-                                Color.theme.orbSecondary.opacity(0.1),
-                                .clear
-                            ],
-                            center: .center,
-                            startRadius: 80,
-                            endRadius: 160
-                        )
-                    )
-                    .scaleEffect(pulseScale + CGFloat(index) * 0.1)
-                    .opacity(glowOpacity)
-            }
-
-            // Main orb
-            ZStack {
-                // Base gradient
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.theme.orbPrimary, Color.theme.orbSecondary],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 180, height: 180)
-
-                // Animated inner glow
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                .white.opacity(0.4),
-                                .white.opacity(0.1),
-                                .clear
-                            ],
-                            center: UnitPoint(
-                                x: 0.3 + sin(animationPhase) * 0.1,
-                                y: 0.3 + cos(animationPhase) * 0.1
-                            ),
-                            startRadius: 0,
-                            endRadius: 90
-                        )
-                    )
-                    .frame(width: 180, height: 180)
-
-                // Speaking wave effect
-                if agentState == .speaking {
-                    ForEach(0..<3) { wave in
-                        Circle()
-                            .stroke(
-                                Color.white.opacity(0.3 - Double(wave) * 0.1),
-                                lineWidth: 2
-                            )
-                            .frame(width: 180, height: 180)
-                            .scaleEffect(1.0 + CGFloat(wave) * 0.15 + sin(animationPhase + Double(wave)) * 0.1)
-                    }
-                }
-
-                // Listening indicator
-                if agentState == .listening {
-                    Circle()
-                        .stroke(Color.white.opacity(0.5), lineWidth: 3)
-                        .frame(width: 200, height: 200)
-                        .scaleEffect(pulseScale)
-                }
-            }
-            .shadow(color: Color.theme.orbPrimary.opacity(0.5), radius: 30)
+            outerGlowLayers
+            mainOrb
         }
         .onAppear {
             startAnimations()
         }
-        .onChange(of: agentState) { _, newState in
+        .onChange(of: agentState) { newState in
             updateAnimations(for: newState)
         }
     }
 
+    // MARK: - Outer Glow Layers
+    private var outerGlowLayers: some View {
+        ForEach(0..<3, id: \.self) { index in
+            Circle()
+                .fill(outerGlowGradient(index: index))
+                .scaleEffect(pulseScale + CGFloat(index) * 0.1)
+                .opacity(glowOpacity)
+        }
+    }
+
+    private func outerGlowGradient(index: Int) -> RadialGradient {
+        RadialGradient(
+            colors: [
+                Color.theme.orbPrimary.opacity(0.3 - Double(index) * 0.1),
+                Color.theme.orbSecondary.opacity(0.1),
+                .clear
+            ],
+            center: .center,
+            startRadius: 80,
+            endRadius: 160
+        )
+    }
+
+    // MARK: - Main Orb
+    private var mainOrb: some View {
+        ZStack {
+            baseGradientCircle
+            innerGlowCircle
+            speakingWaveEffect
+            listeningIndicator
+        }
+        .shadow(color: Color.theme.orbPrimary.opacity(0.5), radius: 30)
+    }
+
+    private var baseGradientCircle: some View {
+        Circle()
+            .fill(
+                LinearGradient(
+                    colors: [Color.theme.orbPrimary, Color.theme.orbSecondary],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 180, height: 180)
+    }
+
+    private var innerGlowCircle: some View {
+        let centerX: CGFloat = 0.3 + sin(animationPhase) * 0.1
+        let centerY: CGFloat = 0.3 + cos(animationPhase) * 0.1
+
+        return Circle()
+            .fill(
+                RadialGradient(
+                    colors: [
+                        Color.white.opacity(0.4),
+                        Color.white.opacity(0.1),
+                        Color.clear
+                    ],
+                    center: UnitPoint(x: centerX, y: centerY),
+                    startRadius: 0,
+                    endRadius: 90
+                )
+            )
+            .frame(width: 180, height: 180)
+    }
+
+    @ViewBuilder
+    private var speakingWaveEffect: some View {
+        if agentState == .speaking {
+            ForEach(0..<3, id: \.self) { wave in
+                speakingWave(index: wave)
+            }
+        }
+    }
+
+    private func speakingWave(index: Int) -> some View {
+        let waveOpacity: Double = 0.3 - Double(index) * 0.1
+        let waveScale: CGFloat = 1.0 + CGFloat(index) * 0.15 + CGFloat(sin(animationPhase + Double(index))) * 0.1
+
+        return Circle()
+            .stroke(Color.white.opacity(waveOpacity), lineWidth: 2)
+            .frame(width: 180, height: 180)
+            .scaleEffect(waveScale)
+    }
+
+    @ViewBuilder
+    private var listeningIndicator: some View {
+        if agentState == .listening {
+            Circle()
+                .stroke(Color.white.opacity(0.5), lineWidth: 3)
+                .frame(width: 200, height: 200)
+                .scaleEffect(pulseScale)
+        }
+    }
+
+    // MARK: - Animations
     private func startAnimations() {
-        // Continuous rotation animation
         withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
             animationPhase = .pi * 2
         }
-
         updateAnimations(for: agentState)
     }
 
