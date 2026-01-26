@@ -19,7 +19,7 @@ concurrency:
 env:
   XCODE_VERSION: "16.2"
   SIMULATOR_DEVICE: "iPhone 16 Pro"
-  SIMULATOR_OS: "18.2"
+  SIMULATOR_OS: "18.1"
 
 jobs:
   lint:
