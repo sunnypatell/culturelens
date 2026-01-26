@@ -19,7 +19,7 @@ concurrency:
 env:
   XCODE_VERSION: "16.2"
   SIMULATOR_DEVICE: "iPhone 16 Pro"
-  SIMULATOR_OS: "18.1"
+  SIMULATOR_OS: "18.2"
 
 jobs:
   lint:
@@ -66,6 +66,9 @@ jobs:
       - name: generate xcode project
         working-directory: ios/CultureLens
         run: xcodegen generate
+
+      - name: list available simulators
+        run: xcrun simctl list devices available
 
       - name: resolve packages
         working-directory: ios/CultureLens
