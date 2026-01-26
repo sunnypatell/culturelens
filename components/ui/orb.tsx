@@ -89,7 +89,10 @@ export function Orb({
             console.log("[Orb] WebGL context restored");
           };
           canvas.addEventListener("webglcontextlost", handleContextLost);
-          canvas.addEventListener("webglcontextrestored", handleContextRestored);
+          canvas.addEventListener(
+            "webglcontextrestored",
+            handleContextRestored
+          );
         }}
         onError={() => {
           console.error("[Orb] Canvas error, falling back to CSS");

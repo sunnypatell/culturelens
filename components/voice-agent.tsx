@@ -242,13 +242,17 @@ export function VoiceAgent({
       // Request microphone permission first
       console.log("[VoiceAgent] Requesting microphone permission...");
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
         console.log("[VoiceAgent] Microphone permission granted");
         // Stop the test stream immediately - ElevenLabs will create its own
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       } catch (micError) {
         console.error("[VoiceAgent] Microphone permission denied:", micError);
-        throw new Error("Microphone permission denied. Please allow microphone access to use the voice agent.");
+        throw new Error(
+          "Microphone permission denied. Please allow microphone access to use the voice agent."
+        );
       }
 
       // Public agent — connect directly with agentId (no backend call needed)
@@ -270,7 +274,10 @@ export function VoiceAgent({
           };
         }
 
-        console.log("[VoiceAgent] Starting session with config:", sessionConfig);
+        console.log(
+          "[VoiceAgent] Starting session with config:",
+          sessionConfig
+        );
         await conversation.startSession(sessionConfig);
         console.log("[VoiceAgent] Session started successfully");
         return;
