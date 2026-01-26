@@ -45,6 +45,8 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         LD_RUNPATH_SEARCH_PATHS: $(inherited) @executable_path/Frameworks
         SWIFT_EMIT_LOC_STRINGS: true
+        TARGETED_DEVICE_FAMILY: "1,2"  # iPhone and iPad
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: true
     dependencies:
       - package: Firebase
         product: FirebaseAuth
@@ -71,6 +73,12 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiresFullScreen: false
         ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
           - CFBundleURLSchemes:
