@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseCrashlytics
 import GoogleSignIn
 
 @main
@@ -35,7 +36,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        // Configure Firebase
         FirebaseApp.configure()
+
+        // Initialize Crashlytics (configured in CrashReportingService)
+        _ = CrashReportingService.shared
+        CrashReportingService.shared.log("App launched")
+
         return true
     }
 

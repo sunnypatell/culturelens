@@ -1,0 +1,178 @@
+/*
+  Localizable.strings
+  CultureLens
+
+  English localization for CultureLens iOS app
+*/
+
+// MARK: - Common
+"common.cancel" = "Cancel";
+"common.done" = "Done";
+"common.save" = "Save";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.share" = "Share";
+"common.loading" = "Loading...";
+"common.error" = "Error";
+"common.success" = "Success";
+"common.retry" = "Retry";
+"common.ok" = "OK";
+
+// MARK: - Tab Bar
+"tabs.home" = "Home";
+"tabs.record" = "Record";
+"tabs.library" = "Library";
+"tabs.settings" = "Settings";
+
+// MARK: - Authentication
+"auth.signIn" = "Sign In";
+"auth.signUp" = "Sign Up";
+"auth.signOut" = "Sign Out";
+"auth.signInWithGoogle" = "Sign In with Google";
+"auth.email" = "Email";
+"auth.password" = "Password";
+"auth.forgotPassword" = "Forgot Password?";
+"auth.createAccount" = "Create Account";
+"auth.alreadyHaveAccount" = "Already have an account?";
+"auth.dontHaveAccount" = "Don't have an account?";
+"auth.welcomeBack" = "Welcome Back";
+"auth.getStarted" = "Get Started";
+
+// MARK: - Home
+"home.title" = "CultureLens";
+"home.welcome" = "Welcome, %@";
+"home.recentSessions" = "Recent Sessions";
+"home.noSessions" = "No sessions yet";
+"home.startFirst" = "Start your first conversation";
+"home.viewAll" = "View All";
+
+// MARK: - Recording
+"record.title" = "New Session";
+"record.startSession" = "Start Session";
+"record.endSession" = "End Session";
+"record.consent" = "Consent Required";
+"record.consentDescription" = "Both participants must consent to being recorded.";
+"record.personA" = "Person A";
+"record.personB" = "Person B";
+"record.hasConsented" = "Has consented";
+"record.sessionTitle" = "Session Title";
+"record.sessionType" = "Session Type";
+"record.storageMode" = "Storage Mode";
+"record.ready" = "Ready";
+"record.listening" = "Listening...";
+"record.speaking" = "Agent Speaking";
+"record.tapToSpeak" = "Tap to start speaking";
+"record.speakNaturally" = "Speak naturally, I'm listening";
+"record.pleaseWait" = "Please wait...";
+"record.connected" = "Connected";
+"record.connecting" = "Connecting...";
+"record.disconnected" = "Disconnected";
+
+// MARK: - Library
+"library.title" = "Library";
+"library.all" = "All";
+"library.favorites" = "Favorites";
+"library.search" = "Search sessions";
+"library.noResults" = "No sessions found";
+"library.empty" = "Your session library is empty";
+"library.startRecording" = "Start recording to see sessions here";
+
+// MARK: - Insights
+"insights.title" = "Insights";
+"insights.overview" = "Overview";
+"insights.patterns" = "Patterns";
+"insights.transcript" = "Transcript";
+"insights.metrics" = "Metrics";
+"insights.summary" = "Summary";
+"insights.keyInsights" = "Key Insights";
+"insights.noAnalysis" = "No Analysis Available";
+"insights.processing" = "Analysis is still processing...";
+"insights.noResults" = "This session doesn't have analysis results yet";
+"insights.showMore" = "Show More";
+"insights.showLess" = "Show Less";
+"insights.evidence" = "Evidence";
+
+// MARK: - Metrics
+"metrics.talkTime" = "Talk Time Distribution";
+"metrics.turnStats" = "Turn Statistics";
+"metrics.totalTurns" = "Total Turns";
+"metrics.interruptions" = "Interruptions";
+"metrics.silenceMoments" = "Silence Moments";
+
+// MARK: - Settings
+"settings.title" = "Settings";
+"settings.account" = "Account";
+"settings.profile" = "Profile";
+"settings.notifications" = "Notifications";
+"settings.appearance" = "Appearance";
+"settings.theme" = "Theme";
+"settings.system" = "System";
+"settings.light" = "Light";
+"settings.dark" = "Dark";
+"settings.about" = "About";
+"settings.version" = "Version";
+"settings.privacy" = "Privacy Policy";
+"settings.terms" = "Terms of Service";
+"settings.deleteAccount" = "Delete Account";
+"settings.deleteAccountWarning" = "This action cannot be undone. All your data will be permanently deleted.";
+
+// MARK: - Session Status
+"status.recording" = "Recording";
+"status.uploading" = "Uploading";
+"status.processing" = "Processing";
+"status.ready" = "Ready";
+"status.failed" = "Failed";
+
+// MARK: - Session Types
+"sessionType.conversation" = "Casual Conversation";
+"sessionType.interview" = "Interview";
+"sessionType.meeting" = "Meeting";
+"sessionType.coaching" = "Coaching Session";
+"sessionType.mediation" = "Mediation";
+"sessionType.other" = "Other";
+
+// MARK: - Storage Modes
+"storageMode.ephemeral" = "Ephemeral (Deletes after 24h)";
+"storageMode.transcriptOnly" = "Transcript Only (No Audio)";
+
+// MARK: - Analysis Depth
+"analysisDepth.quick" = "Quick Analysis";
+"analysisDepth.standard" = "Standard Analysis";
+"analysisDepth.deep" = "Deep Analysis";
+
+// MARK: - Insight Categories
+"category.turnTaking" = "Turn Taking";
+"category.emotion" = "Emotional Patterns";
+"category.directness" = "Communication Style";
+"category.repair" = "Repair Attempts";
+"category.assumptions" = "Assumptions";
+"category.culturalLens" = "Cultural Lens";
+
+// MARK: - Confidence Levels
+"confidence.low" = "Low Confidence";
+"confidence.medium" = "Medium Confidence";
+"confidence.high" = "High Confidence";
+
+// MARK: - Errors
+"error.network" = "Network error. Please check your connection.";
+"error.auth" = "Authentication failed. Please try again.";
+"error.invalidCredentials" = "Invalid email or password.";
+"error.emailInUse" = "This email is already in use.";
+"error.weakPassword" = "Password is too weak.";
+"error.tokenExpired" = "Your session has expired. Please sign in again.";
+"error.microphonePermission" = "Microphone access is required for recording.";
+"error.sessionFailed" = "Session failed to start. Please try again.";
+"error.analysisFailed" = "Analysis failed. Please try again.";
+
+// MARK: - Accessibility
+"accessibility.playButton" = "Play recording";
+"accessibility.pauseButton" = "Pause recording";
+"accessibility.stopButton" = "Stop recording";
+"accessibility.muteButton" = "Mute microphone";
+"accessibility.unmuteButton" = "Unmute microphone";
+"accessibility.favoriteButton" = "Add to favorites";
+"accessibility.unfavoriteButton" = "Remove from favorites";
+"accessibility.deleteButton" = "Delete session";
+"accessibility.shareButton" = "Share session";
+"accessibility.transcriptButton" = "View transcript";
+"accessibility.settingsButton" = "Open settings";

@@ -54,6 +54,8 @@ targets:
         product: FirebaseFirestore
       - package: Firebase
         product: FirebaseStorage
+      - package: Firebase
+        product: FirebaseCrashlytics
       - package: GoogleSignIn
         product: GoogleSignIn
       - package: GoogleSignIn
@@ -85,13 +87,48 @@ targets:
               - com.googleusercontent.apps.407570374043-lmu50155qnjh0k3k94hq1vericp6ubtf
             CFBundleURLName: Google Sign-In
 
+  CultureLensTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: CultureLensTests
+    dependencies:
+      - target: CultureLens
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.culturelens.app.tests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/CultureLens.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CultureLens"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  CultureLensUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: CultureLensUITests
+    dependencies:
+      - target: CultureLens
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.culturelens.app.uitests
+        TEST_TARGET_NAME: CultureLens
+
 schemes:
   CultureLens:
     build:
       targets:
         CultureLens: all
+        CultureLensTests: [test]
+        CultureLensUITests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      coverageTargets:
+        - CultureLens
+      targets:
+        - CultureLensTests
+        - CultureLensUITests
     profile:
       config: Release
     analyze:
