@@ -143,13 +143,15 @@ export function VoiceAgent({
         timestamp: new Date().toISOString(),
       });
     },
-    onStatusChange: (status: "connected" | "disconnected" | "connecting") => {
+    onStatusChange: (prop: {
+      status: "connected" | "disconnected" | "connecting" | "disconnecting";
+    }) => {
       console.log("[VoiceAgent] Status changed:", {
-        status,
+        status: prop.status,
         timestamp: new Date().toISOString(),
       });
     },
-    onMessage: (props: { message: string; source: "user" | "agent" }) => {
+    onMessage: (props: { message: string; source: "user" | "ai" }) => {
       // Capture conversation messages with speaker attribution from ElevenLabs
       const speaker = props.source === "user" ? "A" : "B";
       const messageText = props.message;
