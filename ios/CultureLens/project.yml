@@ -1,0 +1,88 @@
+name: CultureLens
+options:
+  bundleIdPrefix: com.culturelens
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.9"
+    ENABLE_USER_SCRIPT_SANDBOXING: false
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk.git
+    from: "10.0.0"
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS.git
+    from: "7.0.0"
+
+targets:
+  CultureLens:
+    type: application
+    platform: iOS
+    sources:
+      - path: CultureLens
+        excludes:
+          - "**/*.plist.example"
+    resources:
+      - path: CultureLens/Resources
+        excludes:
+          - "**/*.example"
+      - path: CultureLens/Info.plist
+    settings:
+      base:
+        INFOPLIST_FILE: CultureLens/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.culturelens.app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        LD_RUNPATH_SEARCH_PATHS: $(inherited) @executable_path/Frameworks
+        SWIFT_EMIT_LOC_STRINGS: true
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseStorage
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - package: GoogleSignIn
+        product: GoogleSignInSwift
+    info:
+      path: CultureLens/Info.plist
+      properties:
+        CFBundleDisplayName: CultureLens
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen:
+          UIColorName: LaunchScreenBackground
+        NSMicrophoneUsageDescription: CultureLens needs microphone access to record and analyze conversations with the AI voice agent.
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+
+schemes:
+  CultureLens:
+    build:
+      targets:
+        CultureLens: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

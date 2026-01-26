@@ -8,23 +8,15 @@ Native iOS app for CultureLens built with SwiftUI, Firebase, and ElevenLabs.
 - iOS 16.0+
 - macOS Sonoma (for development)
 - Apple ID (free tier works for development/testing)
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) (recommended)
 
-## Setup Instructions
+## Quick Start (Recommended)
 
-### 1. Open in Xcode
+### 1. Install XcodeGen
 
 ```bash
-cd ios/CultureLens
-open -a Xcode .
+brew install xcodegen
 ```
-
-Then in Xcode:
-1. File → New → Project
-2. Choose "App" under iOS
-3. Product Name: `CultureLens`
-4. Bundle Identifier: `com.culturelens.app`
-5. Interface: SwiftUI
-6. Save in the `ios/CultureLens` directory (merge with existing files)
 
 ### 2. Configure Firebase
 
@@ -35,53 +27,97 @@ Then in Xcode:
 5. Download `GoogleService-Info.plist`
 6. Copy to `ios/CultureLens/CultureLens/Resources/GoogleService-Info.plist`
 
-### 3. Add Swift Packages (in Xcode)
+### 3. Generate Xcode Project
 
-1. File → Add Package Dependencies
-2. Add these packages:
-   - `https://github.com/firebase/firebase-ios-sdk.git` (10.0.0+)
-     - Select: FirebaseAuth, FirebaseFirestore, FirebaseStorage
-   - `https://github.com/google/GoogleSignIn-iOS.git` (7.0.0+)
-     - Select: GoogleSignIn, GoogleSignInSwift
+```bash
+cd ios/CultureLens
+xcodegen generate
+```
 
-### 4. Configure Google Sign-In
+This uses `project.yml` to create a properly configured `.xcodeproj` with all dependencies.
 
-1. In `GoogleService-Info.plist`, find `REVERSED_CLIENT_ID`
-2. Go to Project Settings → Targets → Info → URL Types
-3. Add new URL Type with the `REVERSED_CLIENT_ID` value
+### 4. Open and Run
 
-### 5. Run the App
+```bash
+open CultureLens.xcodeproj
+```
 
-1. Select a simulator or your device
-2. Press `Cmd + R` to build and run
-3. For physical device testing (free):
-   - Xcode → Settings → Accounts → Add Apple ID
-   - Select your team in Target → Signing & Capabilities
+Then press `Cmd + R` to build and run on simulator.
+
+---
+
+## Manual Setup (Alternative)
+
+If you prefer not to use XcodeGen:
+
+### 1. Create Project in Xcode
+
+1. Open Xcode → File → New → Project
+2. Choose "App" under iOS
+3. Product Name: `CultureLens`
+4. Bundle Identifier: `com.culturelens.app`
+5. Interface: SwiftUI
+6. Language: Swift
+7. Save in `ios/CultureLens` directory
+
+### 2. Add Existing Files
+
+1. Right-click project → Add Files to "CultureLens"
+2. Navigate to `ios/CultureLens/CultureLens`
+3. Select all folders (Core, Models, Services, ViewModels, Views, Extensions)
+4. Enable "Copy items if needed" and "Create groups"
+
+### 3. Add Swift Packages
+
+File → Add Package Dependencies:
+
+```
+https://github.com/firebase/firebase-ios-sdk.git (10.0.0+)
+  → FirebaseAuth, FirebaseFirestore, FirebaseStorage
+
+https://github.com/google/GoogleSignIn-iOS.git (7.0.0+)
+  → GoogleSignIn, GoogleSignInSwift
+```
+
+### 4. Configure Google Sign-In URL Scheme
+
+1. Find `REVERSED_CLIENT_ID` in `GoogleService-Info.plist`
+2. Project Settings → Targets → Info → URL Types
+3. Add URL Type with the reversed client ID value
+
+---
 
 ## Architecture
 
 ```
-CultureLens/
-├── Core/               # App configuration, constants
-├── Models/             # Data models (Session, Insight, User, etc.)
-├── Services/           # API, Auth, VoiceAgent services
-├── ViewModels/         # MVVM view models
-├── Views/
-│   ├── Auth/          # Login, signup, onboarding
-│   ├── Dashboard/     # Home, library, settings
-│   ├── Recording/     # Voice agent, orb visualization
-│   └── Insights/      # Analysis results display
-└── Extensions/         # Swift helpers
+ios/CultureLens/
+├── project.yml                    # XcodeGen project spec
+├── Package.swift                  # SPM manifest (alternative)
+└── CultureLens/
+    ├── CultureLensApp.swift       # App entry point
+    ├── Info.plist                 # App configuration
+    ├── Core/                      # Configuration, AppState
+    ├── Models/                    # Session, AnalysisResult, User, etc.
+    ├── Services/                  # APIClient, AuthService, VoiceAgent
+    ├── ViewModels/                # AuthViewModel, SessionsViewModel
+    ├── Views/
+    │   ├── Auth/                  # Login, signup, forgot password
+    │   ├── Dashboard/             # Home, Library, Settings
+    │   ├── Recording/             # VoiceAgent, Orb visualization
+    │   └── Insights/              # Analysis display
+    ├── Extensions/                # Color+Theme, View+Extensions
+    └── Resources/
+        ├── Assets.xcassets/       # App icons, colors
+        └── GoogleService-Info.plist
 ```
 
 ## Features
 
 - **Firebase Authentication**: Email/password + Google Sign-In
-- **Voice Agent**: Real-time conversation with ElevenLabs AI
-- **Animated Orb**: Visual feedback during voice interaction
+- **Voice Agent**: Real-time conversation with ElevenLabs AI (WebSocket)
+- **Animated Orb**: Dynamic visual feedback during voice interaction
 - **Session Management**: Create, view, favorite, delete sessions
 - **AI Analysis**: Gemini-powered cultural insights
-- **Offline Support**: Session caching (coming soon)
 - **Dark Mode**: System-aware theming
 
 ## API Integration
@@ -89,11 +125,11 @@ CultureLens/
 The iOS app connects to the same backend as the web app:
 - Base URL: `https://culturelens.vercel.app/api`
 - Authentication: Firebase JWT tokens
-- All data syncs with web in real-time
+- All data syncs with web in real-time via shared Firestore
 
 ## Development Notes
 
-### Testing Without Apple Developer Program
+### Free Development (No Apple Developer Program)
 
 You can develop and test completely free:
 - ✅ Run on simulator (unlimited)
@@ -102,30 +138,45 @@ You can develop and test completely free:
 - ❌ TestFlight distribution
 - ❌ App Store publishing
 
+For physical device:
+1. Xcode → Settings → Accounts → Add Apple ID
+2. Select your team in Target → Signing & Capabilities
+3. Trust developer certificate on device: Settings → General → VPN & Device Management
+
 ### Portfolio Showcase
 
 Since you can't publish to App Store, showcase via:
-1. Screen recordings (simulator or device)
-2. GitHub repository with clear documentation
-3. Demo videos on LinkedIn/portfolio
-4. Side-by-side demo with web app
+1. **Screen recordings** - Simulator or device demos
+2. **GitHub repository** - Clean code with documentation
+3. **Demo videos** - Side-by-side with web app
+4. **Architecture diagrams** - Show MVVM, services layer
 
 ## Troubleshooting
+
+### XcodeGen Issues
+
+```bash
+# Regenerate project
+xcodegen generate --use-cache
+
+# Clear derived data
+rm -rf ~/Library/Developer/Xcode/DerivedData
+```
 
 ### Build Errors
 
 1. Clean build folder: `Cmd + Shift + K`
 2. Reset package caches: File → Packages → Reset Package Caches
-3. Verify `GoogleService-Info.plist` is in the correct location
+3. Verify `GoogleService-Info.plist` location
 
-### Firebase Issues
+### Firebase Connection Issues
 
-- Ensure Bundle ID matches Firebase config
+- Ensure Bundle ID matches Firebase config exactly
 - Check `REVERSED_CLIENT_ID` is in URL Types
-- Verify API key restrictions in Google Cloud Console
+- Verify Firebase project has iOS app registered
 
 ### Voice Agent Not Connecting
 
-- Check microphone permissions in Settings
-- Verify `NSMicrophoneUsageDescription` in Info.plist
-- Ensure backend is running and accessible
+- Check microphone permissions in iOS Settings
+- Verify backend is accessible: `curl https://culturelens.vercel.app/api/elevenlabs/signed-url`
+- Check console for WebSocket errors
