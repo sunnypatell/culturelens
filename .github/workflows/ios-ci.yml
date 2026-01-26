@@ -16,10 +16,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  XCODE_VERSION: "16.2"
+  SIMULATOR_DEVICE: "iPhone 16 Pro"
+  SIMULATOR_OS: "18.2"
+
 jobs:
   lint:
     name: swiftlint
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
@@ -32,16 +37,21 @@ jobs:
 
   build:
     name: build & test
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: lint
     steps:
       - uses: actions/checkout@v4
 
       - name: select xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
 
       - name: install xcodegen
         run: brew install xcodegen
+
+      - name: install xcpretty
+        run: gem install xcpretty
 
       - name: cache swift packages
         uses: actions/cache@v4
@@ -67,10 +77,11 @@ jobs:
       - name: build for testing
         working-directory: ios/CultureLens
         run: |
+          set -o pipefail
           xcodebuild build-for-testing \
             -project CultureLens.xcodeproj \
             -scheme CultureLens \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5' \
+            -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_DEVICE }},OS=${{ env.SIMULATOR_OS }}" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             | xcpretty
@@ -78,13 +89,15 @@ jobs:
       - name: run unit tests
         working-directory: ios/CultureLens
         run: |
+          set -o pipefail
           xcodebuild test \
             -project CultureLens.xcodeproj \
             -scheme CultureLens \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5' \
+            -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_DEVICE }},OS=${{ env.SIMULATOR_OS }}" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
             | xcpretty
 
       - name: upload test results
@@ -92,23 +105,27 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: |
-            ios/CultureLens/build/Logs/Test/*.xcresult
+          path: ios/CultureLens/TestResults.xcresult
           retention-days: 7
 
   build-release:
     name: build release
-    runs-on: macos-latest
+    runs-on: macos-15
     needs: build
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
       - name: select xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
 
       - name: install xcodegen
         run: brew install xcodegen
+
+      - name: install xcpretty
+        run: gem install xcpretty
 
       - name: cache swift packages
         uses: actions/cache@v4
@@ -127,19 +144,23 @@ jobs:
       - name: build release
         working-directory: ios/CultureLens
         run: |
+          set -o pipefail
           xcodebuild build \
             -project CultureLens.xcodeproj \
             -scheme CultureLens \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination "generic/platform=iOS Simulator" \
             -configuration Release \
             CODE_SIGNING_ALLOWED=NO \
             | xcpretty
 
-      - name: archive build info
+      - name: build summary
         run: |
           echo "## iOS Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Configuration:** Release" >> $GITHUB_STEP_SUMMARY
-          echo "- **Platform:** iOS Simulator" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Xcode | ${{ env.XCODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Configuration | Release |" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | iOS Simulator |" >> $GITHUB_STEP_SUMMARY

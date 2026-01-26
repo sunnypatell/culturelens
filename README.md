@@ -9,9 +9,11 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Swift](https://img.shields.io/badge/Swift-5.9-orange?style=flat-square&logo=swift)](ios/)
+[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?style=flat-square&logo=swift&logoColor=white)](ios/)
+[![iOS](https://img.shields.io/badge/iOS-16.0+-000000?style=flat-square&logo=apple&logoColor=white)](ios/)
 [![Firebase](https://img.shields.io/badge/Firebase-Admin_SDK-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.11-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![CI](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sunnypatell/culturelens/actions)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-First Architecture_
@@ -69,6 +71,23 @@ CultureLens is a **production-grade conversation analytics platform** that provi
 - **Testing:** Pytest + asyncio fixtures
 - **Linting:** Ruff (100x faster than Pylint)
 - **API Docs:** OpenAPI/Swagger (auto-generated)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top">
+
+**iOS Native App** ([📱 Full Documentation](ios/README.md))
+
+- **Language:** Swift 5.9 (async/await, actors, property wrappers)
+- **Framework:** SwiftUI (MVVM architecture, Combine)
+- **Platform:** iOS 16+ / iPadOS 16+ / Apple Silicon Macs
+- **Auth:** Firebase Auth SDK + Google Sign-In
+- **Storage:** Firebase Firestore + Firebase Storage
+- **Voice AI:** ElevenLabs WebSocket integration
+- **Testing:** XCTest (unit + UI tests), code coverage
+- **CI/CD:** GitHub Actions, XcodeGen, Fastlane
+- **Quality:** SwiftLint, accessibility (VoiceOver), localization
 
 </td>
 </tr>
@@ -390,6 +409,8 @@ GitHub Actions runs on every pull request:
 | **Backend Lint**       | Ruff         | ~3s     |
 | **Backend Format**     | Ruff Format  | ~2s     |
 | **Backend Test**       | Pytest       | ~5s     |
+| **iOS Lint**           | SwiftLint    | ~5s     |
+| **iOS Build & Test**   | Xcode 16     | ~2m     |
 | **Firebase Deploy**    | Firebase CLI | ~20s    |
 
 ### Local Testing
@@ -521,6 +542,7 @@ firebase deploy --only storage
 
 ## 📚 Documentation
 
+- **[ios/README.md](ios/README.md)** - iOS app architecture, setup, and deployment
 - **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Firebase configuration guide
 - **[AGENT_PROMPT.md](AGENT_PROMPT.md)** - Voice agent system prompt
 - **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)** - ElevenLabs integration
