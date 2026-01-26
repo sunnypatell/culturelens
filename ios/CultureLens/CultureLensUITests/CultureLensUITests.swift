@@ -35,20 +35,27 @@ final class CultureLensUITests: XCTestCase {
         // Tab bar only exists when user is authenticated
         // When not authenticated, login screen is shown instead
         let tabBar = app.tabBars.firstMatch
-        let signInButton = app.buttons["Sign In with Google"]
+        let googleButton = app.buttons["Continue with Google"]
+        let signInButton = app.buttons["Sign In"]
 
-        // Either tab bar exists (authenticated) or sign in button exists (not authenticated)
-        let hasExpectedUI = tabBar.waitForExistence(timeout: 3) || signInButton.waitForExistence(timeout: 3)
-        XCTAssertTrue(hasExpectedUI, "Expected either tab bar or sign in button")
+        // Either tab bar exists (authenticated) or auth buttons exist (not authenticated)
+        let hasExpectedUI = tabBar.waitForExistence(timeout: 5) ||
+                            googleButton.waitForExistence(timeout: 5) ||
+                            signInButton.waitForExistence(timeout: 5)
+        XCTAssertTrue(hasExpectedUI, "Expected either tab bar or auth buttons")
     }
 
     // MARK: - Authentication Flow Tests
 
     func testLoginViewElements() throws {
         // If we're on the login screen, check for key elements
-        let signInButton = app.buttons["Sign In with Google"]
+        let googleButton = app.buttons["Continue with Google"]
+        let signInButton = app.buttons["Sign In"]
 
-        if signInButton.exists {
+        // Check if either auth button exists and is enabled
+        if googleButton.waitForExistence(timeout: 3) {
+            XCTAssertTrue(googleButton.isEnabled)
+        } else if signInButton.waitForExistence(timeout: 3) {
             XCTAssertTrue(signInButton.isEnabled)
         }
     }
