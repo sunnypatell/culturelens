@@ -1,0 +1,149 @@
+# Fastfile for CultureLens iOS
+# https://docs.fastlane.tools
+
+default_platform(:ios)
+
+platform :ios do
+  # ============================================
+  # DEVELOPMENT LANES
+  # ============================================
+
+  desc "Run SwiftLint on the codebase"
+  lane :lint do
+    swiftlint(
+      mode: :lint,
+      config_file: ".swiftlint.yml",
+      ignore_exit_status: false
+    )
+  end
+
+  desc "Run unit tests"
+  lane :test do
+    run_tests(
+      project: "CultureLens.xcodeproj",
+      scheme: "CultureLens",
+      device: "iPhone 15 Pro",
+      clean: true
+    )
+  end
+
+  desc "Build the app for testing"
+  lane :build do
+    build_app(
+      project: "CultureLens.xcodeproj",
+      scheme: "CultureLens",
+      configuration: "Debug",
+      skip_archive: true,
+      skip_codesigning: true
+    )
+  end
+
+  # ============================================
+  # CI/CD LANES
+  # ============================================
+
+  desc "CI lane - lint, build, and test"
+  lane :ci do
+    lint
+    build
+    # test # Uncomment when tests are added
+  end
+
+  desc "Generate Xcode project with XcodeGen"
+  lane :generate_project do
+    sh("cd .. && xcodegen generate")
+    UI.success("Xcode project generated successfully!")
+  end
+
+  # ============================================
+  # RELEASE LANES (for future App Store deployment)
+  # ============================================
+
+  desc "Increment build number"
+  lane :bump_build do
+    increment_build_number(
+      xcodeproj: "CultureLens.xcodeproj"
+    )
+    UI.success("Build number incremented to #{get_build_number}")
+  end
+
+  desc "Increment version number"
+  lane :bump_version do |options|
+    bump_type = options[:type] || "patch"
+    increment_version_number(
+      xcodeproj: "CultureLens.xcodeproj",
+      bump_type: bump_type
+    )
+    UI.success("Version bumped to #{get_version_number}")
+  end
+
+  desc "Build and archive for release"
+  lane :release do
+    # Ensure clean state
+    ensure_git_status_clean
+
+    # Bump build number
+    bump_build
+
+    # Build for release
+    build_app(
+      project: "CultureLens.xcodeproj",
+      scheme: "CultureLens",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "CultureLens.ipa"
+    )
+
+    # Commit version bump
+    commit_version_bump(
+      xcodeproj: "CultureLens.xcodeproj",
+      message: "chore(ios): bump build number to #{get_build_number}"
+    )
+  end
+
+  desc "Upload to TestFlight (requires Apple Developer Program)"
+  lane :beta do
+    release
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  # ============================================
+  # UTILITY LANES
+  # ============================================
+
+  desc "Clean build artifacts"
+  lane :clean do
+    clear_derived_data
+    sh("rm -rf ../build")
+    UI.success("Build artifacts cleaned!")
+  end
+
+  desc "Setup development environment"
+  lane :setup do
+    # Generate Xcode project
+    generate_project
+
+    # Install dependencies (if using CocoaPods)
+    # cocoapods
+
+    UI.success("Development environment setup complete!")
+    UI.message("Open CultureLens.xcodeproj to get started")
+  end
+
+  desc "Print app version info"
+  lane :version_info do
+    UI.message("App Version: #{get_version_number}")
+    UI.message("Build Number: #{get_build_number}")
+  end
+
+  # ============================================
+  # ERROR HANDLING
+  # ============================================
+
+  error do |lane, exception|
+    UI.error("Lane #{lane} failed with error: #{exception.message}")
+  end
+end

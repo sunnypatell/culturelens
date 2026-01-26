@@ -35,10 +35,8 @@ struct Configuration {
     }
 
     // MARK: - ElevenLabs Configuration
-    static var elevenLabsAgentId: String {
-        // This should match NEXT_PUBLIC_ELEVENLABS_AGENT_ID from web app
-        ProcessInfo.processInfo.environment["ELEVENLABS_AGENT_ID"] ?? ""
-    }
+    /// Agent ID matching NEXT_PUBLIC_ELEVENLABS_AGENT_ID from web app
+    static let elevenLabsAgentId = "agent_5401kfq4a552e61962kx44qcbcrn"
 
     static var elevenLabsWebSocketURL: URL {
         URL(string: "wss://api.elevenlabs.io/v1/convai/conversation")!

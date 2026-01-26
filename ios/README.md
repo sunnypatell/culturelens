@@ -1,89 +1,67 @@
-# CultureLens iOS App
+# CultureLens iOS
 
-Native iOS app for CultureLens built with SwiftUI, Firebase, and ElevenLabs.
+[![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
+[![iOS](https://img.shields.io/badge/iOS-16.0+-blue.svg)](https://developer.apple.com/ios/)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-4.0-purple.svg)](https://developer.apple.com/xcode/swiftui/)
+[![Firebase](https://img.shields.io/badge/Firebase-10.0+-yellow.svg)](https://firebase.google.com)
+[![SwiftLint](https://img.shields.io/badge/SwiftLint-Enabled-green.svg)](https://github.com/realm/SwiftLint)
+[![XcodeGen](https://img.shields.io/badge/XcodeGen-Powered-blue.svg)](https://github.com/yonaskolb/XcodeGen)
 
-## Requirements
+Native iOS companion app for CultureLens, built with SwiftUI following Apple's Human Interface Guidelines.
 
+## Features
+
+- **Firebase Authentication** — Email/password + Google Sign-In (shared with web app)
+- **Voice Agent** — Real-time AI conversation via ElevenLabs WebSocket
+- **Animated Orb** — Dynamic visualization responding to conversation state
+- **Session Management** — Create, view, favorite, and delete sessions
+- **AI Analysis** — Gemini-powered cultural insights
+- **Cross-Platform Sync** — Same data on iOS and web via shared Firestore
+- **Dark Mode** — System-aware theming with custom accent colors
+- **Haptic Feedback** — Native iOS haptics for enhanced UX
+- **Skeleton Loading** — Polished loading states with shimmer effects
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- macOS Sonoma or later
 - Xcode 15.0+
-- iOS 16.0+
-- macOS Sonoma (for development)
-- Apple ID (free tier works for development/testing)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) (recommended)
+- [Homebrew](https://brew.sh)
 
-## Quick Start (Recommended)
-
-### 1. Install XcodeGen
+### 1. Install Dependencies
 
 ```bash
+# Install XcodeGen (generates Xcode project from YAML)
 brew install xcodegen
+
+# Install SwiftLint (optional, for linting)
+brew install swiftlint
+
+# Install Fastlane (optional, for automation)
+brew install fastlane
 ```
 
-### 2. Configure Firebase
-
-1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Select your existing CultureLens project
-3. Click **Add app** → iOS
-4. Bundle ID: `com.culturelens.app`
-5. Download `GoogleService-Info.plist`
-6. Copy to `ios/CultureLens/CultureLens/Resources/GoogleService-Info.plist`
-
-### 3. Generate Xcode Project
+### 2. Generate Xcode Project
 
 ```bash
 cd ios/CultureLens
 xcodegen generate
 ```
 
-This uses `project.yml` to create a properly configured `.xcodeproj` with all dependencies.
+This creates `CultureLens.xcodeproj` from `project.yml` with all dependencies configured.
 
-### 4. Open and Run
+### 3. Open and Run
 
 ```bash
 open CultureLens.xcodeproj
 ```
 
-Then press `Cmd + R` to build and run on simulator.
+Press `Cmd + R` to build and run on the simulator.
 
----
-
-## Manual Setup (Alternative)
-
-If you prefer not to use XcodeGen:
-
-### 1. Create Project in Xcode
-
-1. Open Xcode → File → New → Project
-2. Choose "App" under iOS
-3. Product Name: `CultureLens`
-4. Bundle Identifier: `com.culturelens.app`
-5. Interface: SwiftUI
-6. Language: Swift
-7. Save in `ios/CultureLens` directory
-
-### 2. Add Existing Files
-
-1. Right-click project → Add Files to "CultureLens"
-2. Navigate to `ios/CultureLens/CultureLens`
-3. Select all folders (Core, Models, Services, ViewModels, Views, Extensions)
-4. Enable "Copy items if needed" and "Create groups"
-
-### 3. Add Swift Packages
-
-File → Add Package Dependencies:
-
-```
-https://github.com/firebase/firebase-ios-sdk.git (10.0.0+)
-  → FirebaseAuth, FirebaseFirestore, FirebaseStorage
-
-https://github.com/google/GoogleSignIn-iOS.git (7.0.0+)
-  → GoogleSignIn, GoogleSignInSwift
-```
-
-### 4. Configure Google Sign-In URL Scheme
-
-1. Find `REVERSED_CLIENT_ID` in `GoogleService-Info.plist`
-2. Project Settings → Targets → Info → URL Types
-3. Add URL Type with the reversed client ID value
+> **Note:** Xcode will automatically fetch Firebase and GoogleSignIn packages via Swift Package Manager on first build.
 
 ---
 
@@ -91,65 +69,206 @@ https://github.com/google/GoogleSignIn-iOS.git (7.0.0+)
 
 ```
 ios/CultureLens/
-├── project.yml                    # XcodeGen project spec
-├── Package.swift                  # SPM manifest (alternative)
+├── project.yml                 # XcodeGen project specification
+├── Package.swift               # Swift Package Manager manifest
+├── Gemfile                     # Ruby dependencies (Fastlane)
+├── .swiftlint.yml              # SwiftLint configuration
+├── fastlane/
+│   ├── Fastfile                # Automation lanes
+│   ├── Appfile                 # App configuration
+│   └── Pluginfile              # Fastlane plugins
 └── CultureLens/
-    ├── CultureLensApp.swift       # App entry point
-    ├── Info.plist                 # App configuration
-    ├── Core/                      # Configuration, AppState
-    ├── Models/                    # Session, AnalysisResult, User, etc.
-    ├── Services/                  # APIClient, AuthService, VoiceAgent
-    ├── ViewModels/                # AuthViewModel, SessionsViewModel
+    ├── CultureLensApp.swift    # App entry point + Firebase init
+    ├── Info.plist              # App configuration
+    │
+    ├── Core/
+    │   ├── Configuration.swift # Environment & API constants
+    │   └── AppState.swift      # Global app state management
+    │
+    ├── Models/
+    │   ├── Session.swift       # Session data model
+    │   ├── AnalysisResult.swift# AI analysis results
+    │   ├── Insight.swift       # Cultural insights
+    │   ├── User.swift          # User profile
+    │   └── APITypes.swift      # Request/response types
+    │
+    ├── Services/
+    │   ├── APIClient.swift     # HTTP networking (actor, async/await)
+    │   ├── AuthService.swift   # Firebase Auth wrapper
+    │   ├── VoiceAgentService.swift  # ElevenLabs WebSocket + AVFoundation
+    │   ├── KeychainService.swift    # Secure credential storage
+    │   └── NetworkMonitor.swift     # Connectivity monitoring
+    │
+    ├── ViewModels/
+    │   ├── AuthViewModel.swift      # Authentication state
+    │   └── SessionsViewModel.swift  # Sessions list + CRUD
+    │
     ├── Views/
-    │   ├── Auth/                  # Login, signup, forgot password
-    │   ├── Dashboard/             # Home, Library, Settings
-    │   ├── Recording/             # VoiceAgent, Orb visualization
-    │   └── Insights/              # Analysis display
-    ├── Extensions/                # Color+Theme, View+Extensions
+    │   ├── Auth/               # Login, SignUp, ForgotPassword
+    │   ├── Dashboard/          # Home, Library, Settings, TabView
+    │   ├── Recording/          # VoiceAgent, Orb visualization
+    │   └── Insights/           # Analysis display
+    │
+    ├── Extensions/
+    │   ├── Color+Theme.swift       # App color palette
+    │   ├── View+Extensions.swift   # SwiftUI modifiers
+    │   └── Shimmer+Loading.swift   # Loading animations
+    │
     └── Resources/
-        ├── Assets.xcassets/       # App icons, colors
-        └── GoogleService-Info.plist
+        ├── Assets.xcassets/        # App icons, accent colors
+        └── GoogleService-Info.plist # Firebase configuration
 ```
 
-## Features
+---
 
-- **Firebase Authentication**: Email/password + Google Sign-In
-- **Voice Agent**: Real-time conversation with ElevenLabs AI (WebSocket)
-- **Animated Orb**: Dynamic visual feedback during voice interaction
-- **Session Management**: Create, view, favorite, delete sessions
-- **AI Analysis**: Gemini-powered cultural insights
-- **Dark Mode**: System-aware theming
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **UI** | SwiftUI | Declarative UI framework |
+| **Architecture** | MVVM | Clean separation of concerns |
+| **Networking** | URLSession + async/await | Native HTTP client |
+| **Auth** | Firebase iOS SDK | Authentication |
+| **Database** | Firestore | Real-time data sync |
+| **Voice AI** | WebSocket + AVFoundation | ElevenLabs integration |
+| **Storage** | Keychain Services | Secure credential storage |
+| **Linting** | SwiftLint | Code style enforcement |
+| **CI/CD** | Fastlane + GitHub Actions | Build automation |
+| **Project Gen** | XcodeGen | Reproducible Xcode projects |
+
+---
 
 ## API Integration
 
 The iOS app connects to the same backend as the web app:
-- Base URL: `https://culturelens.vercel.app/api`
-- Authentication: Firebase JWT tokens
-- All data syncs with web in real-time via shared Firestore
 
-## Development Notes
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/sessions` | GET | List user sessions |
+| `/api/sessions` | POST | Create new session |
+| `/api/sessions/:id` | GET | Get session details |
+| `/api/sessions/:id/analyze` | POST | Trigger AI analysis |
+| `/api/sessions/:id/favorite` | PATCH | Toggle favorite |
+| `/api/elevenlabs/signed-url` | GET | Get WebSocket auth URL |
+| `/api/auth/user` | GET | Get current user |
+| `/api/settings` | GET/PUT | User settings |
 
-### Free Development (No Apple Developer Program)
+All requests include Firebase JWT in `Authorization: Bearer <token>` header.
 
-You can develop and test completely free:
-- ✅ Run on simulator (unlimited)
-- ✅ Run on your own device (up to 3 devices)
-- ✅ Use all features including Firebase
-- ❌ TestFlight distribution
-- ❌ App Store publishing
+---
 
-For physical device:
-1. Xcode → Settings → Accounts → Add Apple ID
+## Development
+
+### Running SwiftLint
+
+```bash
+cd ios/CultureLens
+swiftlint lint
+```
+
+Or with Fastlane:
+
+```bash
+fastlane lint
+```
+
+### Building
+
+```bash
+# Debug build
+fastlane build
+
+# Full CI pipeline (lint + build)
+fastlane ci
+
+# Clean build artifacts
+fastlane clean
+```
+
+### Regenerating Xcode Project
+
+After modifying `project.yml`:
+
+```bash
+xcodegen generate
+```
+
+### Fastlane Lanes
+
+| Lane | Description |
+|------|-------------|
+| `fastlane lint` | Run SwiftLint |
+| `fastlane build` | Debug build |
+| `fastlane ci` | Full CI pipeline |
+| `fastlane clean` | Clean derived data |
+| `fastlane setup` | Setup dev environment |
+| `fastlane bump_build` | Increment build number |
+| `fastlane bump_version` | Increment version |
+
+---
+
+## Firebase Configuration
+
+The `GoogleService-Info.plist` is pre-configured and connects to the same Firebase project as the web app. Users can sign in with the same credentials on both platforms.
+
+### Google Sign-In URL Scheme
+
+Configured in `project.yml`:
+
+```yaml
+CFBundleURLTypes:
+  - CFBundleURLSchemes:
+      - com.googleusercontent.apps.407570374043-lmu50155qnjh0k3k94hq1vericp6ubtf
+```
+
+---
+
+## Free Development (No Apple Developer Program)
+
+You can develop and test without the $99/year Apple Developer Program:
+
+| Feature | Free Tier | Developer Program |
+|---------|-----------|-------------------|
+| Simulator testing | ✅ Unlimited | ✅ Unlimited |
+| Physical device | ✅ Up to 3 devices | ✅ Unlimited |
+| Firebase features | ✅ Full access | ✅ Full access |
+| TestFlight | ❌ | ✅ |
+| App Store | ❌ | ✅ |
+
+### Testing on Physical Device
+
+1. Xcode → Settings → Accounts → Add Apple ID (free account works)
 2. Select your team in Target → Signing & Capabilities
-3. Trust developer certificate on device: Settings → General → VPN & Device Management
+3. On device: Settings → General → VPN & Device Management → Trust
 
-### Portfolio Showcase
+---
 
-Since you can't publish to App Store, showcase via:
-1. **Screen recordings** - Simulator or device demos
-2. **GitHub repository** - Clean code with documentation
-3. **Demo videos** - Side-by-side with web app
-4. **Architecture diagrams** - Show MVVM, services layer
+## Design Decisions
+
+### Why XcodeGen?
+
+- **Reproducible builds** — Project generated from version-controlled YAML
+- **No merge conflicts** — `.xcodeproj` is gitignored
+- **Easy updates** — Just edit `project.yml` and regenerate
+
+### Why MVVM?
+
+- **SwiftUI native** — Works with `@Published`, `@StateObject`, `@EnvironmentObject`
+- **Testable** — ViewModels can be unit tested without UI
+- **Industry standard** — Familiar to iOS developers
+
+### Why Actor-based Services?
+
+```swift
+actor APIClient {
+    // Thread-safe by design - no manual locking
+}
+```
+
+- **Concurrency safe** — Swift concurrency handles thread safety
+- **Modern Swift** — Leverages Swift 5.5+ structured concurrency
+
+---
 
 ## Troubleshooting
 
@@ -157,9 +276,9 @@ Since you can't publish to App Store, showcase via:
 
 ```bash
 # Regenerate project
-xcodegen generate --use-cache
+xcodegen generate
 
-# Clear derived data
+# Clear Xcode derived data
 rm -rf ~/Library/Developer/Xcode/DerivedData
 ```
 
@@ -167,16 +286,47 @@ rm -rf ~/Library/Developer/Xcode/DerivedData
 
 1. Clean build folder: `Cmd + Shift + K`
 2. Reset package caches: File → Packages → Reset Package Caches
-3. Verify `GoogleService-Info.plist` location
+3. Regenerate project: `xcodegen generate`
 
-### Firebase Connection Issues
+### Firebase Issues
 
-- Ensure Bundle ID matches Firebase config exactly
-- Check `REVERSED_CLIENT_ID` is in URL Types
-- Verify Firebase project has iOS app registered
+- Verify `GoogleService-Info.plist` is in `CultureLens/Resources/`
+- Check Bundle ID matches: `com.culturelens.app`
+- Ensure URL scheme is configured for Google Sign-In
 
 ### Voice Agent Not Connecting
 
-- Check microphone permissions in iOS Settings
-- Verify backend is accessible: `curl https://culturelens.vercel.app/api/elevenlabs/signed-url`
-- Check console for WebSocket errors
+1. Check microphone permissions in iOS Settings
+2. Verify backend: `curl https://culturelens.vercel.app/api/elevenlabs/signed-url`
+3. Check Xcode console for WebSocket errors
+
+---
+
+## Portfolio Showcase
+
+Since you can't publish to App Store without Developer Program:
+
+1. **Screen recordings** — Record demos on simulator or device
+2. **GitHub repository** — Clean code with comprehensive documentation
+3. **Demo videos** — Side-by-side comparison with web app
+4. **Architecture diagrams** — Show MVVM, services layer, data flow
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](../.github/CONTRIBUTING.md) for guidelines.
+
+### iOS-Specific Guidelines
+
+1. **SwiftLint** — All code must pass linting
+2. **Previews** — Add `#Preview` to all views
+3. **Accessibility** — Include accessibility labels
+4. **Documentation** — Use `///` doc comments for public APIs
+5. **Conventional Commits** — Use `feat(ios):`, `fix(ios):`, etc.
+
+---
+
+## License
+
+MIT License — see [LICENSE](../LICENSE) for details.
