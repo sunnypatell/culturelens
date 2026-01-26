@@ -90,48 +90,81 @@ export function VoiceAgent({
     onSessionId?.(sessionId);
   }, [onSessionId, sessionId]);
 
+  // ElevenLabs SDK callback types (from docs):
+  // onConnect: (props: { conversationId: string }) => void
+  // onDisconnect: (details: { reason: "user" | "agent" | "error" }) => void
+  // onMessage: (props: { message: string; source: "user" | "agent" }) => void
+  // onError: (error: string | Error) => void
+  // onModeChange: (mode: { mode: "listening" | "speaking" }) => void
+  // onStatusChange: (status: "connected" | "disconnected" | "connecting") => void
+
   const conversation = useConversation({
-    onConnect: () => {
-      console.log("[VoiceAgent] Connected to ElevenLabs - session active");
+    onConnect: (props: { conversationId: string }) => {
+      console.log("[VoiceAgent] Connected to ElevenLabs", {
+        conversationId: props.conversationId,
+        timestamp: new Date().toISOString(),
+      });
       setStatus("connected");
     },
-    onDisconnect: (reason) => {
+    onDisconnect: (details: { reason?: "user" | "agent" | "error" }) => {
+      const reason = details?.reason || "unknown";
       console.log("[VoiceAgent] Disconnected from ElevenLabs", {
         reason,
+        reasonExplanation:
+          reason === "user"
+            ? "user initiated disconnect"
+            : reason === "agent"
+              ? "agent ended conversation"
+              : reason === "error"
+                ? "error occurred during session"
+                : "unknown disconnection reason",
         hadTranscript: transcriptRef.current.length > 0,
         transcriptLength: transcriptRef.current.length,
+        timestamp: new Date().toISOString(),
       });
       setStatus("idle");
       // Save final transcript when disconnecting
       saveTranscript();
     },
-    onError: (e) => {
+    onError: (e: string | Error) => {
       const errorMsg =
         typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error");
-      console.error("[VoiceAgent] Error:", errorMsg, e);
+      console.error("[VoiceAgent] Error from ElevenLabs:", {
+        error: errorMsg,
+        fullError: e,
+        timestamp: new Date().toISOString(),
+      });
       setError(errorMsg);
       setStatus("idle");
     },
-    onModeChange: (mode) => {
-      console.log("[VoiceAgent] Mode changed:", mode);
-    },
-    onStatusChange: (status) => {
-      console.log("[VoiceAgent] Status changed:", status);
-    },
-    onMessage: (message) => {
-      // Capture conversation messages with speaker attribution
-      const messageText =
-        typeof message === "string" ? message : JSON.stringify(message);
-
-      setTranscript((prev) => {
-        // Alternate speakers: user (A) speaks first, then agent (B)
-        // This assumes a conversational pattern where speakers alternate
-        const speaker = prev.length % 2 === 0 ? "A" : "B";
-        return [
-          ...prev,
-          `[${new Date().toISOString()}] ${speaker}: ${messageText}`,
-        ];
+    onModeChange: (mode: { mode: "listening" | "speaking" }) => {
+      console.log("[VoiceAgent] Mode changed:", {
+        mode: mode.mode,
+        timestamp: new Date().toISOString(),
       });
+    },
+    onStatusChange: (status: "connected" | "disconnected" | "connecting") => {
+      console.log("[VoiceAgent] Status changed:", {
+        status,
+        timestamp: new Date().toISOString(),
+      });
+    },
+    onMessage: (props: { message: string; source: "user" | "agent" }) => {
+      // Capture conversation messages with speaker attribution from ElevenLabs
+      const speaker = props.source === "user" ? "A" : "B";
+      const messageText = props.message;
+
+      console.log("[VoiceAgent] Message received:", {
+        source: props.source,
+        speaker,
+        messageLength: messageText.length,
+        timestamp: new Date().toISOString(),
+      });
+
+      setTranscript((prev) => [
+        ...prev,
+        `[${new Date().toISOString()}] ${speaker}: ${messageText}`,
+      ]);
     },
   });
 
