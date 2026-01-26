@@ -66,6 +66,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (user) {
+        // Set session cookie for middleware authentication
+        // This allows the Next.js middleware to check auth state
+        try {
+          const token = await user.getIdToken();
+          // Set cookie with secure flags (expires in 7 days)
+          document.cookie = `session=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+          console.log(`[AUTH_PROVIDER] Session cookie set`);
+        } catch (error) {
+          console.error(`[AUTH_PROVIDER] Failed to set session cookie:`, error);
+        }
+
         // only sync profile if this is a new user or we haven't synced yet
         // this prevents repeated syncs on every auth state change (token refresh, etc.)
         if (syncedUserRef.current !== user.uid) {
@@ -82,8 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } else {
-        // user signed out, reset sync tracker
+        // user signed out, reset sync tracker and clear cookie
         syncedUserRef.current = null;
+        document.cookie = "session=; path=/; max-age=0";
+        console.log(`[AUTH_PROVIDER] Session cookie cleared`);
       }
 
       setUser(user);

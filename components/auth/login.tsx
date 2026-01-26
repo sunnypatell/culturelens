@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "./auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import { motion } from "framer-motion";
 
 export function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     signIn,
     sendEmailLink,
@@ -48,12 +49,51 @@ export function Login() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // redirect to dashboard if already authenticated
+  // redirect to intended destination or dashboard if already authenticated
   useEffect(() => {
     if (!authLoading && user) {
-      router.push("/");
+      // Wait for session cookie to be set by auth-provider before redirecting
+      // This prevents redirect loops where middleware sees no cookie
+      const checkCookieAndRedirect = () => {
+        const hasSessionCookie = document.cookie.includes("session=");
+        if (!hasSessionCookie) {
+          // Cookie not set yet, wait a bit more
+          setTimeout(checkCookieAndRedirect, 50);
+          return;
+        }
+
+        // check for redirect URL from middleware (includes full path with query params)
+        const redirectUrl = searchParams.get("redirectUrl");
+        // fallback to simple redirect path
+        const redirectPath = searchParams.get("redirect");
+        // also check for sessionId that may have been preserved
+        const sessionId = searchParams.get("sessionId");
+
+        console.log("[Login] Session cookie set, redirecting...", {
+          redirectUrl,
+          redirectPath,
+          sessionId,
+        });
+
+        if (redirectUrl) {
+          // full URL was preserved - use it directly
+          router.push(redirectUrl);
+        } else if (redirectPath) {
+          // build the redirect with sessionId if available
+          const finalUrl = sessionId
+            ? `${redirectPath}?sessionId=${sessionId}`
+            : redirectPath;
+          router.push(finalUrl);
+        } else {
+          router.push("/");
+        }
+      };
+
+      // Start checking after a small initial delay
+      const timeoutId = setTimeout(checkCookieAndRedirect, 100);
+      return () => clearTimeout(timeoutId);
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, searchParams]);
 
   const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -38,14 +38,62 @@ export function Orb({
   getOutputVolume,
   className,
 }: OrbProps) {
+  const [webglError, setWebglError] = useState(false);
+  const [key, setKey] = useState(0);
+
+  // Fallback UI when WebGL fails
+  if (webglError) {
+    return (
+      <div className={className ?? "relative h-full w-full"}>
+        <div className="w-full h-full flex items-center justify-center">
+          <div
+            className="w-3/4 h-3/4 rounded-full animate-pulse"
+            style={{
+              background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`,
+              boxShadow: `0 0 60px ${colors[0]}40, 0 0 120px ${colors[1]}20`,
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={className ?? "relative h-full w-full"}>
       <Canvas
+        key={key}
         resize={{ debounce: resizeDebounce }}
         gl={{
           alpha: true,
           antialias: true,
           premultipliedAlpha: true,
+          powerPreference: "low-power",
+          failIfMajorPerformanceCaveat: false,
+        }}
+        onCreated={({ gl }) => {
+          // Handle WebGL context loss
+          const canvas = gl.domElement;
+          const handleContextLost = (event: Event) => {
+            event.preventDefault();
+            console.warn("[Orb] WebGL context lost, attempting recovery...");
+            setTimeout(() => {
+              try {
+                gl.forceContextRestore();
+              } catch {
+                // If restore fails, remount the canvas
+                setKey((k) => k + 1);
+              }
+            }, 100);
+          };
+          const handleContextRestored = () => {
+            console.log("[Orb] WebGL context restored");
+          };
+          canvas.addEventListener("webglcontextlost", handleContextLost);
+          canvas.addEventListener("webglcontextrestored", handleContextRestored);
+        }}
+        onError={() => {
+          console.error("[Orb] Canvas error, falling back to CSS");
+          setWebglError(true);
         }}
       >
         <Scene
@@ -217,18 +265,7 @@ function Scene({
     u.uColor2.value.lerp(targetColor2Ref.current, 0.08);
   });
 
-  useEffect(() => {
-    const canvas = gl.domElement;
-    const onContextLost = (event: Event) => {
-      event.preventDefault();
-      setTimeout(() => {
-        gl.forceContextRestore();
-      }, 1);
-    };
-    canvas.addEventListener("webglcontextlost", onContextLost, false);
-    return () =>
-      canvas.removeEventListener("webglcontextlost", onContextLost, false);
-  }, [gl]);
+  // Context loss handling moved to Canvas onCreated for better recovery
 
   const uniforms = useMemo(() => {
     perlinNoiseTexture.wrapS = THREE.RepeatWrapping;

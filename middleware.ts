@@ -36,6 +36,10 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute && !session) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    // preserve the full original URL including query params (e.g., sessionId)
+    const originalUrl = `${pathname}${request.nextUrl.search}`;
+    url.searchParams.set("redirectUrl", originalUrl);
+    // also set simple redirect path for backwards compatibility
     url.searchParams.set("redirect", pathname);
     return NextResponse.redirect(url);
   }

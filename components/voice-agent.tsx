@@ -92,18 +92,31 @@ export function VoiceAgent({
 
   const conversation = useConversation({
     onConnect: () => {
+      console.log("[VoiceAgent] Connected to ElevenLabs - session active");
       setStatus("connected");
     },
-    onDisconnect: () => {
+    onDisconnect: (reason) => {
+      console.log("[VoiceAgent] Disconnected from ElevenLabs", {
+        reason,
+        hadTranscript: transcriptRef.current.length > 0,
+        transcriptLength: transcriptRef.current.length,
+      });
       setStatus("idle");
       // Save final transcript when disconnecting
       saveTranscript();
     },
     onError: (e) => {
-      setError(
-        typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error")
-      );
+      const errorMsg =
+        typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error");
+      console.error("[VoiceAgent] Error:", errorMsg, e);
+      setError(errorMsg);
       setStatus("idle");
+    },
+    onModeChange: (mode) => {
+      console.log("[VoiceAgent] Mode changed:", mode);
+    },
+    onStatusChange: (status) => {
+      console.log("[VoiceAgent] Status changed:", status);
     },
     onMessage: (message) => {
       // Capture conversation messages with speaker attribution
@@ -193,6 +206,18 @@ export function VoiceAgent({
     setStatus("connecting");
 
     try {
+      // Request microphone permission first
+      console.log("[VoiceAgent] Requesting microphone permission...");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("[VoiceAgent] Microphone permission granted");
+        // Stop the test stream immediately - ElevenLabs will create its own
+        stream.getTracks().forEach(track => track.stop());
+      } catch (micError) {
+        console.error("[VoiceAgent] Microphone permission denied:", micError);
+        throw new Error("Microphone permission denied. Please allow microphone access to use the voice agent.");
+      }
+
       // Public agent — connect directly with agentId (no backend call needed)
       // connectionType: 'websocket' for WebSocket, 'webrtc' for WebRTC
       // Override voice settings for natural conversation
@@ -200,7 +225,6 @@ export function VoiceAgent({
       if (AGENT_ID) {
         const sessionConfig: any = {
           agentId: AGENT_ID,
-          connectionType: "websocket",
         };
 
         // Only override voice if not using agent's preset voice
@@ -213,7 +237,9 @@ export function VoiceAgent({
           };
         }
 
+        console.log("[VoiceAgent] Starting session with config:", sessionConfig);
         await conversation.startSession(sessionConfig);
+        console.log("[VoiceAgent] Session started successfully");
         return;
       }
 
