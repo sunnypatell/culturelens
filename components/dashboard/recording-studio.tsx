@@ -481,8 +481,14 @@ export function RecordingStudio({
             </Button>
             <Button
               onClick={() => {
-                // For demo: force navigation to results page with mock data
-                window.location.href = "/results";
+                // Navigate to results page with sessionId for real analysis
+                if (currentSessionId) {
+                  window.location.href = `/results?sessionId=${currentSessionId}`;
+                } else {
+                  toast.error(
+                    "No session ID available. Please start a new session."
+                  );
+                }
               }}
               className="px-6"
             >

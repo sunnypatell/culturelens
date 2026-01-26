@@ -7,134 +7,63 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Loader2, FileText, Brain, Users } from "lucide-react";
 import Link from "next/link";
 import { AnalysisLoader } from "@/components/ui/analysis-loader";
+import { useAuth } from "@/components/auth/auth-provider";
+
+interface AnalysisInsights {
+  summary: string;
+  keyPoints: string[];
+  culturalObservations: string[];
+  communicationPatterns: string[];
+  recommendations: string[];
+}
 
 interface AnalysisResult {
   sessionId: string;
   timestamp: number;
   transcript: string;
   mediatorInputs: string[];
-  insights?: {
-    summary: string;
-    keyPoints: string[];
-    culturalObservations: string[];
-    communicationPatterns: string[];
-    recommendations: string[];
-  };
+  insights?: AnalysisInsights;
   status: "pending" | "processing" | "complete" | "error";
 }
-
-// Demo mock data for hackathon presentation
-const DEMO_ANALYSIS: AnalysisResult = {
-  sessionId: "demo-session",
-  timestamp: Date.now(),
-  transcript: `[Jordan] I'm done covering for you on these projects. You missed another deadline and I had to stay until midnight fixing your code.
-
-[Alex] Whoa, calm down. It was one deadline and I told you I had a family emergency.
-
-[Jordan] That's the third "emergency" this month! The rest of us have lives too but we still deliver on time.
-
-[Alex] Are you seriously questioning whether my emergencies are real? That's incredibly disrespectful.
-
-[Jordan] I'm questioning why I'm always the one picking up the slack. Sarah and Mike have noticed too.
-
-[Alex] Oh great, so you've been talking about me behind my back. Really professional.
-
-[Jordan] Someone had to say something! Management thinks everything is fine because I keep covering for you.
-
-[Alex] Maybe if you weren't such a control freak, you'd let me handle things my own way instead of "fixing" everything.
-
-[Jordan] Your way doesn't work! The client almost dropped us because of the bugs you shipped.
-
-[Alex] That was ONE time, and the requirements were unclear. But sure, blame everything on me.
-
-[Jordan] I just want you to take responsibility for once instead of making excuses.
-
-[Alex] Fine. You want me to be honest? I've been struggling, okay? But attacking me isn't helping.`,
-  mediatorInputs: [
-    "Detected escalating tension - both parties using accusatory language",
-    "Identified underlying issues: workload distribution, communication gaps, personal stress",
-    "Noted defensive responses blocking productive dialogue",
-    "Recognized breakthrough moment when Alex acknowledged struggling",
-    "Flagged opportunity for de-escalation and collaborative problem-solving",
-  ],
-  insights: {
-    summary:
-      "This conversation reveals a workplace conflict that has been building over time. Initial accusations about missed deadlines escalated into personal attacks before a breakthrough moment where underlying struggles were acknowledged. The exchange demonstrates how unaddressed tensions can explode, but also shows potential for resolution when vulnerability replaces defensiveness.",
-    keyPoints: [
-      "Underlying resentment has built up over multiple incidents",
-      "Both parties feel unheard and disrespected by the other",
-      "Third-party involvement (Sarah, Mike, management) has complicated the dynamic",
-      "Personal struggles are affecting work performance but weren't communicated",
-      "A vulnerable admission created an opening for potential resolution",
-    ],
-    culturalObservations: [
-      "High-context conflict: Multiple unspoken grievances surfaced simultaneously",
-      "Individualistic accountability framing: Focus on personal blame rather than systemic issues",
-      "Direct confrontation style: Emotions expressed openly but aggressively",
-      "Face-saving behavior: Defensive responses to protect self-image",
-    ],
-    communicationPatterns: [
-      "Turn-taking balance: 55% Jordan, 45% Alex - Jordan dominated early exchanges",
-      "Escalation pattern: Each response increased emotional intensity",
-      "Interruption frequency: High - 4 instances of cutting off or dismissing",
-      "De-escalation moment: Alex's admission of struggling shifted the tone",
-    ],
-    recommendations: [
-      "Establish regular check-ins to surface issues before they escalate",
-      "Use 'I feel' statements instead of accusatory 'you always' language",
-      "Create a safe space for discussing workload and personal challenges",
-      "Implement a team agreement on deadline communication and coverage",
-      "Consider mediated follow-up conversation to rebuild trust",
-    ],
-  },
-  status: "complete",
-};
 
 function ResultsContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("sessionId");
+  const { getIdToken, user } = useAuth();
 
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
-  const [_error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [analysisStep, setAnalysisStep] = useState(1);
 
   useEffect(() => {
-    // For demo: show loading animation briefly, then display mock data
-    // Backend integration is preserved in comments below for production use
-    const timer = setTimeout(() => {
-      setAnalysis({
-        ...DEMO_ANALYSIS,
-        sessionId: sessionId || "demo-session",
-      });
-      setLoading(false);
-    }, 2500); // Show the cool loading animation for demo effect
-
-    return () => clearTimeout(timer);
-
-    /*
-    // PRODUCTION CODE - Uncomment after hackathon demo
     if (!sessionId) {
       setError("No session ID provided");
       setLoading(false);
       return;
     }
-    fetchAnalysis(sessionId);
-    */
-  }, [sessionId]);
 
-  /*
-  // PRODUCTION CODE - Full backend integration preserved
+    if (!user) {
+      // Wait for auth to be ready
+      return;
+    }
+
+    fetchAnalysis(sessionId);
+  }, [sessionId, user]);
+
   const fetchAnalysis = async (id: string) => {
     try {
       setLoading(true);
+      setError(null);
       console.log("[Results] Fetching analysis for session:", id);
 
-      const auth = (await import("@/lib/firebase")).auth;
-      const token = await auth.currentUser?.getIdToken();
+      const token = await getIdToken();
       if (!token) {
-        throw new Error("not authenticated");
+        throw new Error("Not authenticated. Please sign in.");
       }
 
+      // Step 1: Check if analysis already exists
+      setAnalysisStep(1);
       let response = await fetch(`/api/sessions/${id}/analyze`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -142,7 +71,11 @@ function ResultsContent() {
       });
       let data = await response.json();
 
+      // Step 2: If no analysis exists, trigger the analysis pipeline
       if (!response.ok && data.error?.code === "BAD_REQUEST") {
+        console.log("[Results] No existing analysis, triggering pipeline...");
+        setAnalysisStep(2);
+
         const triggerResponse = await fetch(`/api/sessions/${id}/analyze`, {
           method: "POST",
           headers: {
@@ -153,63 +86,175 @@ function ResultsContent() {
         if (!triggerResponse.ok) {
           const triggerData = await triggerResponse.json();
           throw new Error(
-            triggerData.error?.message || "failed to trigger analysis"
+            triggerData.error?.message || "Failed to trigger analysis"
           );
         }
 
         data = await triggerResponse.json();
       } else if (!response.ok) {
-        throw new Error(data.error?.message || "failed to load analysis");
+        throw new Error(data.error?.message || "Failed to load analysis");
       }
 
+      // Step 3: Parse the analysis data
+      setAnalysisStep(3);
       const analysisData = data.data;
+      console.log("[Results] Analysis data received:", analysisData);
 
+      // Step 4: Transform to UI format
+      setAnalysisStep(4);
+
+      // Extract transcript from segments
+      const transcript =
+        analysisData.segments
+          ?.map(
+            (seg: { speaker: string; text: string }) =>
+              `[${seg.speaker}] ${seg.text}`
+          )
+          .join("\n\n") || "No transcript available";
+
+      // Extract insights from the debrief and insights array
+      const insights: AnalysisInsights = {
+        summary: "",
+        keyPoints: [],
+        culturalObservations: [],
+        communicationPatterns: [],
+        recommendations: [],
+      };
+
+      // Parse debrief text to extract structured insights
+      if (analysisData.debrief?.text) {
+        const debriefText = analysisData.debrief.text;
+
+        // Extract summary (first paragraph before "Key Discussion Points")
+        const summaryMatch = debriefText.match(
+          /^([\s\S]*?)(?=\n\nKey Discussion Points:|$)/
+        );
+        if (summaryMatch) {
+          insights.summary = summaryMatch[1].trim();
+        }
+
+        // Extract key points
+        const keyPointsMatch = debriefText.match(
+          /Key Discussion Points:\n([\s\S]*?)(?=\n\nCultural Communication Insights:|$)/
+        );
+        if (keyPointsMatch) {
+          insights.keyPoints = keyPointsMatch[1]
+            .split("\n")
+            .filter((line: string) => line.trim().startsWith("•"))
+            .map((line: string) => line.replace(/^•\s*/, "").trim());
+        }
+
+        // Extract cultural observations
+        const culturalMatch = debriefText.match(
+          /Cultural Communication Insights:\n([\s\S]*?)(?=\n\nCommunication Patterns Identified:|$)/
+        );
+        if (culturalMatch) {
+          insights.culturalObservations = culturalMatch[1]
+            .split("\n")
+            .filter((line: string) => line.trim().startsWith("•"))
+            .map((line: string) => line.replace(/^•\s*/, "").trim());
+        }
+
+        // Extract communication patterns
+        const patternsMatch = debriefText.match(
+          /Communication Patterns Identified:\n([\s\S]*?)(?=\n\nRecommendations for Future Conversations:|$)/
+        );
+        if (patternsMatch) {
+          insights.communicationPatterns = patternsMatch[1]
+            .split("\n")
+            .filter((line: string) => line.trim().startsWith("•"))
+            .map((line: string) => line.replace(/^•\s*/, "").trim());
+        }
+
+        // Extract recommendations
+        const recommendationsMatch = debriefText.match(
+          /Recommendations for Future Conversations:\n([\s\S]*?)(?=\n\nParticipation Metrics:|$)/
+        );
+        if (recommendationsMatch) {
+          insights.recommendations = recommendationsMatch[1]
+            .split("\n")
+            .filter((line: string) => line.trim().startsWith("•"))
+            .map((line: string) => line.replace(/^•\s*/, "").trim());
+        }
+      }
+
+      // Also pull from insights array if available
+      if (analysisData.insights && Array.isArray(analysisData.insights)) {
+        analysisData.insights.forEach(
+          (insight: { category: string; summary: string }) => {
+            if (insight.category === "culturalLens") {
+              insights.culturalObservations.push(insight.summary);
+            } else if (insight.category === "turnTaking") {
+              insights.communicationPatterns.push(insight.summary);
+            }
+          }
+        );
+
+        // Deduplicate
+        insights.culturalObservations = [
+          ...new Set(insights.culturalObservations),
+        ];
+        insights.communicationPatterns = [
+          ...new Set(insights.communicationPatterns),
+        ];
+      }
+
+      // Extract mediator inputs from insights
+      const mediatorInputs =
+        analysisData.insights?.map((i: { summary: string }) => i.summary) || [];
+
+      // Step 5: Set final analysis
+      setAnalysisStep(5);
       setAnalysis({
         sessionId: id,
         timestamp: Date.now(),
-        transcript:
-          analysisData.segments
-            ?.map(
-              (seg: any) =>
-                `[${seg.speaker}] ${seg.text}`
-            )
-            .join("\n\n") || "no transcript available",
-        mediatorInputs: analysisData.insights?.map((i: any) => i.text) || [],
-        insights: analysisData.debrief
-          ? {
-              summary: analysisData.debrief.text,
-              keyPoints:
-                analysisData.debrief.sections?.map((s: any) => s.title) || [],
-              culturalObservations: [],
-              communicationPatterns: Object.entries(
-                analysisData.metrics?.talkTimeMs || {}
-              ).map(
-                ([speaker, ms]) =>
-                  `${speaker}: ${((ms as number) / 1000).toFixed(1)}s speaking time`
-              ),
-              recommendations: [],
-            }
-          : undefined,
+        transcript,
+        mediatorInputs,
+        insights:
+          insights.summary ||
+          insights.keyPoints.length > 0 ||
+          insights.culturalObservations.length > 0
+            ? insights
+            : undefined,
         status: "complete",
       });
 
       setLoading(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "failed to load analysis");
+      console.error("[Results] Analysis error:", err);
+      setError(err instanceof Error ? err.message : "Failed to load analysis");
       setLoading(false);
     }
   };
-  */
 
   if (loading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
         <AnalysisLoader
-          currentStep={2}
+          currentStep={analysisStep}
           totalSteps={5}
           showSteps={true}
           className="w-full max-w-xl"
         />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-6 space-y-4">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold text-destructive">Error</h2>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+          <Link href="/" className="block">
+            <Button className="w-full">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </Card>
       </div>
     );
   }
@@ -311,70 +356,82 @@ function ResultsContent() {
 
             <div className="space-y-6">
               {/* Summary */}
-              <div>
-                <h3 className="font-semibold mb-2">Summary</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {analysis.insights.summary}
-                </p>
-              </div>
+              {analysis.insights.summary && (
+                <div>
+                  <h3 className="font-semibold mb-2">Summary</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {analysis.insights.summary}
+                  </p>
+                </div>
+              )}
 
               {/* Key Points */}
-              <div>
-                <h3 className="font-semibold mb-2">Key Points</h3>
-                <ul className="space-y-2">
-                  {analysis.insights.keyPoints.map((point, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-primary font-bold">•</span>
-                      <span className="text-muted-foreground">{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {analysis.insights.keyPoints.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Key Points</h3>
+                  <ul className="space-y-2">
+                    {analysis.insights.keyPoints.map((point, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-primary font-bold">•</span>
+                        <span className="text-muted-foreground">{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Cultural Observations */}
-              <div>
-                <h3 className="font-semibold mb-2 flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Cultural Observations
-                </h3>
-                <ul className="space-y-2">
-                  {analysis.insights.culturalObservations.map((obs, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-primary font-bold">•</span>
-                      <span className="text-muted-foreground">{obs}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {analysis.insights.culturalObservations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Cultural Observations
+                  </h3>
+                  <ul className="space-y-2">
+                    {analysis.insights.culturalObservations.map(
+                      (obs, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-primary font-bold">•</span>
+                          <span className="text-muted-foreground">{obs}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+              )}
 
               {/* Communication Patterns */}
-              <div>
-                <h3 className="font-semibold mb-2">Communication Patterns</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {analysis.insights.communicationPatterns.map(
-                    (pattern, index) => (
-                      <div key={index} className="p-3 bg-muted/50 rounded-lg">
-                        <p className="text-sm">{pattern}</p>
-                      </div>
-                    )
-                  )}
+              {analysis.insights.communicationPatterns.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Communication Patterns</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {analysis.insights.communicationPatterns.map(
+                      (pattern, index) => (
+                        <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                          <p className="text-sm">{pattern}</p>
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Recommendations */}
-              <div>
-                <h3 className="font-semibold mb-2">Recommendations</h3>
-                <div className="space-y-2">
-                  {analysis.insights.recommendations.map((rec, index) => (
-                    <div
-                      key={index}
-                      className="p-3 bg-primary/5 border border-primary/20 rounded-lg"
-                    >
-                      <p className="text-sm">{rec}</p>
-                    </div>
-                  ))}
+              {analysis.insights.recommendations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Recommendations</h3>
+                  <div className="space-y-2">
+                    {analysis.insights.recommendations.map((rec, index) => (
+                      <div
+                        key={index}
+                        className="p-3 bg-primary/5 border border-primary/20 rounded-lg"
+                      >
+                        <p className="text-sm">{rec}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </Card>
         )}
@@ -392,19 +449,23 @@ function ResultsContent() {
         </Card>
 
         {/* Mediator Inputs */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">AI Mediator Inputs</h2>
-          <div className="space-y-2">
-            {analysis.mediatorInputs.map((input, index) => (
-              <div
-                key={index}
-                className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg"
-              >
-                <p className="text-sm text-muted-foreground">{input}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {analysis.mediatorInputs.length > 0 && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">
+              AI Mediator Observations
+            </h2>
+            <div className="space-y-2">
+              {analysis.mediatorInputs.map((input, index) => (
+                <div
+                  key={index}
+                  className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg"
+                >
+                  <p className="text-sm text-muted-foreground">{input}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </main>
     </div>
   );
