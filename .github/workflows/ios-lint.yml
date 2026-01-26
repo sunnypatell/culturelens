@@ -1,0 +1,26 @@
+name: ios lint
+
+on:
+  pull_request:
+    paths:
+      - "ios/**/*.swift"
+      - "ios/**/.swiftlint.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "ios/**/*.swift"
+      - "ios/**/.swiftlint.yml"
+
+jobs:
+  swiftlint:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install swiftlint
+        run: brew install swiftlint
+
+      - name: run swiftlint
+        working-directory: ios/CultureLens
+        run: swiftlint lint --reporter github-actions-logging

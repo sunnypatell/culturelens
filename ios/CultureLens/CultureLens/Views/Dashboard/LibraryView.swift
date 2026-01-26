@@ -89,9 +89,10 @@ struct LibraryView: View {
 
                 // Sessions list
                 if sessionsViewModel.isLoading {
-                    Spacer()
-                    ProgressView()
-                    Spacer()
+                    ScrollView {
+                        LoadingSessionsView()
+                            .padding()
+                    }
                 } else if sessionsViewModel.filteredSessions.isEmpty {
                     Spacer()
                     emptyStateView

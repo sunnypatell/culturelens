@@ -72,6 +72,10 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         ITSAppUsesNonExemptEncryption: false
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - com.googleusercontent.apps.407570374043-lmu50155qnjh0k3k94hq1vericp6ubtf
+            CFBundleURLName: Google Sign-In
 
 schemes:
   CultureLens:

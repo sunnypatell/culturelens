@@ -80,3 +80,23 @@ backend/.pytest_cache/
 backend/.coverage
 backend/htmlcov/
 backend/*.egg-info/
+
+# iOS / Xcode
+ios/CultureLens/*.xcodeproj
+ios/CultureLens/*.xcworkspace
+ios/CultureLens/DerivedData/
+ios/CultureLens/.build/
+ios/CultureLens/Packages/
+ios/CultureLens/.swiftpm/
+*.xcuserstate
+*.xcuserdatad
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# iOS secrets - keep example, ignore actual
+# ios/CultureLens/CultureLens/Resources/GoogleService-Info.plist

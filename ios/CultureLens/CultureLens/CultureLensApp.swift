@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import GoogleSignIn
 
 @main
 struct CultureLensApp: App {
@@ -20,6 +21,10 @@ struct CultureLensApp: App {
                 .environmentObject(authViewModel)
                 .environmentObject(appState)
                 .preferredColorScheme(appState.colorScheme)
+                .onOpenURL { url in
+                    // Handle Google Sign-In callback URL
+                    GIDSignIn.sharedInstance.handle(url)
+                }
         }
     }
 }
@@ -32,6 +37,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         FirebaseApp.configure()
         return true
+    }
+
+    // Handle Google Sign-In URL for iOS 12 and earlier
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
+        return GIDSignIn.sharedInstance.handle(url)
     }
 }
 
