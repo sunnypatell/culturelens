@@ -7,9 +7,12 @@ on:
       - "**.tsx"
       - "package.json"
       - "tsconfig.json"
+      - "!ios/**"
   push:
     branches:
       - main
+    paths-ignore:
+      - "ios/**"
 
 jobs:
   typecheck:

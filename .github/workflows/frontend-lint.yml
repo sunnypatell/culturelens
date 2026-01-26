@@ -9,9 +9,12 @@ on:
       - "**.jsx"
       - "package.json"
       - "eslint.config.mjs"
+      - "!ios/**"
   push:
     branches:
       - main
+    paths-ignore:
+      - "ios/**"
 
 jobs:
   lint:

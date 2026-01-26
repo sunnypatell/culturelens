@@ -10,9 +10,12 @@ on:
       - "**.json"
       - "**.md"
       - ".prettierrc"
+      - "!ios/**"
   push:
     branches:
       - main
+    paths-ignore:
+      - "ios/**"
 
 jobs:
   format-check:
