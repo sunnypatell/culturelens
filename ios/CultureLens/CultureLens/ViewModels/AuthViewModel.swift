@@ -24,7 +24,7 @@ final class AuthViewModel: ObservableObject {
     @Published var displayName: String = ""
 
     // MARK: - Private Properties
-    private let authService = AuthService.shared
+    private lazy var authService = AuthService.shared
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initialization
