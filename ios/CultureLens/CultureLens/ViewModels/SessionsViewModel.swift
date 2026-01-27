@@ -72,6 +72,15 @@ final class SessionsViewModel: ObservableObject {
     // MARK: - Initialization
     init() {
         setupBindings()
+        if ScreenshotMode.isActive {
+            loadScreenshotData()
+        }
+    }
+
+    private func loadScreenshotData() {
+        sessions = MockData.sessions
+        filteredSessions = MockData.sessions
+        stats = MockData.stats
     }
 
     // MARK: - Bindings

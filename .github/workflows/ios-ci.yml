@@ -12,6 +12,11 @@ on:
         required: false
         default: false
         type: boolean
+      generate_screenshots:
+        description: "generate app screenshots"
+        required: false
+        default: false
+        type: boolean
   release:
     types: [published]
 
@@ -199,3 +204,126 @@ jobs:
           gh release upload ${{ github.event.release.tag_name }} \
             ios/CultureLens/release/CultureLens-Simulator.zip \
             --clobber
+
+  screenshots:
+    name: generate screenshots
+    runs-on: macos-15
+    needs: lint
+    if: github.event_name == 'workflow_dispatch' && inputs.generate_screenshots
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: select xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: install xcodegen
+        run: brew install xcodegen
+
+      - name: install xcpretty
+        run: gem install xcpretty
+
+      - name: cache swift packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/CultureLens/.build
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-spm-${{ hashFiles('ios/CultureLens/project.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: generate xcode project
+        working-directory: ios/CultureLens
+        run: xcodegen generate
+
+      - name: resolve packages
+        working-directory: ios/CultureLens
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project CultureLens.xcodeproj \
+            -scheme CultureLens
+
+      - name: build for testing
+        working-directory: ios/CultureLens
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -project CultureLens.xcodeproj \
+            -scheme CultureLens \
+            -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_DEVICE }}" \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty
+
+      - name: boot simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available | grep "${{ env.SIMULATOR_DEVICE }}" | head -1 | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+          echo "Booting simulator: $DEVICE_ID"
+          xcrun simctl boot "$DEVICE_ID" || true
+          # set appearance to light for consistent screenshots
+          xcrun simctl ui "$DEVICE_ID" appearance light
+          # set status bar to clean values
+          xcrun simctl status_bar "$DEVICE_ID" override \
+            --time "9:41" \
+            --batteryState charged \
+            --batteryLevel 100 \
+            --wifiBars 3 \
+            --cellularBars 4
+
+      - name: run screenshot tests
+        working-directory: ios/CultureLens
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project CultureLens.xcodeproj \
+            -scheme CultureLens \
+            -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_DEVICE }}" \
+            -only-testing:CultureLensUITests/ScreenshotTests \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath ScreenshotResults.xcresult \
+            | xcpretty || true
+
+      - name: extract screenshots from xcresult
+        run: |
+          mkdir -p ios/CultureLens/screenshots
+
+          # extract all attachments from the xcresult bundle
+          cd ios/CultureLens
+          if [ -d "ScreenshotResults.xcresult" ]; then
+            xcrun xcresulttool get --path ScreenshotResults.xcresult \
+              --format json > result.json 2>/dev/null || true
+
+            # use xcparse to extract screenshots if available, otherwise manual
+            if command -v xcparse &> /dev/null; then
+              xcparse screenshots ScreenshotResults.xcresult screenshots/
+            else
+              # fallback: extract attachments manually
+              find ScreenshotResults.xcresult -name "*.png" -exec cp {} screenshots/ \;
+
+              # also try xcresulttool export
+              xcrun xcresulttool export \
+                --path ScreenshotResults.xcresult \
+                --output-path screenshots \
+                --type file 2>/dev/null || true
+            fi
+
+            # list what we got
+            echo "## Screenshots Generated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            ls -la screenshots/ >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No screenshots found in directory" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No xcresult bundle found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-screenshots
+          path: |
+            ios/CultureLens/screenshots/
+            ios/CultureLens/ScreenshotResults.xcresult
+          retention-days: 30

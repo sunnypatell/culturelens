@@ -36,6 +36,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        // Skip Firebase in screenshot mode
+        guard !ScreenshotMode.isActive else { return true }
+
         // Configure Firebase
         FirebaseApp.configure()
 

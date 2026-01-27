@@ -29,7 +29,21 @@ final class AuthViewModel: ObservableObject {
 
     // MARK: - Initialization
     init() {
-        setupBindings()
+        if ScreenshotMode.isActive {
+            setupScreenshotMode()
+        } else {
+            setupBindings()
+        }
+    }
+
+    // MARK: - Screenshot Mode
+    private func setupScreenshotMode() {
+        authState = .authenticated
+        user = User(
+            id: MockData.userId,
+            email: "demo@culturelens.app",
+            displayName: "Demo User"
+        )
     }
 
     // MARK: - Bindings
