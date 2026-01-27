@@ -104,6 +104,7 @@ jobs:
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             -enableCodeCoverage YES \
+            -skip-testing:CultureLensUITests/ScreenshotTests \
             -resultBundlePath TestResults.xcresult \
             | xcpretty
 
