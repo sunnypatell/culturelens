@@ -1,21 +1,74 @@
-MIT License
+CultureLens Source Available License
 
 Copyright (c) 2026 Sunny Patel (sunnypatel124555@gmail.com)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+TERMS AND CONDITIONS
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. DEFINITIONS
+
+"Software" refers to CultureLens and all associated source code, documentation,
+and assets contained in this repository.
+
+"Use" means running, executing, or deploying the Software for personal,
+educational, or internal business purposes.
+
+"Distribute" means sharing unmodified copies of the Software with others.
+
+"Modify" means creating derivative works, adapting, altering, or changing
+the Software's source code in any way.
+
+2. PERMITTED USES
+
+You are granted permission to:
+
+- USE the Software for any lawful purpose
+- DISTRIBUTE unmodified copies of the Software, provided this license
+  and copyright notice are included
+- STUDY the source code for educational purposes
+- REFERENCE the Software in academic or professional work with attribution
+
+3. RESTRICTIONS
+
+You may NOT, without prior written permission from the copyright holder:
+
+- MODIFY, adapt, or create derivative works based on the Software
+- REMOVE or alter any copyright notices, license terms, or attributions
+- USE the Software in a way that competes directly with the original product
+- SUBLICENSE, sell, or commercially redistribute the Software
+- USE the Software for any unlawful purpose
+
+4. FAIR USE REQUIREMENTS
+
+When using the Software, you must:
+
+- Implement reasonable rate limiting to prevent abuse of connected services
+- Not circumvent any access controls or security measures
+- Not use the Software to harm, harass, or negatively impact others
+- Respect the terms of service of all integrated third-party services
+  (Firebase, ElevenLabs, Google Cloud, etc.)
+
+5. ATTRIBUTION
+
+Any public use or distribution must include visible attribution to:
+"CultureLens by Sunny Patel (https://github.com/sunnypatell/culturelens)"
+
+6. REQUESTING PERMISSION
+
+To request permission to modify the Software, contact:
+Sunny Patel - sunnypatel124555@gmail.com
+
+7. DISCLAIMER
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+8. TERMINATION
+
+This license automatically terminates if you violate any of these terms.
+Upon termination, you must cease all use and destroy all copies of the
+Software in your possession.

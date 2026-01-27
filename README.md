@@ -14,7 +14,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Admin_SDK-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.11-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![CI](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sunnypatell/culturelens/actions)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-Source_Available-blue?style=flat-square)](LICENSE)
 
 _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-First Architecture_
 
@@ -562,7 +562,9 @@ firebase deploy --only storage
 
 ## 📄 License
 
-[MIT](LICENSE) © 2026 Sunny Patel
+[Source Available License](LICENSE) © 2026 Sunny Patel
+
+You may use and distribute this software, but modifications require permission. See [LICENSE](LICENSE) for full terms.
 
 ---
 
