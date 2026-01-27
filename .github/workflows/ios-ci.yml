@@ -5,12 +5,15 @@ on:
     paths:
       - "ios/**"
       - ".github/workflows/ios-ci.yml"
-  push:
-    branches:
-      - main
-    paths:
-      - "ios/**"
-      - ".github/workflows/ios-ci.yml"
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: "create release artifact"
+        required: false
+        default: false
+        type: boolean
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,7 +22,6 @@ concurrency:
 env:
   XCODE_VERSION: "latest"
   SIMULATOR_DEVICE: "iPhone 16 Pro"
-  SIMULATOR_OS: "latest"
 
 jobs:
   lint:
@@ -35,7 +37,7 @@ jobs:
         working-directory: ios/CultureLens
         run: swiftlint lint --reporter github-actions-logging
 
-  build:
+  build-and-test:
     name: build & test
     runs-on: macos-15
     needs: lint
@@ -66,9 +68,6 @@ jobs:
       - name: generate xcode project
         working-directory: ios/CultureLens
         run: xcodegen generate
-
-      - name: list available simulators
-        run: xcrun simctl list devices available
 
       - name: resolve packages
         working-directory: ios/CultureLens
@@ -112,10 +111,10 @@ jobs:
           retention-days: 7
 
   build-release:
-    name: build release
+    name: build simulator app
     runs-on: macos-15
-    needs: build
-    if: github.ref == 'refs/heads/main'
+    needs: build-and-test
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.create_release)
     steps:
       - uses: actions/checkout@v4
 
@@ -144,26 +143,59 @@ jobs:
         working-directory: ios/CultureLens
         run: xcodegen generate
 
-      - name: build release
+      - name: build release for simulator
         working-directory: ios/CultureLens
         run: |
           set -o pipefail
           xcodebuild build \
             -project CultureLens.xcodeproj \
             -scheme CultureLens \
-            -destination "generic/platform=iOS Simulator" \
+            -sdk iphonesimulator \
             -configuration Release \
+            -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
             | xcpretty
 
-      - name: build summary
+      - name: package simulator app
+        working-directory: ios/CultureLens
         run: |
-          echo "## iOS Build Summary" >> $GITHUB_STEP_SUMMARY
+          APP_PATH=$(find build -name "CultureLens.app" -type d | head -1)
+          echo "Found app at: $APP_PATH"
+
+          # create release directory
+          mkdir -p release
+
+          # copy app bundle
+          cp -R "$APP_PATH" release/
+
+          # create zip
+          cd release
+          zip -r CultureLens-Simulator.zip CultureLens.app
+
+          # get app info
+          echo "## Build Info" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" CultureLens.app/Info.plist > version.txt
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" CultureLens.app/Info.plist > build.txt
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Xcode | ${{ env.XCODE_VERSION }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Configuration | Release |" >> $GITHUB_STEP_SUMMARY
-          echo "| Platform | iOS Simulator |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | $(cat version.txt) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | $(cat build.txt) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Size | $(du -h CultureLens-Simulator.zip | cut -f1) |" >> $GITHUB_STEP_SUMMARY
+
+      - name: upload simulator app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CultureLens-Simulator
+          path: ios/CultureLens/release/CultureLens-Simulator.zip
+          retention-days: 90
+
+      - name: upload to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} \
+            ios/CultureLens/release/CultureLens-Simulator.zip \
+            --clobber
