@@ -47,6 +47,51 @@ struct MainTabView: View {
     }
 }
 
+// MARK: - Animated Background
+struct AnimatedBackground: View {
+    @State private var animate = false
+
+    var body: some View {
+        ZStack {
+            Color.theme.background
+                .ignoresSafeArea()
+
+            // Floating orbs like the webapp
+            Circle()
+                .fill(Color.theme.primary.opacity(0.08))
+                .frame(width: 300, height: 300)
+                .blur(radius: 60)
+                .offset(
+                    x: animate ? 50 : -50,
+                    y: animate ? -30 : 30
+                )
+
+            Circle()
+                .fill(Color.theme.accent.opacity(0.06))
+                .frame(width: 250, height: 250)
+                .blur(radius: 50)
+                .offset(
+                    x: animate ? -40 : 60,
+                    y: animate ? 60 : -20
+                )
+
+            Circle()
+                .fill(Color.theme.cyan.opacity(0.05))
+                .frame(width: 200, height: 200)
+                .blur(radius: 40)
+                .offset(
+                    x: animate ? 30 : -60,
+                    y: animate ? -50 : 50
+                )
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
+                animate = true
+            }
+        }
+    }
+}
+
 // MARK: - Home View
 struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -55,23 +100,19 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Welcome header
-                    welcomeHeader
+            ZStack {
+                AnimatedBackground()
 
-                    // Quick stats
-                    statsSection
-
-                    // Quick actions
-                    quickActionsSection
-
-                    // Recent sessions
-                    recentSessionsSection
+                ScrollView {
+                    VStack(spacing: 20) {
+                        welcomeHeader
+                        statsSection
+                        quickActionsSection
+                        recentSessionsSection
+                    }
+                    .padding()
                 }
-                .padding()
             }
-            .background(Color.theme.background)
             .navigationTitle("Home")
             .refreshable {
                 await sessionsViewModel.refreshSessions()
@@ -80,7 +121,7 @@ struct HomeView: View {
     }
 
     private var welcomeHeader: some View {
-        HStack {
+        HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Welcome back,")
                     .font(.subheadline)
@@ -92,7 +133,6 @@ struct HomeView: View {
 
             Spacer()
 
-            // User avatar
             if let photoURL = authViewModel.user?.photoURL,
                let url = URL(string: photoURL) {
                 AsyncImage(url: url) { image in
@@ -102,15 +142,18 @@ struct HomeView: View {
                 } placeholder: {
                     userInitialsView
                 }
-                .frame(width: 48, height: 48)
+                .frame(width: 52, height: 52)
                 .clipShape(Circle())
             } else {
                 userInitialsView
             }
         }
-        .padding()
-        .background(Color.theme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(16)
+        .background {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .shadow(color: Color.theme.primary.opacity(0.08), radius: 12, y: 4)
+        }
     }
 
     private var userInitialsView: some View {
@@ -122,62 +165,63 @@ struct HomeView: View {
                 .font(.headline.bold())
                 .foregroundColor(.white)
         }
-        .frame(width: 48, height: 48)
+        .frame(width: 52, height: 52)
+        .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 2)
     }
 
     private var statsSection: some View {
         LazyVGrid(columns: [
             GridItem(.flexible()),
             GridItem(.flexible())
-        ], spacing: 16) {
-            StatCard(
+        ], spacing: 12) {
+            GradientStatCard(
                 title: "This Month",
                 value: "\(sessionsViewModel.stats.thisMonth)",
                 icon: "calendar",
-                color: .blue
+                gradient: .indigoPurple
             )
 
-            StatCard(
+            GradientStatCard(
                 title: "Total Sessions",
                 value: "\(sessionsViewModel.stats.totalSessions)",
                 icon: "waveform.circle",
-                color: .purple
+                gradient: .purpleMagenta
             )
 
-            StatCard(
+            GradientStatCard(
                 title: "Insights",
                 value: "\(sessionsViewModel.stats.totalInsights)",
                 icon: "lightbulb",
-                color: .orange
+                gradient: .roseOrange
             )
 
-            StatCard(
+            GradientStatCard(
                 title: "Time Recorded",
                 value: sessionsViewModel.stats.formattedTotalDuration,
                 icon: "clock",
-                color: .green
+                gradient: .emeraldCyan
             )
         }
     }
 
     private var quickActionsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
                 .font(.headline)
 
-            HStack(spacing: 16) {
-                QuickActionButton(
+            HStack(spacing: 12) {
+                GradientActionButton(
                     title: "New Session",
                     icon: "plus.circle.fill",
-                    color: Color.theme.primary
+                    gradient: .indigoPurple
                 ) {
                     appState.selectedTab = .record
                 }
 
-                QuickActionButton(
+                GradientActionButton(
                     title: "View Library",
                     icon: "books.vertical.fill",
-                    color: Color.theme.accent
+                    gradient: .purpleMagenta
                 ) {
                     appState.selectedTab = .library
                 }
@@ -186,7 +230,7 @@ struct HomeView: View {
     }
 
     private var recentSessionsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Recent Sessions")
                     .font(.headline)
@@ -196,7 +240,7 @@ struct HomeView: View {
                 Button("See All") {
                     appState.selectedTab = .library
                 }
-                .font(.subheadline)
+                .font(.subheadline.weight(.medium))
                 .foregroundColor(Color.theme.primary)
             }
 
@@ -221,7 +265,78 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Stat Card
+// MARK: - Gradient Stat Card
+struct GradientStatCard: View {
+    let title: String
+    let value: String
+    let icon: String
+    let gradient: LinearGradient
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                ZStack {
+                    Circle()
+                        .fill(.white.opacity(0.2))
+                        .frame(width: 36, height: 36)
+
+                    Image(systemName: icon)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+
+                Spacer()
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(value)
+                    .font(.title.bold())
+                    .foregroundColor(.white)
+
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.8))
+            }
+        }
+        .padding(16)
+        .background {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(gradient)
+                .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+        }
+    }
+}
+
+// MARK: - Gradient Action Button
+struct GradientActionButton: View {
+    let title: String
+    let icon: String
+    let gradient: LinearGradient
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(.white)
+
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(gradient)
+                    .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+            }
+        }
+    }
+}
+
+// MARK: - Stat Card (legacy, kept for compatibility)
 struct StatCard: View {
     let title: String
     let value: String
@@ -229,31 +344,16 @@ struct StatCard: View {
     let color: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(color)
-
-                Spacer()
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(value)
-                    .font(.title2.bold())
-
-                Text(title)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding()
-        .background(Color.theme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        GradientStatCard(
+            title: title,
+            value: value,
+            icon: icon,
+            gradient: LinearGradient(colors: [color, color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
+        )
     }
 }
 
-// MARK: - Quick Action Button
+// MARK: - Quick Action Button (legacy, kept for compatibility)
 struct QuickActionButton: View {
     let title: String
     let icon: String
@@ -261,21 +361,12 @@ struct QuickActionButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.title)
-                    .foregroundColor(.white)
-
-                Text(title)
-                    .font(.caption.bold())
-                    .foregroundColor(.white)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(color)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-        }
+        GradientActionButton(
+            title: title,
+            icon: icon,
+            gradient: LinearGradient(colors: [color, color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing),
+            action: action
+        )
     }
 }
 
@@ -283,9 +374,15 @@ struct QuickActionButton: View {
 struct EmptySessionsView: View {
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "waveform.circle")
-                .font(.system(size: 48))
-                .foregroundColor(.secondary)
+            ZStack {
+                Circle()
+                    .fill(Color.theme.primary.opacity(0.1))
+                    .frame(width: 80, height: 80)
+
+                Image(systemName: "waveform.circle")
+                    .font(.system(size: 36))
+                    .foregroundStyle(LinearGradient.primaryGradient)
+            }
 
             VStack(spacing: 4) {
                 Text("No sessions yet")
@@ -298,8 +395,10 @@ struct EmptySessionsView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(32)
-        .background(Color.theme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+        }
     }
 }
 
@@ -309,20 +408,21 @@ struct SessionCardView: View {
     @EnvironmentObject var sessionsViewModel: SessionsViewModel
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 14) {
             // Status indicator
             ZStack {
-                Circle()
-                    .fill(statusColor.opacity(0.2))
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(statusGradient)
                     .frame(width: 48, height: 48)
 
                 Image(systemName: session.status.icon)
-                    .foregroundColor(statusColor)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.displayTitle)
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
 
                 HStack(spacing: 8) {
@@ -330,8 +430,8 @@ struct SessionCardView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
 
-                    if let duration = session.duration {
-                        Text("•")
+                    if session.duration != nil {
+                        Text("·")
                             .foregroundColor(.secondary)
 
                         Text(session.formattedDuration)
@@ -342,18 +442,17 @@ struct SessionCardView: View {
 
                 if session.status != .ready {
                     Text(session.status.displayName)
-                        .font(.caption2)
-                        .foregroundColor(statusColor)
+                        .font(.caption2.weight(.medium))
+                        .foregroundColor(.white)
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(statusColor.opacity(0.1))
+                        .padding(.vertical, 3)
+                        .background(statusGradient)
                         .clipShape(Capsule())
                 }
             }
 
             Spacer()
 
-            // Favorite button
             Button {
                 Task {
                     await sessionsViewModel.toggleFavorite(session)
@@ -361,29 +460,33 @@ struct SessionCardView: View {
             } label: {
                 Image(systemName: session.isFavorite == true ? "star.fill" : "star")
                     .foregroundColor(session.isFavorite == true ? .yellow : .secondary)
+                    .font(.system(size: 16))
             }
 
             Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(.tertiaryLabel)
         }
-        .padding()
-        .background(Color.theme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(14)
+        .background {
+            RoundedRectangle(cornerRadius: 18)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        }
     }
 
-    private var statusColor: Color {
+    private var statusGradient: LinearGradient {
         switch session.status {
         case .recording:
-            return .red
+            return .roseOrange
         case .uploading:
-            return .orange
+            return LinearGradient(colors: [Color.theme.warning, Color.theme.orange], startPoint: .topLeading, endPoint: .bottomTrailing)
         case .processing:
-            return .blue
+            return .indigoPurple
         case .ready:
-            return .green
+            return .emeraldCyan
         case .failed:
-            return .red
+            return .errorGradient
         }
     }
 }

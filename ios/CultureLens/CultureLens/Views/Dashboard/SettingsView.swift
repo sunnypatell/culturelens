@@ -60,6 +60,36 @@ struct SettingsView: View {
                 } header: {
                     Text("Account")
                 }
+
+                // Footer with copyright
+                Section {
+                    VStack(spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "waveform.circle.fill")
+                                .font(.title3)
+                                .foregroundStyle(LinearGradient.primaryGradient)
+
+                            Text("CultureLens")
+                                .font(.headline)
+                                .foregroundStyle(LinearGradient.primaryGradient)
+                        }
+
+                        Text("\u{00A9} 2026 Sunny Patel. All rights reserved.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        HStack(spacing: 4) {
+                            Image(systemName: "envelope.fill")
+                                .font(.caption2)
+                            Link("sunnypatel124555@gmail.com", destination: URL(string: "mailto:sunnypatel124555@gmail.com")!)
+                                .font(.caption)
+                        }
+                        .foregroundColor(Color.theme.primary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .listRowBackground(Color.clear)
+                }
             }
             .navigationTitle("Settings")
             .alert("Sign Out", isPresented: $showingSignOutAlert) {
@@ -86,7 +116,6 @@ struct SettingsView: View {
     // MARK: - Profile Row
     private var profileRow: some View {
         HStack(spacing: 16) {
-            // Avatar
             if let photoURL = authViewModel.user?.photoURL,
                let url = URL(string: photoURL) {
                 AsyncImage(url: url) { image in
@@ -136,12 +165,18 @@ struct SettingsView: View {
                 .foregroundColor(.white)
         }
         .frame(width: 60, height: 60)
+        .shadow(color: Color.theme.primary.opacity(0.3), radius: 6, y: 2)
     }
 
     // MARK: - Appearance Row
     private var appearanceRow: some View {
         HStack {
-            Label("Theme", systemImage: "paintbrush.fill")
+            Label {
+                Text("Theme")
+            } icon: {
+                Image(systemName: "paintbrush.fill")
+                    .foregroundStyle(LinearGradient.purpleMagenta)
+            }
 
             Spacer()
 
@@ -161,17 +196,34 @@ struct SettingsView: View {
     @ViewBuilder
     private var preferencesRows: some View {
         Toggle(isOn: $appState.notificationsEnabled) {
-            Label("Notifications", systemImage: "bell.fill")
+            Label {
+                Text("Notifications")
+            } icon: {
+                Image(systemName: "bell.fill")
+                    .foregroundStyle(LinearGradient.roseOrange)
+            }
         }
+        .tint(Color.theme.primary)
 
         Toggle(isOn: $appState.autoSaveEnabled) {
-            Label("Auto-save Sessions", systemImage: "arrow.down.doc.fill")
+            Label {
+                Text("Auto-save Sessions")
+            } icon: {
+                Image(systemName: "arrow.down.doc.fill")
+                    .foregroundStyle(LinearGradient.emeraldCyan)
+            }
         }
+        .tint(Color.theme.primary)
 
         NavigationLink {
             DefaultSettingsView()
         } label: {
-            Label("Default Session Settings", systemImage: "slider.horizontal.3")
+            Label {
+                Text("Default Session Settings")
+            } icon: {
+                Image(systemName: "slider.horizontal.3")
+                    .foregroundStyle(LinearGradient.indigoPurple)
+            }
         }
     }
 
@@ -182,7 +234,13 @@ struct SettingsView: View {
             exportData()
         } label: {
             HStack {
-                Label("Export My Data", systemImage: "square.and.arrow.up")
+                Label {
+                    Text("Export My Data")
+                        .foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(LinearGradient.tealCyan)
+                }
 
                 Spacer()
 
@@ -196,13 +254,23 @@ struct SettingsView: View {
         NavigationLink {
             PrivacyPolicyView()
         } label: {
-            Label("Privacy Policy", systemImage: "hand.raised.fill")
+            Label {
+                Text("Privacy Policy")
+            } icon: {
+                Image(systemName: "hand.raised.fill")
+                    .foregroundStyle(LinearGradient.primaryGradient)
+            }
         }
 
         NavigationLink {
             TermsOfServiceView()
         } label: {
-            Label("Terms of Service", systemImage: "doc.text.fill")
+            Label {
+                Text("Terms of Service")
+            } icon: {
+                Image(systemName: "doc.text.fill")
+                    .foregroundColor(Color.theme.info)
+            }
         }
     }
 
@@ -210,7 +278,12 @@ struct SettingsView: View {
     @ViewBuilder
     private var aboutRows: some View {
         HStack {
-            Label("Version", systemImage: "info.circle.fill")
+            Label {
+                Text("Version")
+            } icon: {
+                Image(systemName: "info.circle.fill")
+                    .foregroundColor(Color.theme.info)
+            }
 
             Spacer()
 
@@ -220,7 +293,13 @@ struct SettingsView: View {
 
         Link(destination: URL(string: "https://github.com/sunnypatell/culturelens")!) {
             HStack {
-                Label("GitHub", systemImage: "link")
+                Label {
+                    Text("GitHub")
+                        .foregroundColor(.primary)
+                } icon: {
+                    Image(systemName: "link")
+                        .foregroundStyle(LinearGradient.primaryGradient)
+                }
 
                 Spacer()
 
@@ -233,7 +312,12 @@ struct SettingsView: View {
         NavigationLink {
             AcknowledgmentsView()
         } label: {
-            Label("Acknowledgments", systemImage: "heart.fill")
+            Label {
+                Text("Acknowledgments")
+            } icon: {
+                Image(systemName: "heart.fill")
+                    .foregroundStyle(LinearGradient.pinkRose)
+            }
         }
     }
 
@@ -263,7 +347,6 @@ struct SettingsView: View {
             do {
                 let data = try await APIClient.shared.exportData()
 
-                // Create a temporary file and share it
                 let tempURL = FileManager.default.temporaryDirectory
                     .appendingPathComponent("culturelens-export-\(Date().timeIntervalSince1970).json")
 
@@ -330,6 +413,7 @@ struct DefaultSettingsView: View {
                     }
 
                     Slider(value: $sensitivityLevel, in: 0...100, step: 10)
+                        .tint(Color.theme.primary)
                 }
             } header: {
                 Text("Sensitivity")
@@ -350,7 +434,7 @@ struct PrivacyPolicyView: View {
                 Text("Privacy Policy")
                     .font(.title.bold())
 
-                Text("Last updated: January 2025")
+                Text("Last updated: January 2026")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -387,7 +471,7 @@ struct TermsOfServiceView: View {
                 Text("Terms of Service")
                     .font(.title.bold())
 
-                Text("Last updated: January 2025")
+                Text("Last updated: January 2026")
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -421,17 +505,23 @@ struct AcknowledgmentsView: View {
     var body: some View {
         List {
             Section {
-                AcknowledgmentRow(name: "SwiftUI", description: "Apple's declarative UI framework")
-                AcknowledgmentRow(name: "Firebase", description: "Authentication and database")
-                AcknowledgmentRow(name: "ElevenLabs", description: "Conversational AI voice agent")
-                AcknowledgmentRow(name: "Google Gemini", description: "AI analysis engine")
+                AcknowledgmentRow(name: "SwiftUI", description: "Apple's declarative UI framework", icon: "swift", color: .orange)
+                AcknowledgmentRow(name: "Firebase", description: "Authentication and database", icon: "flame.fill", color: Color(hex: "#FFCA28"))
+                AcknowledgmentRow(name: "ElevenLabs", description: "Conversational AI voice agent", icon: "waveform", color: Color.theme.primary)
+                AcknowledgmentRow(name: "Google Gemini", description: "AI analysis engine", icon: "brain", color: Color.theme.info)
             } header: {
                 Text("Technologies")
             }
 
             Section {
-                Text("Built with love for the hackathon")
-                    .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Built by Sunny Patel")
+                        .font(.subheadline.weight(.medium))
+                    Text("Designed for cross-cultural understanding")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
             } header: {
                 Text("Credits")
             }
@@ -444,15 +534,29 @@ struct AcknowledgmentsView: View {
 struct AcknowledgmentRow: View {
     let name: String
     let description: String
+    var icon: String = "star.fill"
+    var color: Color = Color.theme.primary
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(name)
-                .font(.headline)
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(color.opacity(0.15))
+                    .frame(width: 40, height: 40)
 
-            Text(description)
-                .font(.caption)
-                .foregroundColor(.secondary)
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(color)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name)
+                    .font(.subheadline.weight(.semibold))
+
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .padding(.vertical, 4)
     }

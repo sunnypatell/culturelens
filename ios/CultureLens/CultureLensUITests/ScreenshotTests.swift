@@ -33,7 +33,6 @@ final class ScreenshotTests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
 
-        // Also save to disk for CI artifact collection
         let fullScreenshot = XCUIScreen.main.screenshot()
         let fullAttachment = XCTAttachment(screenshot: fullScreenshot)
         fullAttachment.name = "\(name)-full"
@@ -47,64 +46,53 @@ final class ScreenshotTests: XCTestCase {
         return true
     }
 
+    private func navigateToTab(index: Int) -> Bool {
+        let tabBar = app.tabBars.firstMatch
+        guard tabBar.waitForExistence(timeout: 10) else { return false }
+        let tab = tabBar.buttons.element(boundBy: index)
+        guard tab.waitForExistence(timeout: 3) else { return false }
+        tab.tap()
+        Thread.sleep(forTimeInterval: 1.5)
+        return true
+    }
+
     // MARK: - Main Tab Screenshots
 
     func testScreenshot01_HomeTab() throws {
-        // Wait for main tab view to load
         let tabBar = app.tabBars.firstMatch
         XCTAssertTrue(tabBar.waitForExistence(timeout: 10), "Tab bar should appear in screenshot mode")
 
-        // Wait a moment for content to load
-        Thread.sleep(forTimeInterval: 1)
+        Thread.sleep(forTimeInterval: 1.5)
         takeScreenshot(named: "01-home-dashboard")
     }
 
     func testScreenshot02_RecordTab() throws {
-        let tabBar = app.tabBars.firstMatch
-        guard tabBar.waitForExistence(timeout: 10) else {
+        guard navigateToTab(index: 1) else {
             XCTFail("Tab bar not found")
             return
         }
-
-        // Tap record tab
-        let recordTab = tabBar.buttons.element(boundBy: 1)
-        recordTab.tap()
-        Thread.sleep(forTimeInterval: 1)
         takeScreenshot(named: "02-recording-studio")
     }
 
     func testScreenshot03_LibraryTab() throws {
-        let tabBar = app.tabBars.firstMatch
-        guard tabBar.waitForExistence(timeout: 10) else {
+        guard navigateToTab(index: 2) else {
             XCTFail("Tab bar not found")
             return
         }
-
-        // Tap library tab
-        let libraryTab = tabBar.buttons.element(boundBy: 2)
-        libraryTab.tap()
-        Thread.sleep(forTimeInterval: 1)
         takeScreenshot(named: "03-library")
     }
 
     func testScreenshot04_SettingsTab() throws {
-        let tabBar = app.tabBars.firstMatch
-        guard tabBar.waitForExistence(timeout: 10) else {
+        guard navigateToTab(index: 3) else {
             XCTFail("Tab bar not found")
             return
         }
-
-        // Tap settings tab
-        let settingsTab = tabBar.buttons.element(boundBy: 3)
-        settingsTab.tap()
-        Thread.sleep(forTimeInterval: 1)
         takeScreenshot(named: "04-settings")
     }
 
     // MARK: - Auth Screens (separate launch without screenshot mode)
 
     func testScreenshot05_SignInScreen() throws {
-        // Relaunch without screenshot mode to show auth screen
         let authApp = XCUIApplication()
         authApp.launchArguments = ["UI_TESTING"]
         authApp.launch()
@@ -125,14 +113,12 @@ final class ScreenshotTests: XCTestCase {
     }
 
     func testScreenshot06_SignUpScreen() throws {
-        // Relaunch without screenshot mode to show auth screen
         let authApp = XCUIApplication()
         authApp.launchArguments = ["UI_TESTING"]
         authApp.launch()
 
         Thread.sleep(forTimeInterval: 2)
 
-        // Try to tap "Sign Up" or "Create Account" to switch to sign up form
         let signUpButton = authApp.buttons["Sign Up"]
         let createAccountButton = authApp.buttons["Create Account"]
 
@@ -167,11 +153,11 @@ final class ScreenshotTests: XCTestCase {
         }
 
         // Navigate to settings and enable dark mode
-        let settingsTab = tabBar.buttons.element(boundBy: 3)
-        settingsTab.tap()
-        Thread.sleep(forTimeInterval: 1)
+        guard navigateToTab(index: 3) else {
+            XCTFail("Cannot navigate to settings")
+            return
+        }
 
-        // Look for dark mode toggle or appearance section
         let darkButton = app.buttons["Dark"]
         if darkButton.waitForExistence(timeout: 3) {
             darkButton.tap()
@@ -179,9 +165,10 @@ final class ScreenshotTests: XCTestCase {
         }
 
         // Go back to home tab
-        let homeTab = tabBar.buttons.element(boundBy: 0)
-        homeTab.tap()
-        Thread.sleep(forTimeInterval: 1)
+        guard navigateToTab(index: 0) else {
+            XCTFail("Cannot navigate to home")
+            return
+        }
         takeScreenshot(named: "07-home-dark-mode")
     }
 
@@ -195,7 +182,7 @@ final class ScreenshotTests: XCTestCase {
         }
 
         XCUIDevice.shared.orientation = .landscapeLeft
-        Thread.sleep(forTimeInterval: 1)
+        Thread.sleep(forTimeInterval: 1.5)
         takeScreenshot(named: "08-home-landscape")
 
         // Reset

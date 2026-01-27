@@ -28,6 +28,16 @@ extension Color {
         let error = Color(hex: "#ef4444")
         let info = Color(hex: "#3b82f6")
 
+        // Webapp gradient palette
+        let rose = Color(hex: "#f43f5e")
+        let orange = Color(hex: "#fb923c")
+        let emerald = Color(hex: "#10b981")
+        let cyan = Color(hex: "#06b6d4")
+        let teal = Color(hex: "#14b8a6")
+        let pink = Color(hex: "#ec4899")
+        let amber = Color(hex: "#f59e0b")
+        let magenta = Color(hex: "#d946ef")
+
         // Background colors
         let background = Color(uiColor: .systemBackground)
         let secondaryBackground = Color(uiColor: .secondarySystemBackground)
@@ -110,6 +120,43 @@ extension LinearGradient {
 
     static let orbGradient = LinearGradient(
         colors: [Color.theme.orbPrimary, Color.theme.orbSecondary],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    // Webapp gradient cards
+    static let indigoPurple = LinearGradient(
+        colors: [Color(hex: "#6366f1"), Color(hex: "#8b5cf6")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let purpleMagenta = LinearGradient(
+        colors: [Color(hex: "#8b5cf6"), Color(hex: "#d946ef")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let roseOrange = LinearGradient(
+        colors: [Color(hex: "#f43f5e"), Color(hex: "#fb923c")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let emeraldCyan = LinearGradient(
+        colors: [Color(hex: "#10b981"), Color(hex: "#06b6d4")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let pinkRose = LinearGradient(
+        colors: [Color(hex: "#ec4899"), Color(hex: "#f43f5e")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let tealCyan = LinearGradient(
+        colors: [Color(hex: "#14b8a6"), Color(hex: "#06b6d4")],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )

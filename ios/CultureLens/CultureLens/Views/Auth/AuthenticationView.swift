@@ -11,40 +11,85 @@ struct AuthenticationView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var isShowingSignUp = false
     @State private var isShowingForgotPassword = false
+    @State private var animateOrbs = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
-                LinearGradient.primaryGradient
-                    .ignoresSafeArea()
+                // Rich gradient background matching webapp
+                LinearGradient(
+                    colors: [
+                        Color(hex: "#4f46e5"),
+                        Color(hex: "#6366f1"),
+                        Color(hex: "#7c3aed"),
+                        Color(hex: "#8b5cf6")
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+
+                // Animated floating orbs
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 250, height: 250)
+                    .blur(radius: 40)
+                    .offset(
+                        x: animateOrbs ? -60 : 60,
+                        y: animateOrbs ? -100 : -60
+                    )
+
+                Circle()
+                    .fill(Color(hex: "#d946ef").opacity(0.15))
+                    .frame(width: 200, height: 200)
+                    .blur(radius: 50)
+                    .offset(
+                        x: animateOrbs ? 80 : -40,
+                        y: animateOrbs ? 100 : 60
+                    )
+
+                Circle()
+                    .fill(Color(hex: "#06b6d4").opacity(0.1))
+                    .frame(width: 180, height: 180)
+                    .blur(radius: 35)
+                    .offset(
+                        x: animateOrbs ? -50 : 50,
+                        y: animateOrbs ? 50 : 150
+                    )
 
                 ScrollView {
-                    VStack(spacing: 32) {
+                    VStack(spacing: 28) {
                         // Logo and title
-                        VStack(spacing: 16) {
+                        VStack(spacing: 14) {
                             ZStack {
                                 Circle()
-                                    .fill(.white.opacity(0.2))
-                                    .frame(width: 100, height: 100)
+                                    .fill(.white.opacity(0.15))
+                                    .frame(width: 96, height: 96)
+                                    .blur(radius: 1)
+
+                                Circle()
+                                    .fill(.white.opacity(0.1))
+                                    .frame(width: 110, height: 110)
 
                                 Image(systemName: "waveform.circle.fill")
-                                    .font(.system(size: 48))
+                                    .font(.system(size: 52))
                                     .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.1), radius: 4)
                             }
 
                             Text("CultureLens")
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .font(.system(size: 34, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
 
                             Text("Understand conversations through a cultural lens")
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(.white.opacity(0.85))
                                 .multilineTextAlignment(.center)
+                                .padding(.horizontal, 20)
                         }
-                        .padding(.top, 60)
+                        .padding(.top, 50)
 
-                        // Auth form card
+                        // Auth form card - glassmorphism
                         VStack(spacing: 24) {
                             if isShowingSignUp {
                                 SignUpFormView(
@@ -58,12 +103,23 @@ struct AuthenticationView: View {
                             }
                         }
                         .padding(24)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .shadow(color: .black.opacity(0.2), radius: 20, y: 10)
-                        .padding(.horizontal, 24)
+                        .background {
+                            RoundedRectangle(cornerRadius: 28)
+                                .fill(.ultraThinMaterial)
+                                .shadow(color: .black.opacity(0.15), radius: 30, y: 15)
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 28)
+                                .stroke(.white.opacity(0.2), lineWidth: 1)
+                        }
+                        .padding(.horizontal, 20)
                     }
                     .padding(.bottom, 40)
+                }
+            }
+            .onAppear {
+                withAnimation(.easeInOut(duration: 10).repeatForever(autoreverses: true)) {
+                    animateOrbs = true
                 }
             }
             .sheet(isPresented: $isShowingForgotPassword) {
@@ -97,47 +153,28 @@ struct SignInFormView: View {
                 .font(.title2.bold())
                 .foregroundColor(.primary)
 
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 // Email field
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Email")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        Image(systemName: "envelope.fill")
-                            .foregroundColor(.secondary)
-
-                        TextField("Enter your email", text: $authViewModel.email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
-                            .focused($focusedField, equals: .email)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+                AuthTextField(
+                    label: "Email",
+                    icon: "envelope.fill",
+                    placeholder: "Enter your email",
+                    text: $authViewModel.email
+                )
+                .textContentType(.emailAddress)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
 
                 // Password field
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Password")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        Image(systemName: "lock.fill")
-                            .foregroundColor(.secondary)
-
-                        SecureField("Enter your password", text: $authViewModel.password)
-                            .textContentType(.password)
-                            .focused($focusedField, equals: .password)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+                AuthTextField(
+                    label: "Password",
+                    icon: "lock.fill",
+                    placeholder: "Enter your password",
+                    text: $authViewModel.password,
+                    isSecure: true
+                )
+                .textContentType(.password)
 
                 // Forgot password
                 HStack {
@@ -145,7 +182,7 @@ struct SignInFormView: View {
                     Button("Forgot password?") {
                         isShowingForgotPassword = true
                     }
-                    .font(.footnote)
+                    .font(.footnote.weight(.medium))
                     .foregroundColor(Color.theme.primary)
                 }
             }
@@ -156,7 +193,7 @@ struct SignInFormView: View {
                     await authViewModel.signIn()
                 }
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     if authViewModel.isLoading {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -166,16 +203,17 @@ struct SignInFormView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.theme.primary)
+                .padding(.vertical, 14)
+                .background(LinearGradient.primaryGradient)
                 .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 4)
             }
             .disabled(authViewModel.isLoading || !authViewModel.canSignIn)
             .opacity(authViewModel.canSignIn ? 1 : 0.6)
 
             // Divider
-            HStack {
+            HStack(spacing: 16) {
                 Rectangle()
                     .fill(Color(.separator))
                     .frame(height: 1)
@@ -189,34 +227,41 @@ struct SignInFormView: View {
                     .frame(height: 1)
             }
 
-            // Social sign in buttons
+            // Google sign in
             Button {
                 Task {
                     await authViewModel.signInWithGoogle()
                 }
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     Image(systemName: "g.circle.fill")
-                        .font(.title2)
+                        .font(.title3)
 
                     Text("Continue with Google")
                         .fontWeight(.medium)
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color(.systemGray6))
+                .padding(.vertical, 14)
+                .background {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color(.systemBackground))
+                        .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
+                }
                 .foregroundColor(.primary)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color(.separator), lineWidth: 1)
+                }
             }
             .disabled(authViewModel.isLoading)
 
             // Sign up link
-            HStack {
+            HStack(spacing: 4) {
                 Text("Don't have an account?")
                     .foregroundColor(.secondary)
 
                 Button("Sign Up") {
-                    withAnimation {
+                    withAnimation(.spring(response: 0.4)) {
                         isShowingSignUp = true
                     }
                 }
@@ -233,105 +278,53 @@ struct SignUpFormView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @Binding var isShowingSignUp: Bool
 
-    @FocusState private var focusedField: Field?
-
-    enum Field {
-        case name
-        case email
-        case password
-        case confirmPassword
-    }
-
     var body: some View {
         VStack(spacing: 20) {
             Text("Create Account")
                 .font(.title2.bold())
                 .foregroundColor(.primary)
 
-            VStack(spacing: 16) {
-                // Name field
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Full Name")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            VStack(spacing: 14) {
+                AuthTextField(
+                    label: "Full Name",
+                    icon: "person.fill",
+                    placeholder: "Enter your name",
+                    text: $authViewModel.displayName
+                )
+                .textContentType(.name)
 
-                    HStack {
-                        Image(systemName: "person.fill")
-                            .foregroundColor(.secondary)
+                AuthTextField(
+                    label: "Email",
+                    icon: "envelope.fill",
+                    placeholder: "Enter your email",
+                    text: $authViewModel.email
+                )
+                .textContentType(.emailAddress)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
 
-                        TextField("Enter your name", text: $authViewModel.displayName)
-                            .textContentType(.name)
-                            .focused($focusedField, equals: .name)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+                AuthTextField(
+                    label: "Password",
+                    icon: "lock.fill",
+                    placeholder: "At least 8 characters",
+                    text: $authViewModel.password,
+                    isSecure: true
+                )
+                .textContentType(.newPassword)
 
-                // Email field
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Email")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        Image(systemName: "envelope.fill")
-                            .foregroundColor(.secondary)
-
-                        TextField("Enter your email", text: $authViewModel.email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                            .disableAutocorrection(true)
-                            .focused($focusedField, equals: .email)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                // Password field
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Password")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        Image(systemName: "lock.fill")
-                            .foregroundColor(.secondary)
-
-                        SecureField("At least 8 characters", text: $authViewModel.password)
-                            .textContentType(.newPassword)
-                            .focused($focusedField, equals: .password)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-
-                // Confirm password field
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Confirm Password")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        Image(systemName: "lock.fill")
-                            .foregroundColor(.secondary)
-
-                        SecureField("Confirm your password", text: $authViewModel.confirmPassword)
-                            .textContentType(.newPassword)
-                            .focused($focusedField, equals: .confirmPassword)
-
-                        if !authViewModel.confirmPassword.isEmpty {
-                            Image(systemName: authViewModel.doPasswordsMatch ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundColor(authViewModel.doPasswordsMatch ? .green : .red)
-                        }
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+                AuthTextField(
+                    label: "Confirm Password",
+                    icon: "lock.fill",
+                    placeholder: "Confirm your password",
+                    text: $authViewModel.confirmPassword,
+                    isSecure: true,
+                    trailingIcon: !authViewModel.confirmPassword.isEmpty
+                        ? (authViewModel.doPasswordsMatch ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        : nil,
+                    trailingColor: authViewModel.doPasswordsMatch ? .green : .red
+                )
+                .textContentType(.newPassword)
             }
 
             // Create account button
@@ -340,7 +333,7 @@ struct SignUpFormView: View {
                     await authViewModel.createAccount()
                 }
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     if authViewModel.isLoading {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -350,21 +343,22 @@ struct SignUpFormView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.theme.primary)
+                .padding(.vertical, 14)
+                .background(LinearGradient.primaryGradient)
                 .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 4)
             }
             .disabled(authViewModel.isLoading || !authViewModel.canCreateAccount)
             .opacity(authViewModel.canCreateAccount ? 1 : 0.6)
 
             // Sign in link
-            HStack {
+            HStack(spacing: 4) {
                 Text("Already have an account?")
                     .foregroundColor(.secondary)
 
                 Button("Sign In") {
-                    withAnimation {
+                    withAnimation(.spring(response: 0.4)) {
                         isShowingSignUp = false
                     }
                 }
@@ -372,6 +366,53 @@ struct SignUpFormView: View {
                 .foregroundColor(Color.theme.primary)
             }
             .font(.footnote)
+        }
+    }
+}
+
+// MARK: - Auth Text Field
+struct AuthTextField: View {
+    let label: String
+    let icon: String
+    let placeholder: String
+    @Binding var text: String
+    var isSecure: Bool = false
+    var trailingIcon: String?
+    var trailingColor: Color = .secondary
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.caption.weight(.medium))
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.theme.primary.opacity(0.6))
+                    .frame(width: 20)
+
+                if isSecure {
+                    SecureField(placeholder, text: $text)
+                } else {
+                    TextField(placeholder, text: $text)
+                }
+
+                if let trailingIcon = trailingIcon {
+                    Image(systemName: trailingIcon)
+                        .foregroundColor(trailingColor)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(.separator).opacity(0.5), lineWidth: 1)
+            }
         }
     }
 }
@@ -385,9 +426,15 @@ struct ForgotPasswordView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                Image(systemName: "envelope.badge.fill")
-                    .font(.system(size: 64))
-                    .foregroundColor(Color.theme.primary)
+                ZStack {
+                    Circle()
+                        .fill(Color.theme.primary.opacity(0.1))
+                        .frame(width: 100, height: 100)
+
+                    Image(systemName: "envelope.badge.fill")
+                        .font(.system(size: 44))
+                        .foregroundStyle(LinearGradient.primaryGradient)
+                }
 
                 VStack(spacing: 8) {
                     Text("Reset Password")
@@ -399,24 +446,15 @@ struct ForgotPasswordView: View {
                         .multilineTextAlignment(.center)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Email")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    HStack {
-                        Image(systemName: "envelope.fill")
-                            .foregroundColor(.secondary)
-
-                        TextField("Enter your email", text: $authViewModel.email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
+                AuthTextField(
+                    label: "Email",
+                    icon: "envelope.fill",
+                    placeholder: "Enter your email",
+                    text: $authViewModel.email
+                )
+                .textContentType(.emailAddress)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
                 .padding(.horizontal)
 
                 Button {
@@ -435,10 +473,11 @@ struct ForgotPasswordView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.theme.primary)
+                    .padding(.vertical, 14)
+                    .background(LinearGradient.primaryGradient)
                     .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 4)
                 }
                 .disabled(authViewModel.isLoading || !authViewModel.isEmailValid)
                 .padding(.horizontal)

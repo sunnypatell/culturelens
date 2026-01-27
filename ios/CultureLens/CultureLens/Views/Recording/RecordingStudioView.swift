@@ -28,9 +28,7 @@ struct RecordingStudioView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background
-                Color.theme.background
-                    .ignoresSafeArea()
+                AnimatedBackground()
 
                 VStack {
                     switch currentStep {
@@ -104,7 +102,6 @@ struct RecordingStudioView: View {
     private func startRecording() {
         Task {
             do {
-                // Create session in backend
                 let settings = SessionSettings(
                     title: sessionSettings.title.isEmpty ? nil : sessionSettings.title,
                     sessionType: sessionSettings.sessionType.rawValue,
@@ -120,7 +117,6 @@ struct RecordingStudioView: View {
                 let session = try await sessionsViewModel.createSession(settings: settings)
                 currentSession = session
 
-                // Connect to voice agent
                 try await voiceAgent.connect(sessionId: session.id)
 
                 appState.triggerHaptic(.success)
@@ -138,7 +134,6 @@ struct RecordingStudioView: View {
 
             await voiceAgent.disconnect()
 
-            // Trigger analysis
             if let session = currentSession {
                 if let result = await sessionsViewModel.analyzeSession(session) {
                     currentSession?.analysisResult = result
@@ -152,9 +147,8 @@ struct RecordingStudioView: View {
     }
 
     private func viewInsights() {
-        if let session = currentSession {
+        if currentSession != nil {
             appState.selectedTab = .library
-            // Navigation will be handled by the library view
         }
     }
 
@@ -185,11 +179,17 @@ struct SessionSetupView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Header
-                VStack(spacing: 8) {
-                    Image(systemName: "mic.circle.fill")
-                        .font(.system(size: 64))
-                        .foregroundStyle(LinearGradient.primaryGradient)
+                // Header with gradient icon
+                VStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.theme.primary.opacity(0.1))
+                            .frame(width: 90, height: 90)
+
+                        Image(systemName: "mic.circle.fill")
+                            .font(.system(size: 52))
+                            .foregroundStyle(LinearGradient.primaryGradient)
+                    }
 
                     Text("Start a New Session")
                         .font(.title2.bold())
@@ -198,9 +198,9 @@ struct SessionSetupView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-                .padding(.top, 20)
+                .padding(.top, 16)
 
-                // Form
+                // Form card
                 VStack(spacing: 20) {
                     // Title
                     VStack(alignment: .leading, spacing: 8) {
@@ -209,9 +209,16 @@ struct SessionSetupView: View {
 
                         TextField("e.g., Team Meeting", text: $settings.title)
                             .textFieldStyle(.plain)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 12)
+                            .background {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(.systemGray6))
+                            }
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(.separator).opacity(0.3), lineWidth: 1)
+                            }
                     }
 
                     // Session Type
@@ -223,7 +230,7 @@ struct SessionSetupView: View {
                             GridItem(.flexible()),
                             GridItem(.flexible()),
                             GridItem(.flexible())
-                        ], spacing: 12) {
+                        ], spacing: 10) {
                             ForEach(SessionType.allCases, id: \.self) { type in
                                 SessionTypeButton(
                                     type: type,
@@ -286,22 +293,26 @@ struct SessionSetupView: View {
                         .pickerStyle(.segmented)
                     }
                 }
-                .padding()
-                .background(Color.theme.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .padding(18)
+                .background {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                }
 
                 // Start button
                 Button(action: onStartSession) {
-                    HStack {
+                    HStack(spacing: 8) {
                         Image(systemName: "play.fill")
                         Text("Start Session")
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.theme.primary)
+                    .padding(.vertical, 16)
+                    .background(LinearGradient.primaryGradient)
                     .foregroundColor(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 4)
                 }
             }
             .padding()
@@ -322,16 +333,23 @@ struct SessionTypeButton: View {
                     .font(.title2)
 
                 Text(type.displayName)
-                    .font(.caption)
+                    .font(.caption.weight(.medium))
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(isSelected ? Color.theme.primary.opacity(0.15) : Color(.systemGray6))
+            .background {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.theme.primary.opacity(0.12))
+                } else {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color(.systemGray6))
+                }
+            }
             .foregroundColor(isSelected ? Color.theme.primary : .primary)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 14)
                     .stroke(isSelected ? Color.theme.primary : .clear, lineWidth: 2)
             )
         }
@@ -358,12 +376,29 @@ struct AnalysisDepthOption: View {
 
                 Spacer()
 
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? Color.theme.primary : .secondary)
+                ZStack {
+                    Circle()
+                        .stroke(isSelected ? Color.theme.primary : Color(.systemGray4), lineWidth: 2)
+                        .frame(width: 22, height: 22)
+
+                    if isSelected {
+                        Circle()
+                            .fill(LinearGradient.primaryGradient)
+                            .frame(width: 14, height: 14)
+                    }
+                }
             }
-            .padding()
-            .background(isSelected ? Color.theme.primary.opacity(0.1) : Color(.systemGray6))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(14)
+            .background {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSelected ? Color.theme.primary.opacity(0.08) : Color(.systemGray6))
+            }
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.theme.primary.opacity(0.3), lineWidth: 1)
+                }
+            }
         }
         .buttonStyle(.plain)
     }
@@ -379,16 +414,24 @@ struct ContextTagChip: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 Image(systemName: tag.icon)
-                    .font(.caption)
+                    .font(.caption.weight(.medium))
 
                 Text(tag.displayName)
-                    .font(.caption)
+                    .font(.caption.weight(.medium))
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isSelected ? Color.theme.primary : Color(.systemGray6))
+            .background {
+                if isSelected {
+                    Capsule()
+                        .fill(LinearGradient.primaryGradient)
+                        .shadow(color: Color.theme.primary.opacity(0.2), radius: 3, y: 1)
+                } else {
+                    Capsule()
+                        .fill(Color(.systemGray6))
+                }
+            }
             .foregroundColor(isSelected ? .white : .primary)
-            .clipShape(Capsule())
         }
     }
 }
@@ -402,9 +445,15 @@ struct ConsentSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    Image(systemName: "hand.raised.fill")
-                        .font(.system(size: 48))
-                        .foregroundColor(Color.theme.primary)
+                    ZStack {
+                        Circle()
+                            .fill(Color.theme.primary.opacity(0.1))
+                            .frame(width: 80, height: 80)
+
+                        Image(systemName: "hand.raised.fill")
+                            .font(.system(size: 36))
+                            .foregroundStyle(LinearGradient.primaryGradient)
+                    }
 
                     VStack(spacing: 8) {
                         Text("Participant Consent")
@@ -437,19 +486,22 @@ struct ConsentSheet: View {
                             text: "You can delete your data at any time"
                         )
                     }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .padding(16)
+                    .background {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.ultraThinMaterial)
+                    }
 
                     VStack(spacing: 12) {
                         Button(action: onAgree) {
                             Text("I Confirm All Participants Consent")
                                 .fontWeight(.semibold)
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.theme.primary)
+                                .padding(.vertical, 14)
+                                .background(LinearGradient.primaryGradient)
                                 .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                                .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 4)
                         }
 
                         Button(action: onCancel) {
@@ -472,9 +524,15 @@ struct ConsentItem: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: icon)
-                .foregroundColor(Color.theme.primary)
-                .frame(width: 24)
+            ZStack {
+                Circle()
+                    .fill(Color.theme.primary.opacity(0.1))
+                    .frame(width: 32, height: 32)
+
+                Image(systemName: icon)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Color.theme.primary)
+            }
 
             Text(text)
                 .font(.subheadline)
@@ -501,14 +559,14 @@ struct ProcessingView: View {
 
             ZStack {
                 Circle()
-                    .stroke(Color(.systemGray5), lineWidth: 8)
+                    .stroke(Color(.systemGray5), lineWidth: 6)
                     .frame(width: 120, height: 120)
 
                 Circle()
                     .trim(from: 0, to: progress)
                     .stroke(
                         LinearGradient.primaryGradient,
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
                     )
                     .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
@@ -552,12 +610,12 @@ struct SessionCompleteView: View {
             VStack(spacing: 16) {
                 ZStack {
                     Circle()
-                        .fill(Color.theme.success.opacity(0.2))
+                        .fill(Color.theme.success.opacity(0.15))
                         .frame(width: 100, height: 100)
 
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 48))
-                        .foregroundColor(Color.theme.success)
+                        .foregroundStyle(LinearGradient.emeraldCyan)
                 }
 
                 Text("Session Complete!")
@@ -571,20 +629,23 @@ struct SessionCompleteView: View {
 
             // Stats
             if let result = session.analysisResult {
-                HStack(spacing: 24) {
+                HStack(spacing: 12) {
                     StatBadge(
                         value: "\(result.insights.count)",
-                        label: "Insights"
+                        label: "Insights",
+                        gradient: .indigoPurple
                     )
 
                     StatBadge(
                         value: "\(result.segments.count)",
-                        label: "Segments"
+                        label: "Segments",
+                        gradient: .purpleMagenta
                     )
 
                     StatBadge(
                         value: session.formattedDuration,
-                        label: "Duration"
+                        label: "Duration",
+                        gradient: .emeraldCyan
                     )
                 }
             }
@@ -593,20 +654,22 @@ struct SessionCompleteView: View {
 
             VStack(spacing: 12) {
                 Button(action: onViewInsights) {
-                    HStack {
+                    HStack(spacing: 8) {
                         Image(systemName: "lightbulb.fill")
                         Text("View Insights")
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.theme.primary)
+                    .padding(.vertical, 14)
+                    .background(LinearGradient.primaryGradient)
                     .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .shadow(color: Color.theme.primary.opacity(0.3), radius: 8, y: 4)
                 }
 
                 Button(action: onNewSession) {
                     Text("Start New Session")
+                        .fontWeight(.medium)
                         .foregroundColor(Color.theme.primary)
                 }
             }
@@ -618,20 +681,25 @@ struct SessionCompleteView: View {
 struct StatBadge: View {
     let value: String
     let label: String
+    var gradient: LinearGradient = .primaryGradient
 
     var body: some View {
         VStack(spacing: 4) {
             Text(value)
-                .font(.title2.bold())
+                .font(.title3.bold())
+                .foregroundColor(.white)
 
             Text(label)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.white.opacity(0.8))
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color.theme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.vertical, 14)
+        .background {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(gradient)
+                .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+        }
     }
 }
 
