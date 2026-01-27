@@ -553,20 +553,16 @@ firebase deploy --only storage
 
 ## 👥 Team
 
-Built at **MLH HackHive 2026** by:
-
-| Contributor             | GitHub                                             | Role                       |
-| ----------------------- | -------------------------------------------------- | -------------------------- |
-| **Sunny Patel**         | [@sunnypatell](https://github.com/sunnypatell)     | Full-Stack, Architecture   |
-| **Daniyal Lilani**      | [@daniyallilani](https://github.com/daniyallilani) | Backend, AI/ML             |
-| **Aryan Kashefi-Aazam** | [@aryan-ka](https://github.com/aryan-ka)           | Frontend, UI/UX            |
-| **Paul Joseph**         | [@pauljoseph](https://github.com/paulj-04)         | Frontend, UI/UX, Marketing |
+| Contributor        | GitHub                                             | Role                     |
+| ------------------ | -------------------------------------------------- | ------------------------ |
+| **Sunny Patel**    | [@sunnypatell](https://github.com/sunnypatell)     | Full-Stack, Architecture |
+| **Daniyal Lilani** | [@daniyallilani](https://github.com/daniyallilani) | Backend, AI/ML           |
 
 ---
 
 ## 📄 License
 
-[MIT](LICENSE) © 2026 CultureLens Team
+[MIT](LICENSE) © 2026 Sunny Patel
 
 ---
 
