@@ -30,6 +30,8 @@ _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-Fir
 
 > full walkthrough of the web app and native iOS app running side-by-side
 
+[![Watch Demo](https://img.shields.io/badge/▶_Watch_Demo-4A90D9?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/user-attachments/assets/c55d6efe-05c0-49cf-82ff-e8a41719c4f0)
+
 https://github.com/user-attachments/assets/c55d6efe-05c0-49cf-82ff-e8a41719c4f0
 
 ---
