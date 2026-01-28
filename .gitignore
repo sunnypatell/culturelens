@@ -100,3 +100,6 @@ ios/CultureLens/.swiftpm/
 
 # iOS secrets - keep example, ignore actual
 # ios/CultureLens/CultureLens/Resources/GoogleService-Info.plist
+
+# large media files
+*.mp4
