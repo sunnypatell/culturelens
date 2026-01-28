@@ -1,9 +1,9 @@
 "area: frontend":
   - changed-files:
       - any-glob-to-any-file:
-          - "src/app/**"
-          - "src/components/**"
-          - "src/styles/**"
+          - "app/**"
+          - "components/**"
+          - "lib/**"
           - "public/**"
           - "*.css"
           - "*.tsx"
@@ -12,9 +12,8 @@
 "area: backend":
   - changed-files:
       - any-glob-to-any-file:
-          - "src/api/**"
-          - "src/server/**"
-          - "src/lib/api/**"
+          - "backend/**"
+          - "app/api/**"
 
 "area: firebase":
   - changed-files:
