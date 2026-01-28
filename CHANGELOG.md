@@ -28,6 +28,10 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 - **CI badges**: tests, validate, and CI status badges in README header
 - **demo**: clickable "Watch Demo" badge with inline video player in README
 
+- **docs content**: enriched all 8 Fumadocs MDX pages with comprehensive descriptions, architecture diagrams, code examples, and env var references (`627d84e`)
+- **OpenAPI spec**: expanded from 818→1600+ lines with 10 reusable component schemas, descriptions and examples on every property, $ref references, production server, and full GDPR export schema (`6d2828f`)
+- **docs branding**: customized Scalar API explorer and Fumadocs sidebar with CultureLens purple/cyan theme, SVG logo, and GitHub link (`124b554`)
+
 ### changed
 
 - **CI**: upgraded `actions/checkout` v4→v6 and `actions/setup-node` v4→v6 across all 10 workflows (`5183a85`)
