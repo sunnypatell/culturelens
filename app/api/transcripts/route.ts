@@ -18,7 +18,7 @@ import { createRequestLogger } from "@/lib/logger";
  */
 export async function POST(request: Request) {
   return apiHandler(async () => {
-    const logger = createRequestLogger("POST /api/transcripts");
+    const logger = createRequestLogger("POST", "/api/transcripts");
     logger.info("saving transcript");
 
     // authenticate user

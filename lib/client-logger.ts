@@ -6,45 +6,44 @@
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
-interface LogContext {
-  [key: string]: unknown;
-}
-
 function formatMessage(
   level: LogLevel,
   msg: string,
-  context?: LogContext
+  ...args: unknown[]
 ): string {
   const timestamp = new Date().toISOString();
   const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-  if (context && Object.keys(context).length > 0) {
-    return `${prefix} ${msg} ${JSON.stringify(context)}`;
+  if (args.length > 0) {
+    const extra = args
+      .map((a) => (typeof a === "string" ? a : JSON.stringify(a)))
+      .join(" ");
+    return `${prefix} ${msg} ${extra}`;
   }
   return `${prefix} ${msg}`;
 }
 
 export const clientLogger = {
-  debug(msg: string, context?: LogContext) {
+  debug(msg: string, ...args: unknown[]) {
     if (process.env.NODE_ENV === "development") {
       // eslint-disable-next-line no-console
-      console.debug(formatMessage("debug", msg, context));
+      console.debug(formatMessage("debug", msg, ...args));
     }
   },
 
-  info(msg: string, context?: LogContext) {
+  info(msg: string, ...args: unknown[]) {
     if (process.env.NODE_ENV === "development") {
       // eslint-disable-next-line no-console
-      console.log(formatMessage("info", msg, context));
+      console.log(formatMessage("info", msg, ...args));
     }
   },
 
-  warn(msg: string, context?: LogContext) {
+  warn(msg: string, ...args: unknown[]) {
     // eslint-disable-next-line no-console
-    console.warn(formatMessage("warn", msg, context));
+    console.warn(formatMessage("warn", msg, ...args));
   },
 
-  error(msg: string, context?: LogContext) {
+  error(msg: string, ...args: unknown[]) {
     // eslint-disable-next-line no-console
-    console.error(formatMessage("error", msg, context));
+    console.error(formatMessage("error", msg, ...args));
   },
 };
