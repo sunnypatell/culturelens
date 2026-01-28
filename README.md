@@ -28,7 +28,9 @@ _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-Fir
 
 > full walkthrough of the web app and native iOS app running side-by-side
 
-https://github.com/sunnypatell/culturelens/releases/download/v1.1.1-ios/CultureLens.mp4
+[![Watch the Demo](https://img.shields.io/badge/▶_Watch_Demo-CultureLens_Walkthrough-blueviolet?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/sunnypatell/culturelens/releases/download/v1.1.1-ios/CultureLens.mp4)
+
+> click the badge above to download and watch the full demo (web + iOS)
 
 ---
 
