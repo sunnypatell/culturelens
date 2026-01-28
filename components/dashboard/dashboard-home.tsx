@@ -27,6 +27,7 @@ import {
   ArrowRight,
   MicIcon,
 } from "lucide-react";
+import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
 
 interface ApiSession {
   id: string;
@@ -94,7 +95,7 @@ export function DashboardHome({
       gradient: ["#f43f5e", "#fb923c"],
     },
   ]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -218,6 +219,10 @@ export function DashboardHome({
       gradient: ["#f43f5e", "#fb923c"],
     },
   ];
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
