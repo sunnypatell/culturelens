@@ -311,7 +311,23 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="relative z-10">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary via-accent to-primary shadow-lg relative">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary via-accent to-primary shadow-lg relative overflow-hidden">
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "Profile"}
+                    className="w-full h-full object-cover rounded-full"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="w-full h-full flex items-center justify-center text-sm font-bold text-primary-foreground">
+                    {(
+                      user?.displayName?.[0] ||
+                      user?.email?.[0] ||
+                      "U"
+                    ).toUpperCase()}
+                  </span>
+                )}
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-accent opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-300" />
               </div>
               <motion.div
