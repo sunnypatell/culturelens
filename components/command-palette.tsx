@@ -42,13 +42,10 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  const runCommand = useCallback(
-    (command: () => void) => {
-      setOpen(false);
-      command();
-    },
-    []
-  );
+  const runCommand = useCallback((command: () => void) => {
+    setOpen(false);
+    command();
+  }, []);
 
   return (
     <>
@@ -131,9 +128,7 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
               <CommandItem
                 icon={<FileText className="h-4 w-4" />}
                 label="View Results"
-                onSelect={() =>
-                  runCommand(() => router.push("/results"))
-                }
+                onSelect={() => runCommand(() => router.push("/results"))}
               />
               <CommandItem
                 icon={

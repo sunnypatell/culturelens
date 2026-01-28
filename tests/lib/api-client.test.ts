@@ -98,10 +98,7 @@ describe("createSession", () => {
       json: async () => ({ detail: "consent required" }),
     });
 
-    const result = await createSession(
-      { personA: false, personB: false },
-      {}
-    );
+    const result = await createSession({ personA: false, personB: false }, {});
     expect(result.error).toBe("consent required");
   });
 });

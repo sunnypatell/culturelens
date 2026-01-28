@@ -44,11 +44,7 @@ function addHeader(doc: jsPDF, y: number): number {
   return y + 40;
 }
 
-function addSectionHeading(
-  doc: jsPDF,
-  text: string,
-  y: number
-): number {
+function addSectionHeading(doc: jsPDF, text: string, y: number): number {
   if (y > 260) {
     doc.addPage();
     y = 20;
@@ -83,11 +79,7 @@ function addParagraph(doc: jsPDF, text: string, y: number): number {
   return y + 4;
 }
 
-function addBulletList(
-  doc: jsPDF,
-  items: string[],
-  y: number
-): number {
+function addBulletList(doc: jsPDF, items: string[], y: number): number {
   doc.setTextColor(...BRAND.muted);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
@@ -206,12 +198,9 @@ export function generateAnalysisPDF(data: ExportData): void {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(...BRAND.muted);
-    doc.text(
-      `CultureLens Report — Page ${i} of ${pageCount}`,
-      105,
-      290,
-      { align: "center" }
-    );
+    doc.text(`CultureLens Report — Page ${i} of ${pageCount}`, 105, 290, {
+      align: "center",
+    });
   }
 
   // download

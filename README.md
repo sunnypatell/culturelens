@@ -13,7 +13,7 @@
 [![iOS](https://img.shields.io/badge/iOS-16.0+-000000?style=flat-square&logo=apple&logoColor=white)](ios/)
 [![Firebase](https://img.shields.io/badge/Firebase-Admin_SDK-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.11-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![CI](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sunnypatell/culturelens/actions)
+[![Lint](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/frontend-lint.yml?branch=main&style=flat-square&label=lint&logo=eslint)](https://github.com/sunnypatell/culturelens/actions/workflows/frontend-lint.yml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/frontend-test.yml?branch=main&style=flat-square&label=tests&logo=vitest)](https://github.com/sunnypatell/culturelens/actions/workflows/frontend-test.yml)
 [![Validate](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/sunnypatell/culturelens/actions/workflows/validate.yml)
 [![License](https://img.shields.io/badge/License-Source_Available-blue?style=flat-square)](LICENSE)

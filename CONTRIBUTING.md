@@ -8,19 +8,19 @@ thanks for your interest in contributing. this guide covers setup, conventions, 
 
 ### prerequisites
 
-| tool | version | check |
-| --- | --- | --- |
-| Node.js | 18+ | `node --version` |
-| Python | 3.11+ | `python3 --version` |
-| npm | 9+ | `npm --version` |
-| Git | 2+ | `git --version` |
+| tool    | version | check               |
+| ------- | ------- | ------------------- |
+| Node.js | 18+     | `node --version`    |
+| Python  | 3.11+   | `python3 --version` |
+| npm     | 9+      | `npm --version`     |
+| Git     | 2+      | `git --version`     |
 
 **optional (for iOS development):**
 
-| tool | version |
-| --- | --- |
-| Xcode | 15+ |
-| XcodeGen | latest (`brew install xcodegen`) |
+| tool      | version                           |
+| --------- | --------------------------------- |
+| Xcode     | 15+                               |
+| XcodeGen  | latest (`brew install xcodegen`)  |
 | SwiftLint | latest (`brew install swiftlint`) |
 
 ### setup
@@ -77,12 +77,14 @@ type(scope): description
 **types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
 
 **rules:**
+
 - lowercase everything (except code references)
 - imperative mood ("added", "removed", not "add", "remove")
 - use `!` for breaking changes: `feat!:` or `feat(api)!:`
 - include commit SHAs when referencing previous commits
 
 **examples:**
+
 ```
 feat(api): added session comparison endpoint
 
@@ -151,6 +153,7 @@ npm run test:coverage # coverage report
 ```
 
 tests live in `tests/` mirroring the source structure:
+
 ```
 tests/
 └── lib/
@@ -184,6 +187,7 @@ xcodebuild test -project CultureLens.xcodeproj -scheme CultureLens \
 ### why Next.js API routes instead of a separate backend?
 
 the FastAPI backend exists for heavy compute (audio processing), but most CRUD operations go through Next.js API routes. this means:
+
 - single deployment (Vercel handles everything)
 - shared TypeScript types between frontend and API
 - edge function performance for auth verification

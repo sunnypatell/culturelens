@@ -46,8 +46,7 @@ export async function GET() {
     checkService("firebase", async () => {
       // verify firebase admin SDK is importable and configured
       const hasConfig = !!(
-        process.env.FIREBASE_CLIENT_EMAIL &&
-        process.env.FIREBASE_PRIVATE_KEY
+        process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY
       );
       if (!hasConfig) throw new Error("firebase credentials not configured");
     }),
