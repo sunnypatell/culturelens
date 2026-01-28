@@ -83,7 +83,7 @@ firebase emulators:start
 
 security rules are **automatically deployed** via github actions when changes are pushed to `main` branch.
 
-see [.github/FIREBASE_DEPLOY_SETUP.md](.github/FIREBASE_DEPLOY_SETUP.md) for details.
+see the relevant GitHub Actions workflow (`.github/workflows/`) for details.
 
 ## troubleshooting
 
@@ -106,5 +106,5 @@ verify authorization header format: `Bearer <token>`
 ## documentation
 
 - firebase auth implementation: [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md)
-- firebase deploy setup: [.github/FIREBASE_DEPLOY_SETUP.md](.github/FIREBASE_DEPLOY_SETUP.md)
+- firebase deploy setup: see `.github/workflows/` for CI/CD workflows
 - firebase documentation: https://firebase.google.com/docs
