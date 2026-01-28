@@ -1,17 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  ArrowLeft,
-  Loader2,
-  FileText,
-  Brain,
-  Users,
-  Download,
-} from "lucide-react";
+import { ArrowLeft, Loader2, Brain, Users, Download } from "lucide-react";
 import Link from "next/link";
 import { AnalysisLoader } from "@/components/ui/analysis-loader";
 import { useAuth } from "@/components/auth/auth-provider";
