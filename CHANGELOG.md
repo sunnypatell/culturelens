@@ -38,7 +38,17 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 - **CI**: labeler.yml paths corrected from `src/app/**` to `app/**` to match actual repo structure
 - **CI**: `.gitignore` scoped `/transcripts/` to root-level only, preventing `app/api/transcripts/` from being ignored
+- **CI**: standardized node 20 across all 5 workflows, Dockerfile, and `.nvmrc` — Next.js 16.1 requires >=20.9.0 (`a43566d`)
+- **CI**: fixed CI badge referencing non-existent `ci.yml` → `frontend-lint.yml` (`a43566d`)
+- **lint**: added `scripts/` to eslint and prettier ignore, removing 106 false-positive warnings (`875a9f4`)
+- **lint**: removed all unused imports and variables across 4 components (`3865667`)
+- **lint**: resolved all 7 `react-hooks/exhaustive-deps` warnings across 7 files (`1e6191f`)
+- **a11y**: associated form labels with controls and added keyboard handlers in 6 components (`5c465b4`)
+- **types**: eliminated last 2 `Record<string, any>` → `Record<string, unknown>` in API routes (`87ce197`)
 - **docs**: README test count updated from 31 → 71, endpoint count from 16 → 23
+- **docs**: upgraded all 11 documentation files to match README styling standard — emoji headers, dividers, tables (`f35b7c2`)
+- **infra**: added HEALTHCHECK to frontend Dockerfile and docker-compose.yml (`b28a748`)
+- **infra**: added package.json metadata (description, keywords, repository, author, license, engines) (`b28a748`)
 - **cleanup**: consolidated duplicate issue templates (.md removed, .yml forms kept)
 - **cleanup**: removed unused imports (`useCallback`, `FileText`) from `app/results/page.tsx`
 - **cleanup**: added `*.mp4` to `.gitignore` for large media files
