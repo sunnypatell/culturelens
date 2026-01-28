@@ -28,7 +28,7 @@ _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-Fir
 
 > full walkthrough of the web app and native iOS app running side-by-side
 
-https://github.com/sunnypatell/culturelens/raw/main/docs/demo.mp4
+https://github.com/user-attachments/assets/c55d6efe-05c0-49cf-82ff-e8a41719c4f0
 
 ---
 
