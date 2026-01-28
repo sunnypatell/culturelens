@@ -1,6 +1,26 @@
 {
   "name": "culturelens",
   "version": "0.2.0",
+  "description": "consent-based conversation analytics platform with cultural awareness — Next.js + FastAPI + SwiftUI",
+  "keywords": [
+    "conversation-analytics",
+    "cultural-awareness",
+    "nextjs",
+    "fastapi",
+    "firebase",
+    "elevenlabs",
+    "gemini",
+    "voice-ai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunnypatell/culturelens.git"
+  },
+  "author": "Sunny Patel",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "private": true,
   "scripts": {
     "setup": "node scripts/setup.js",
