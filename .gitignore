@@ -51,8 +51,8 @@ Desktop.ini
 # generated audio files
 public/audio/
 
-# generated transcript files
-transcripts/
+# generated transcript files (root-level only, not app/api/transcripts/)
+/transcripts/
 
 # debug logs
 npm-debug.log*
