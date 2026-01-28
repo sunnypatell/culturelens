@@ -1,13 +1,14 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Loader2, FileText, Brain, Users } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, Brain, Users, Download } from "lucide-react";
 import Link from "next/link";
 import { AnalysisLoader } from "@/components/ui/analysis-loader";
 import { useAuth } from "@/components/auth/auth-provider";
+import { generateAnalysisPDF } from "@/lib/pdf-export";
 
 interface AnalysisInsights {
   summary: string;
@@ -292,9 +293,13 @@ function ResultsContent() {
             </Link>
             <h1 className="text-2xl font-bold">Conversation Analysis</h1>
           </div>
-          <Button variant="outline" size="sm">
-            <FileText className="mr-2 h-4 w-4" />
-            Export Report
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => analysis && generateAnalysisPDF(analysis)}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export PDF
           </Button>
         </div>
       </header>
