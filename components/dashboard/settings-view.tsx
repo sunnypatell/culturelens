@@ -452,6 +452,7 @@ export function SettingsView() {
                     ].map((option) => (
                       <label
                         key={option.value}
+                        htmlFor={option.value}
                         className={cn(
                           "flex items-start space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-primary/50",
                           "border-border"
@@ -681,6 +682,7 @@ export function SettingsView() {
                     ].map((option) => (
                       <label
                         key={option.value}
+                        htmlFor={option.value}
                         className="flex items-start space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-amber-500/50 border-amber-200 dark:border-amber-900 bg-white dark:bg-amber-950/10"
                       >
                         <RadioGroupItem

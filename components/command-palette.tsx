@@ -68,7 +68,14 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
         {/* backdrop */}
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+          role="button"
+          tabIndex={0}
           onClick={() => setOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              setOpen(false);
+            }
+          }}
         />
 
         {/* dialog */}
