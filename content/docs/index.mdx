@@ -1,29 +1,71 @@
 ---
 title: CultureLens Documentation
-description: reference documentation for CultureLens development and integration
+description: developer documentation for CultureLens — consent-based conversation analytics with cultural awareness
 ---
 
-Welcome to the CultureLens documentation. Browse the sidebar to explore guides, API reference, and architecture docs.
+welcome to the CultureLens developer documentation. CultureLens is a consent-based conversation mirror that analyzes communication patterns with cultural awareness, delivering neutral audio insights without judgment.
 
-## API
+built during [MLH HackHive 2026](https://mlh.io), it combines real-time voice AI with sophisticated analysis pipelines to provide non-judgmental feedback on conversational dynamics.
 
-| Resource | Description |
+## what CultureLens does
+
+- **real-time voice interaction** — ElevenLabs conversational AI agent with 4 natural voices, WebSocket streaming, and in-app voice selection
+- **cultural communication analysis** — Google Gemini 2.5 Flash analyzes directness, formality, power dynamics, turn-taking, and interruption patterns
+- **privacy-first architecture** — dual consent requirement, ephemeral and transcript-only storage modes, GDPR-compliant data export and account deletion
+- **edge-optimized pipeline** — Vercel Edge Functions + Firebase Admin SDK for sub-100ms auth verification across 23 API endpoints
+
+## tech stack
+
+| layer | technology |
 | --- | --- |
-| [API Reference](/docs/api-reference) | comprehensive Next.js API route reference (23 endpoints across 8 resource groups) |
-| [API Explorer](/docs/api) | interactive Scalar API explorer with OpenAPI 3.1 spec, try-it-out, and code samples |
+| frontend | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, 30+ Radix primitives |
+| backend | FastAPI (Python 3.11+), Firebase Admin SDK |
+| database | Cloud Firestore (6 collections) |
+| auth | Firebase Auth (email, Google, phone, anonymous, email link) |
+| AI analysis | Google Gemini 2.5 Flash |
+| voice AI | ElevenLabs Conversational AI + TTS |
+| native | iOS app (Swift 5.9, SwiftUI, HealthKit) |
+| deployment | Vercel (frontend), Docker (backend) |
 
-## Integration Guides
+## quick links
 
-| Guide | Description |
+| resource | description |
 | --- | --- |
-| [ElevenLabs Setup](/docs/guides/elevenlabs-setup) | ElevenLabs voice agent setup and configuration |
-| [Voice Quickstart](/docs/guides/voice-quickstart) | quick start guide for voice integration |
-| [Voice Selection](/docs/guides/voice-selection) | voice model selection guide |
-| [Voice Settings](/docs/guides/voice-settings) | voice settings quick reference |
-| [Gemini Integration](/docs/guides/gemini-integration) | Google Gemini 2.5 Flash integration details |
+| [API reference](/docs/api-reference) | complete documentation for all 23 API endpoints |
+| [API explorer](/docs/api) | interactive Scalar API explorer with try-it-out and code samples |
+| [ElevenLabs setup](/docs/guides/elevenlabs-setup) | voice agent configuration and natural speech tuning |
+| [voice quickstart](/docs/guides/voice-quickstart) | get natural-sounding voice output in minutes |
+| [voice selection](/docs/guides/voice-selection) | in-app voice selection feature documentation |
+| [voice settings](/docs/guides/voice-settings) | voice parameter cheatsheet and troubleshooting |
+| [Gemini integration](/docs/guides/gemini-integration) | AI analysis pipeline, prompts, and fallback behavior |
+| [session architecture](/docs/architecture/session-improvements) | session lifecycle, Firestore data model, and bug fix history |
 
-## Architecture
+## environment variables
 
-| Doc | Description |
-| --- | --- |
-| [Session Improvements](/docs/architecture/session-improvements) | session management architecture and improvements |
+CultureLens requires the following environment variables (see `.env.example`):
+
+```bash
+# firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+FIREBASE_ADMIN_PROJECT_ID=
+FIREBASE_ADMIN_CLIENT_EMAIL=
+FIREBASE_ADMIN_PRIVATE_KEY=
+
+# google gemini
+GOOGLE_AI_API_KEY=
+
+# elevenlabs
+ELEVENLABS_API_KEY=
+ELEVENLABS_AGENT_ID=
+```
+
+## project links
+
+- [live app](https://culturelens.vercel.app)
+- [GitHub repository](https://github.com/sunnypatell/culturelens)
+- [contributing guide](/docs/contributing)

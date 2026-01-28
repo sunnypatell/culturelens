@@ -1,94 +1,92 @@
 ---
-title: "Voice Quickstart"
-description: "quick start guide for making the voice agent sound natural"
+title: Voice Quickstart
+description: get natural-sounding voice output from the CultureLens agent in minutes
 ---
 
+this is the fastest path to making the CultureLens voice agent sound natural. for full details, see the [ElevenLabs setup guide](/docs/guides/elevenlabs-setup).
 
-## ❌ The Problem
+## prerequisites
 
-Your agent sounds robotic because it's using the default voice with default settings.
+- an [ElevenLabs account](https://elevenlabs.io) (free tier works)
+- `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` configured in `.env`
+- the CultureLens app running locally (`npm run dev`)
 
----
+## the problem
 
-## ✅ The Fix (2 Minutes)
+the default ElevenLabs voice with default settings sounds robotic — monotone delivery, no variation in pacing, and scripted-sounding responses.
 
-### Step 1: Open Your Agent Settings
+## the fix
 
-1. Go to [elevenlabs.io/app/conversational-ai](https://elevenlabs.io/app/conversational-ai)
-2. Find your agent: `agent_5401kfq4a552e61962kx44qcbcrn`
-3. Click **Edit Agent**
+### 1. open agent settings
 
-### Step 2: Change the Voice (Most Important!)
+go to [elevenlabs.io/app/conversational-ai](https://elevenlabs.io/app/conversational-ai), find your agent, and click **Edit Agent**.
 
-In the agent settings, find **Voice** section:
+### 2. select a natural voice
 
-**Best FREE Natural Voices:**
+| voice | gender | notes | tier |
+| --- | --- | --- | --- |
+| **Rachel** ⭐ | female | warm, conversational — best default choice | free |
+| **Drew** | male | approachable, natural pacing | free |
+| **Clyde** | male | calm, thoughtful — good for analysis delivery | free |
 
-| #   | Voice         | Gender                 | Notes                                                            | Tier |
-| --- | ------------- | ---------------------- | ---------------------------------------------------------------- | ---- |
-| 1   | **Rachel** ⭐ | Female, Conversational | Sounds very natural and friendly. Great for casual conversation. | Free |
-| 2   | **Drew**      | Male, Conversational   | Warm and approachable. Natural pacing.                           | Free |
-| 3   | **Clyde**     | Male, Warm             | Calm and thoughtful. Good for analysis.                          | Free |
-
-**Select one of these voices** instead of whatever is currently selected.
-
-### Step 3: Adjust Voice Settings
-
-Under **Voice Settings**, set these values:
+### 3. set voice parameters
 
 ```
-Stability: 0.5 (natural variation, not monotone)
-Similarity: 0.75 (keeps voice consistent)
-Style: 0.4 (conversational, not dramatic)
-Use speaker boost: ON
+stability: 0.5
+similarity: 0.75
+style: 0.4
+speaker boost: ON
 ```
 
-### Step 4: Adjust Conversation Settings
-
-Under **Conversation Settings**:
+### 4. set conversation parameters
 
 ```
-Response style: Conversational (NOT Formal)
-Response length: Medium
-Enable interruptions: ON
-Turn detection: Sensitivity - Medium
+response style: conversational
+response length: medium
+interruptions: ON
+turn detection sensitivity: medium
 ```
 
-### Step 5: Save and Test
+### 5. save and test
 
-1. Click **Save Agent** (top right)
-2. Go to your CultureLens app
-3. Click "Connect to Agent"
-4. Test it - it should sound MUCH more natural now
+save the agent, open the CultureLens app, connect to the agent, and test. you should hear natural conversational speech with varied pacing and tone.
 
----
+## how voice selection works in the app
 
-## 🔀 Before vs After
+the app provides 4 pre-configured voices in the UI. when a user selects a voice, it overrides the agent's default via the ElevenLabs SDK:
 
-| Aspect     | Before (Default settings)         | After (Rachel + these settings)      |
-| ---------- | --------------------------------- | ------------------------------------ |
-| **Tone**   | Monotone, robotic speech          | Natural conversational tone          |
-| **Pacing** | No variation in pacing            | Varied pacing and emphasis           |
-| **Feel**   | Sounds like reading from a script | Sounds like talking to a real person |
+```typescript
+await conversation.startSession({
+  agentId: AGENT_ID,
+  overrides: {
+    tts: {
+      voiceId: selectedVoice,
+      stability: 0.5,
+      similarity_boost: 0.75,
+      style: 0.4,
+      use_speaker_boost: true,
+    },
+  },
+});
+```
 
----
+this means in-app voice selection takes priority over dashboard settings.
 
-## 🔧 Still Sounds Robotic?
+## before vs. after
 
-1. **Make sure you saved the agent** - changes don't apply until you click Save
-2. **Disconnect and reconnect** - old settings might be cached
-3. **Try a different voice** - Rachel and Drew are usually the most natural
-4. **Lower stability more** - try 0.4 instead of 0.5 for even more variation
+| aspect | before | after |
+| --- | --- | --- |
+| tone | monotone, robotic | natural conversational tone |
+| pacing | no variation | varied pacing and emphasis |
+| feel | reading from a script | talking to a real person |
 
----
+## still sounds robotic?
 
-## 💡 Pro Tip
+1. make sure you saved the agent — changes don't apply until you click Save
+2. disconnect and reconnect — old settings may be cached
+3. try Rachel or Drew — they're the most natural-sounding free voices
+4. lower stability to 0.4 for even more variation
 
-If you want it to sound REALLY natural:
+## pro tip
 
-- Use Rachel voice
-- Stability: 0.4-0.5
-- Style: 0.3-0.4
-- Enable the system prompt from `AGENT_PROMPT.md` (adds "um", "like", natural pauses)
-
-Together, these make the agent sound incredibly human.
+for the most natural output, combine Rachel voice (stability 0.4–0.5, style 0.3–0.4) with the full system prompt from `AGENT_PROMPT.md` which adds natural filler words and conversational pacing.

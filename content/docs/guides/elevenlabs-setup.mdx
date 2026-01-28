@@ -1,110 +1,114 @@
 ---
-title: "ElevenLabs Setup"
-description: "ElevenLabs voice agent setup and configuration"
+title: ElevenLabs Setup
+description: complete guide to configuring the ElevenLabs voice agent for natural-sounding conversation analysis
 ---
 
+CultureLens uses [ElevenLabs](https://elevenlabs.io) for two things: a real-time conversational AI agent that conducts voice sessions with users, and a text-to-speech API that generates audio debriefs after analysis.
 
-## 🔧 Updating Your Agent to Sound More Natural
+this guide covers configuring the ElevenLabs agent to sound natural and conversational rather than robotic and scripted.
 
-### Step 1: Access Your ElevenLabs Dashboard
+## architecture
 
-1. Go to [elevenlabs.io](https://elevenlabs.io)
-2. Navigate to **Conversational AI** → **Agents**
-3. Find your agent (ID: `agent_5401kfq4a552e61962kx44qcbcrn`)
-4. Click **Edit Agent**
+the voice pipeline works as follows:
 
-### Step 2: Update System Prompt
+```
+user speaks → browser microphone → WebSocket → ElevenLabs agent
+                                                    ↓
+                                         agent processes speech
+                                                    ↓
+                                         agent responds via TTS
+                                                    ↓
+user hears response ← browser audio ← WebSocket ← audio stream
+```
 
-1. In the agent editor, find the **System Prompt** section
-2. Delete the current prompt
-3. Copy the entire prompt from [`/AGENT_PROMPT.md`](../AGENT_PROMPT.md)
-4. Paste it into the System Prompt field
+there are two ElevenLabs integration points in the codebase:
 
-### Step 3: Adjust Voice Settings
+| integration | file | description |
+| --- | --- | --- |
+| conversational agent | `components/voice-agent.tsx` | real-time WebSocket voice sessions via `@11labs/react` SDK |
+| text-to-speech | `app/api/elevenlabs/tts/route.ts` | generates audio debriefs from analysis text, stores in Firestore |
+| signed URL | `app/api/elevenlabs/signed-url/route.ts` | creates authenticated WebSocket URLs for the voice agent |
 
-While you're in the agent settings, update these:
+## environment variables
 
-**Voice Settings:**
+```bash
+# required in .env
+ELEVENLABS_API_KEY=your_api_key_here
+ELEVENLABS_AGENT_ID=agent_5401kfq4a552e61962kx44qcbcrn
+```
 
-| Setting                | Value      | Notes                              |
-| ---------------------- | ---------- | ---------------------------------- |
-| **Stability**          | 0.5-0.6    | Allows natural variation in speech |
-| **Similarity**         | 0.7-0.8    | Keeps voice consistent             |
-| **Style Exaggeration** | 0.4-0.5    | Conversational, not dramatic       |
-| **Speaker Boost**      | ✅ Enabled | —                                  |
+get your API key from [elevenlabs.io/app/settings](https://elevenlabs.io/app/settings). the agent ID is created in the ElevenLabs Conversational AI dashboard.
 
-**Conversation Settings:**
+## configuring the agent
 
-| Setting                  | Value          | Notes                   |
-| ------------------------ | -------------- | ----------------------- |
-| **Mode**                 | Conversational | Not formal/professional |
-| **Response Length**      | Medium         | 60-90 seconds           |
-| **Enable Interruptions** | Yes            | More natural flow       |
+### step 1: access the dashboard
 
-### Step 4: Test the Changes
+1. go to [elevenlabs.io/app/conversational-ai](https://elevenlabs.io/app/conversational-ai)
+2. find your agent (ID: `agent_5401kfq4a552e61962kx44qcbcrn`)
+3. click **Edit Agent**
 
-1. Save your agent
-2. In your local CultureLens app, go to the voice agent section
-3. Click "Connect to Agent"
-4. Have a test conversation
-5. Listen for:
-   - Natural filler words (um, you know, like)
-   - No disclaimers about "can't give advice"
-   - Neutral observations vs prescriptive advice
-   - Conversational tone vs robotic analysis
+### step 2: update the system prompt
 
----
+1. in the agent editor, find the **System Prompt** section
+2. delete the current prompt
+3. paste the full prompt from `AGENT_PROMPT.md` in the project root
+4. this prompt instructs the agent to be neutral, non-judgmental, and culturally aware
 
-## 🗣️ What You Should Hear
+### step 3: configure voice settings
 
-**Before (Robotic):**
+| setting | recommended value | effect |
+| --- | --- | --- |
+| stability | 0.5–0.6 | lower = more natural variation; higher = more consistent but monotone |
+| similarity boost | 0.7–0.8 | how closely output matches the base voice |
+| style exaggeration | 0.4–0.5 | conversational delivery without being dramatic |
+| speaker boost | enabled | improves clarity and presence |
 
-> "I cannot provide relationship advice as I am not a therapist. However, I have identified several communication patterns in your conversation. Person A interrupted Person B five times during the discussion."
+### step 4: configure conversation settings
 
-**After (Natural):**
+| setting | recommended value | effect |
+| --- | --- | --- |
+| mode | conversational | casual tone rather than formal/professional |
+| response length | medium | 60–90 second responses |
+| enable interruptions | yes | allows natural back-and-forth |
+| turn detection sensitivity | medium | balanced between too eager and too slow |
 
-> "Mm, so listening to that... I noticed something about the pacing. When you brought up the weekend plans, the response came really quick - like, almost before you finished your sentence. And that happened a few times around certain topics. Did that feel different to you than the slower back-and-forth about work stuff?"
+### step 5: test
 
----
+1. save the agent
+2. open the CultureLens app locally
+3. click "Connect to Agent" in the voice section
+4. have a test conversation and listen for natural filler words, neutral observations, and conversational tone
 
-## ✅ Key Improvements
+## before vs. after
 
-✅ **Natural Speech Patterns**
+**before (default settings):**
+> "I have identified several communication patterns in your conversation. Person A interrupted Person B five times during the discussion."
 
-- Occasional "um", "like", "you know"
-- Varied sentence structure
-- Contractions (I'm, you're, that's)
+**after (tuned settings):**
+> "Mm, so listening to that... I noticed something about the pacing. When you brought up the weekend plans, the response came really quick — like, almost before you finished your sentence. Did that feel different to you?"
 
-✅ **No Disclaimers**
+## what natural sounds like
 
-- Won't say "I can't give relationship advice"
-- Won't redirect to therapy
-- Just analyzes naturally
+- occasional filler words ("um", "like", "you know")
+- varied sentence structure and pacing
+- contractions ("I'm", "you're", "that's")
+- neutral observations without judgment or disclaimers
+- cultural awareness without stereotyping
+- invites reflection rather than asserting truth
 
-✅ **Neutral Observations**
+## troubleshooting
 
-- Focuses on patterns, not judgments
-- No picking sides
-- Describes what happened vs prescribing solutions
+| problem | solution |
+| --- | --- |
+| agent sounds robotic | verify the full system prompt was pasted, lower stability to 0.4–0.5 |
+| agent gives disclaimers | old prompt may be cached — disconnect and reconnect |
+| no filler words | lower stability further, enable "Natural Speech" if available |
+| connection fails | check `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` in `.env` |
+| WebSocket errors | verify signed URL endpoint is returning valid URLs, check browser console |
+| rate limit errors on TTS | TTS is limited to 10 requests per 60 seconds per user |
 
-✅ **Cultural Awareness**
+## related
 
-- Mentions communication styles without stereotyping
-- Uses "some styles do X" instead of "you are X"
-- Invites reflection vs asserting truth
-
----
-
-## 🔧 Troubleshooting
-
-| Problem                          | Solution                                                                                                                                                    |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Agent still sounds robotic**   | Make sure you copied the ENTIRE prompt (it's long!). Check that voice settings match recommendations above. Try regenerating the response if it sounds off. |
-| **Agent giving disclaimers**     | Double-check the system prompt was fully replaced. Old prompts might have cached - disconnect and reconnect.                                                |
-| **Agent not using filler words** | Adjust Stability setting lower (0.4-0.5). Enable "Natural Speech" if available in settings.                                                                 |
-
----
-
-## 💬 Need Help?
-
-Check the main agent prompt file for detailed examples and guidelines: [`/AGENT_PROMPT.md`](../AGENT_PROMPT.md)
+- [voice quickstart](/docs/guides/voice-quickstart) — minimal steps to get natural voice output
+- [voice selection](/docs/guides/voice-selection) — in-app voice switching
+- [voice settings cheatsheet](/docs/guides/voice-settings) — copy-paste settings reference
