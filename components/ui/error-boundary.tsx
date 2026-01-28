@@ -4,6 +4,7 @@ import React, { Component } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, RotateCcw } from "lucide-react";
+import { clientLogger } from "@/lib/client-logger";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -29,8 +30,7 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // eslint-disable-next-line no-console
-    console.error("[ErrorBoundary]", error, errorInfo);
+    clientLogger.error("[ErrorBoundary]", error, errorInfo);
   }
 
   handleReset = () => {
