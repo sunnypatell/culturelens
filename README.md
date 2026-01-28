@@ -218,43 +218,111 @@ backend/
 └── pyproject.toml               # ruff + pytest config
 ```
 
-### Data Flow Architecture
+### System Architecture
 
-**Session Lifecycle:**
+```mermaid
+graph TB
+    subgraph Client["client layer"]
+        WEB["Next.js 16 web app<br/>React 19 + Tailwind CSS 4"]
+        IOS["iOS app<br/>SwiftUI + MVVM"]
+    end
 
+    subgraph Edge["edge / API layer"]
+        API["Next.js API routes<br/>16 endpoints"]
+        MW["middleware<br/>auth + rate limiting"]
+    end
+
+    subgraph Services["external services"]
+        FB_AUTH["Firebase Auth<br/>5 auth methods"]
+        FB_DB["Firestore<br/>6 collections"]
+        FB_STORE["Firebase Storage<br/>audio files"]
+        GEMINI["Google Gemini 2.5 Flash<br/>transcript analysis"]
+        ELEVEN["ElevenLabs<br/>voice agent + TTS"]
+    end
+
+    subgraph Backend["python backend"]
+        FAST["FastAPI<br/>health + sessions"]
+    end
+
+    WEB --> MW --> API
+    IOS --> API
+    API --> FB_AUTH
+    API --> FB_DB
+    API --> FB_STORE
+    API --> GEMINI
+    API --> ELEVEN
+    WEB --> ELEVEN
+    IOS --> ELEVEN
+    WEB --> FAST
 ```
-1. User initiates session
-   ├─> POST /api/sessions (creates firestore document)
-   └─> Returns session ID
 
-2. Voice agent records conversation
-   ├─> ElevenLabs SDK handles audio streaming
-   ├─> Transcript saved to /api/transcripts
-   └─> Session status: recording → processing
+### Data Flow
 
-3. Analysis pipeline triggered
-   ├─> POST /api/sessions/[id]/analyze
-   ├─> Fetches transcript from firestore
-   ├─> Computes metrics (turn-taking, interruptions)
-   ├─> Generates insights (cultural patterns)
-   └─> Updates session.analysisResult
+```mermaid
+sequenceDiagram
+    participant U as user
+    participant W as web / iOS
+    participant A as API routes
+    participant F as firestore
+    participant E as elevenlabs
+    participant G as gemini AI
 
-4. User views insights
-   ├─> useSessionInsights hook fetches data
-   ├─> Transforms API response to UI format
-   └─> Real-time updates via firestore listeners
+    U->>W: start session
+    W->>A: POST /api/sessions
+    A->>F: create session doc
+    A-->>W: session ID
+
+    U->>W: record conversation
+    W->>E: websocket audio stream
+    E-->>W: agent responses
+    W->>A: POST /api/transcripts
+    A->>F: store transcript
+
+    U->>W: request analysis
+    W->>A: POST /api/sessions/:id/analyze
+    A->>F: fetch transcript
+    A->>G: analyze with cultural prompt
+    G-->>A: insights + metrics
+    A->>F: store analysis result
+    A-->>W: analysis data
+
+    U->>W: view insights
+    W->>A: GET /api/sessions/:id/analyze
+    A->>F: fetch analysis
+    A-->>W: formatted insights
+```
+
+### Authentication Flow
+
+```mermaid
+flowchart LR
+    A[user] --> B{auth method}
+    B --> C[email/password]
+    B --> D[google OAuth]
+    B --> E[phone SMS]
+    B --> F[email link]
+
+    C --> G[Firebase Auth]
+    D --> G
+    E --> G
+    F --> G
+
+    G --> H[ID token]
+    H --> I[API routes<br/>Bearer token]
+    I --> J[verifyIdToken]
+    J --> K[Firestore<br/>userId scoped]
 ```
 
 ### Security Architecture
 
-- **Authentication:** Firebase Auth with JWT verification
-- **Authorization:** Firebase Admin SDK with per-user data filtering
-- **API Security:** All endpoints require `Authorization: Bearer <token>` header
-- **Ownership Verification:** session.userId checked on every mutation
-- **Rate Limiting:** ElevenLabs TTS limited to 10 req/min per user
-- **Firestore Rules:** Authenticated users can only access own data
-- **CORS:** Configured for vercel.app + localhost origins
-- **Env Separation:** Client/server secrets properly scoped
+- **authentication:** Firebase Auth with JWT verification on every API call
+- **authorization:** Firebase Admin SDK with per-user data isolation
+- **API security:** all endpoints require `Authorization: Bearer <token>` header
+- **ownership verification:** `session.userId` checked on every mutation
+- **rate limiting:** ElevenLabs TTS limited to 10 req/min per user
+- **firestore rules:** authenticated users can only access their own data
+- **CORS:** configured for vercel.app + localhost origins
+- **env separation:** client/server secrets properly scoped via `NEXT_PUBLIC_` prefix
 
 ---
 
@@ -407,41 +475,59 @@ npm run start
 
 ### Continuous Integration
 
-GitHub Actions runs on every pull request:
+GitHub Actions runs **10 workflows** on every pull request and push:
 
-| Check                  | Tool         | Runtime |
-| ---------------------- | ------------ | ------- |
-| **Frontend Lint**      | ESLint       | ~10s    |
-| **Frontend Typecheck** | TypeScript   | ~15s    |
-| **Frontend Format**    | Prettier     | ~5s     |
-| **Backend Lint**       | Ruff         | ~3s     |
-| **Backend Format**     | Ruff Format  | ~2s     |
-| **Backend Test**       | Pytest       | ~5s     |
-| **iOS Lint**           | SwiftLint    | ~5s     |
-| **iOS Build & Test**   | Xcode 16     | ~2m     |
-| **Firebase Deploy**    | Firebase CLI | ~20s    |
+| workflow | tool | what it checks |
+| --- | --- | --- |
+| **frontend test** | vitest | 31 unit tests (API client, error classes, rate limiter) |
+| **frontend build** | next build | verifies production build compiles without errors |
+| **frontend lint** | ESLint | TypeScript code quality rules |
+| **frontend typecheck** | tsc --noEmit | strict type checking |
+| **frontend format** | Prettier | consistent code formatting |
+| **backend lint** | Ruff | Python linting (100x faster than Pylint) |
+| **backend format** | Ruff Format | Python formatting |
+| **backend test** | Pytest | FastAPI endpoint tests |
+| **iOS lint** | SwiftLint | Swift code style |
+| **iOS build & test** | Xcode + XCTest | 45 unit tests + simulator build |
 
-### Local Testing
+### local testing
 
 ```bash
-# frontend
-npm run lint:frontend        # eslint check
-npm run typecheck            # typescript compiler
-npm run format:check         # prettier validation
+# frontend unit tests
+npm test                     # run all vitest tests
+npm run test:watch           # watch mode
+npm run test:coverage        # coverage report
+
+# frontend quality
+npm run lint:frontend        # eslint
+npm run typecheck            # typescript strict mode
+npm run format:check         # prettier
 
 # backend
-npm run lint:backend         # ruff check
-npm run format:backend       # ruff format
 npm run test:backend         # pytest suite
+npm run lint:backend         # ruff check
+
+# iOS (requires Xcode)
+cd ios/CultureLens && xcodegen generate
+xcodebuild test -project CultureLens.xcodeproj -scheme CultureLens \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  -only-testing:CultureLensTests CODE_SIGNING_ALLOWED=NO
 ```
 
-### Code Quality Metrics
+### test coverage
 
-- **TypeScript Strict Mode:** Enabled
-- **ESLint Rules:** 50+ rules enforced
-- **Prettier Config:** Consistent formatting
-- **Test Coverage:** Backend endpoints covered
-- **Type Safety:** Zod runtime validation + TypeScript compile-time checks
+| layer | framework | tests | coverage areas |
+| --- | --- | --- | --- |
+| **frontend** | vitest + testing-library | 31 | API client, error handling, rate limiting |
+| **backend** | pytest | 5 | health checks, session CRUD |
+| **iOS** | XCTest | 45 | models, enums, codable conformance, UI layout |
+
+### code quality
+
+- **TypeScript strict mode** enabled with path aliases
+- **Zod schemas** for runtime + compile-time validation on all API routes
+- **structured logging** via pino (JSON in production, pretty in dev)
+- **health endpoint** at `/api/health` monitors firebase, gemini, elevenlabs status
 
 ---
 
@@ -498,6 +584,31 @@ npm run test:backend         # pytest suite
 
 ---
 
+## 🐳 Docker
+
+run the entire stack in containers:
+
+```bash
+# build and start all services
+docker compose up --build
+
+# services:
+#   frontend -> http://localhost:3000
+#   backend  -> http://localhost:8000
+```
+
+the frontend uses a multi-stage build (deps -> build -> runner) with Next.js standalone output for minimal image size. environment variables are passed through from your `.env` file.
+
+```bash
+# build just the frontend
+docker build -t culturelens .
+
+# build just the backend
+docker build -t culturelens-backend ./backend
+```
+
+---
+
 ## 🌐 Deployment
 
 ### Frontend (Vercel)
@@ -550,12 +661,21 @@ firebase deploy --only storage
 
 ## 📚 Documentation
 
-- **[ios/README.md](ios/README.md)** - iOS app architecture, setup, and deployment
-- **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** - Firebase configuration guide
-- **[AGENT_PROMPT.md](AGENT_PROMPT.md)** - Voice agent system prompt
-- **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)** - ElevenLabs integration
-- **[docs/VOICE_SELECTION.md](docs/VOICE_SELECTION.md)** - Voice selection guide
-- **[docs/VOICE_SETTINGS_CHEATSHEET.md](docs/VOICE_SETTINGS_CHEATSHEET.md)** - Quick reference
+| document | description |
+| --- | --- |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | setup, branch conventions, PR process, code style |
+| **[ios/README.md](ios/README.md)** | iOS app architecture, setup, and deployment |
+| **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** | Firebase project configuration guide |
+| **[AGENT_PROMPT.md](AGENT_PROMPT.md)** | ElevenLabs voice agent system prompt |
+| **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)** | ElevenLabs integration walkthrough |
+| **[docs/VOICE_SELECTION.md](docs/VOICE_SELECTION.md)** | voice selection and customization guide |
+| **[docs/VOICE_SETTINGS_CHEATSHEET.md](docs/VOICE_SETTINGS_CHEATSHEET.md)** | quick reference for voice settings |
+
+### API reference
+
+- **health check:** `GET /api/health` -- returns service status for firebase, gemini, elevenlabs
+- **FastAPI docs:** `http://localhost:8000/docs` -- auto-generated OpenAPI/Swagger UI
+- **all 16 Next.js API routes** documented in the [component architecture](#component-architecture) section above
 
 ---
 
