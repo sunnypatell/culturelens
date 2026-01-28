@@ -597,7 +597,9 @@ export function RecordingStudio({
             <h1 className="text-3xl font-bold text-foreground">
               Live Recording
             </h1>
-            <p className="text-muted-foreground">Team Meeting Discussion</p>
+            <p className="text-muted-foreground">
+              {sessionTitle || "Untitled Session"}
+            </p>
           </div>
           <Badge
             variant={state === "recording" ? "default" : "secondary"}
