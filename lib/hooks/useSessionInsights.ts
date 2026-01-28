@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { clientLogger } from "@/lib/client-logger";
 import type { AnalysisResult, Insight, Session } from "@/lib/types";
 
 interface CommunicationPattern {
@@ -273,7 +274,7 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
             responseData.error?.message?.includes("not ready for analysis"));
 
         if (needsAnalysis) {
-          console.log(
+          clientLogger.info(
             "[useSessionInsights] Analysis not ready, triggering analysis..."
           );
 
@@ -331,7 +332,10 @@ export function useSessionInsights(sessionId: string | null): InsightsData {
           error: null,
         });
       } catch (error) {
-        console.error("[useSessionInsights] Error fetching insights:", error);
+        clientLogger.error(
+          "[useSessionInsights] Error fetching insights:",
+          error
+        );
         setData((prev) => ({
           ...prev,
           loading: false,

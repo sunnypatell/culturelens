@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { clientLogger } from "@/lib/client-logger";
 import type { AnalysisResult } from "@/lib/types";
 
 export interface Session {
@@ -87,10 +88,12 @@ export function useSessions(): UseSessionsResult {
         const result: { data: Session[]; meta?: { total: number } } =
           await response.json();
 
-        console.log(`[useSessions] Fetched ${result.data.length} sessions`);
+        clientLogger.info(
+          `[useSessions] Fetched ${result.data.length} sessions`
+        );
         setSessions(result.data);
       } catch (err) {
-        console.error("[useSessions] Error fetching sessions:", err);
+        clientLogger.error("[useSessions] Error fetching sessions:", err);
         setError(
           err instanceof Error ? err.message : "failed to load sessions"
         );

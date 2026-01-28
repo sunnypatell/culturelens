@@ -4,11 +4,19 @@ import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Loader2, FileText, Brain, Users, Download } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  FileText,
+  Brain,
+  Users,
+  Download,
+} from "lucide-react";
 import Link from "next/link";
 import { AnalysisLoader } from "@/components/ui/analysis-loader";
 import { useAuth } from "@/components/auth/auth-provider";
 import { generateAnalysisPDF } from "@/lib/pdf-export";
+import { clientLogger } from "@/lib/client-logger";
 
 interface AnalysisInsights {
   summary: string;
@@ -56,7 +64,7 @@ function ResultsContent() {
     try {
       setLoading(true);
       setError(null);
-      console.log("[Results] Fetching analysis for session:", id);
+      clientLogger.info("[Results] Fetching analysis for session:", id);
 
       const token = await getIdToken();
       if (!token) {
@@ -74,7 +82,9 @@ function ResultsContent() {
 
       // Step 2: If no analysis exists, trigger the analysis pipeline
       if (!response.ok && data.error?.code === "BAD_REQUEST") {
-        console.log("[Results] No existing analysis, triggering pipeline...");
+        clientLogger.info(
+          "[Results] No existing analysis, triggering pipeline..."
+        );
         setAnalysisStep(2);
 
         const triggerResponse = await fetch(`/api/sessions/${id}/analyze`, {
@@ -99,7 +109,7 @@ function ResultsContent() {
       // Step 3: Parse the analysis data
       setAnalysisStep(3);
       const analysisData = data.data;
-      console.log("[Results] Analysis data received:", analysisData);
+      clientLogger.info("[Results] Analysis data received:", analysisData);
 
       // Step 4: Transform to UI format
       setAnalysisStep(4);
@@ -222,7 +232,7 @@ function ResultsContent() {
 
       setLoading(false);
     } catch (err) {
-      console.error("[Results] Analysis error:", err);
+      clientLogger.error("[Results] Analysis error:", err);
       setError(err instanceof Error ? err.message : "Failed to load analysis");
       setLoading(false);
     }

@@ -28,6 +28,7 @@ import {
   MicIcon,
 } from "lucide-react";
 import { DashboardSkeleton } from "@/components/ui/dashboard-skeleton";
+import { clientLogger } from "@/lib/client-logger";
 
 interface ApiSession {
   id: string;
@@ -106,7 +107,7 @@ export function DashboardHome({
     try {
       const token = await getIdToken();
       if (!token) {
-        console.error("no auth token available");
+        clientLogger.error("no auth token available");
         setLoading(false);
         return;
       }
@@ -190,7 +191,7 @@ export function DashboardHome({
         ]);
       }
     } catch (error) {
-      console.error("failed to fetch sessions:", error);
+      clientLogger.error("failed to fetch sessions:", error);
     } finally {
       setLoading(false);
     }
