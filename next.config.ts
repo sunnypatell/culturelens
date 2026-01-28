@@ -1,8 +1,20 @@
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 
 const nextConfig: NextConfig = {
   // standalone output for Docker deployments
   output: "standalone",
+  async redirects() {
+    return [
+      {
+        source: "/api/docs",
+        destination: "/docs/api",
+        permanent: true,
+      },
+    ];
+  },
 };
 
-export default nextConfig;
+const withMDX = createMDX();
+
+export default withMDX(nextConfig);

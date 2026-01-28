@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -105,11 +106,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-            <Analytics />
-          </AuthProvider>
+          <RootProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+              <Analytics />
+            </AuthProvider>
+          </RootProvider>
         </ThemeProvider>
       </body>
     </html>
