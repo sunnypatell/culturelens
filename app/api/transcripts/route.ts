@@ -10,6 +10,7 @@ import {
 } from "@/lib/api";
 import { TranscriptSchemas } from "@/lib/api/schemas";
 import { verifyIdToken } from "@/lib/auth-server";
+import { createRequestLogger } from "@/lib/logger";
 
 /**
  * POST /api/transcripts
@@ -17,7 +18,8 @@ import { verifyIdToken } from "@/lib/auth-server";
  */
 export async function POST(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_TRANSCRIPTS] Saving transcript`);
+    const logger = createRequestLogger("POST /api/transcripts");
+    logger.info("saving transcript");
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -28,7 +30,7 @@ export async function POST(request: Request) {
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_TRANSCRIPTS] Authenticated user:`, userId);
+    logger.info({ userId }, "authenticated user");
 
     // validate request body
     const body = await validateRequest(request, TranscriptSchemas.create);
@@ -43,7 +45,7 @@ export async function POST(request: Request) {
         timestamp: body.timestamp || new Date().toISOString(),
         segments: body.segments || [],
       });
-      console.log(`[API_TRANSCRIPTS] Transcript saved:`, transcriptId);
+      logger.info({ transcriptId }, "transcript saved");
     } catch (error) {
       throw new DatabaseError(
         "transcript save",
