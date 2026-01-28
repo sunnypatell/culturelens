@@ -14,6 +14,8 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Admin_SDK-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.11-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![CI](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/sunnypatell/culturelens/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/frontend-test.yml?branch=main&style=flat-square&label=tests&logo=vitest)](https://github.com/sunnypatell/culturelens/actions/workflows/frontend-test.yml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/sunnypatell/culturelens/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/sunnypatell/culturelens/actions/workflows/validate.yml)
 [![License](https://img.shields.io/badge/License-Source_Available-blue?style=flat-square)](LICENSE)
 
 _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-First Architecture_
@@ -228,7 +230,7 @@ graph TB
     end
 
     subgraph Edge["edge / API layer"]
-        API["Next.js API routes<br/>16 endpoints"]
+        API["Next.js API routes<br/>23 endpoints"]
         MW["middleware<br/>auth + rate limiting"]
     end
 
@@ -477,18 +479,18 @@ npm run start
 
 GitHub Actions runs **10 workflows** on every pull request and push:
 
-| workflow               | tool           | what it checks                                          |
-| ---------------------- | -------------- | ------------------------------------------------------- |
-| **frontend test**      | vitest         | 31 unit tests (API client, error classes, rate limiter) |
-| **frontend build**     | next build     | verifies production build compiles without errors       |
-| **frontend lint**      | ESLint         | TypeScript code quality rules                           |
-| **frontend typecheck** | tsc --noEmit   | strict type checking                                    |
-| **frontend format**    | Prettier       | consistent code formatting                              |
-| **backend lint**       | Ruff           | Python linting (100x faster than Pylint)                |
-| **backend format**     | Ruff Format    | Python formatting                                       |
-| **backend test**       | Pytest         | FastAPI endpoint tests                                  |
-| **iOS lint**           | SwiftLint      | Swift code style                                        |
-| **iOS build & test**   | Xcode + XCTest | 45 unit tests + simulator build                         |
+| workflow               | tool           | what it checks                                                                                                             |
+| ---------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **frontend test**      | vitest         | 71 unit tests across 8 files (API client, errors, rate limiter, PDF export, format, logger, error boundary, client logger) |
+| **frontend build**     | next build     | verifies production build compiles without errors                                                                          |
+| **frontend lint**      | ESLint         | TypeScript code quality rules                                                                                              |
+| **frontend typecheck** | tsc --noEmit   | strict type checking                                                                                                       |
+| **frontend format**    | Prettier       | consistent code formatting                                                                                                 |
+| **backend lint**       | Ruff           | Python linting (100x faster than Pylint)                                                                                   |
+| **backend format**     | Ruff Format    | Python formatting                                                                                                          |
+| **backend test**       | Pytest         | FastAPI endpoint tests                                                                                                     |
+| **iOS lint**           | SwiftLint      | Swift code style                                                                                                           |
+| **iOS build & test**   | Xcode + XCTest | 45 unit tests + simulator build                                                                                            |
 
 ### local testing
 
@@ -516,11 +518,11 @@ xcodebuild test -project CultureLens.xcodeproj -scheme CultureLens \
 
 ### test coverage
 
-| layer        | framework                | tests | coverage areas                                |
-| ------------ | ------------------------ | ----- | --------------------------------------------- |
-| **frontend** | vitest + testing-library | 31    | API client, error handling, rate limiting     |
-| **backend**  | pytest                   | 5     | health checks, session CRUD                   |
-| **iOS**      | XCTest                   | 45    | models, enums, codable conformance, UI layout |
+| layer        | framework                | tests | coverage areas                                                                              |
+| ------------ | ------------------------ | ----- | ------------------------------------------------------------------------------------------- |
+| **frontend** | vitest + testing-library | 71    | API client, errors, rate limiter, PDF export, format, logger, error boundary, client logger |
+| **backend**  | pytest                   | 5     | health checks, session CRUD                                                                 |
+| **iOS**      | XCTest                   | 45    | models, enums, codable conformance, UI layout                                               |
 
 ### code quality
 
