@@ -54,6 +54,13 @@ export default function Layout({ children }: { children: ReactNode }) {
           external: true,
         },
       ]}
+      sidebar={{
+        footer: (
+          <p className="text-xs text-muted-foreground text-center py-2">
+            © 2026 Sunny Patel. All rights reserved.
+          </p>
+        ),
+      }}
     >
       {children}
     </DocsLayout>

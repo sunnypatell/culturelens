@@ -137,7 +137,7 @@ API requests are rate-limited per user. see response headers for limit details.
         url: "https://github.com/sunnypatell",
       },
       license: {
-        name: "Proprietary",
+        name: "Proprietary — © 2026 Sunny Patel. All rights reserved.",
       },
     },
     servers: [
