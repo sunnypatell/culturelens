@@ -3,9 +3,11 @@
  * uses admin SDK for user management and token verification
  */
 
-import { adminAuth } from "./firebase-admin";
+import { getAdminAuth } from "./firebase-admin";
 
-const auth = adminAuth;
+function auth() {
+  return getAdminAuth();
+}
 
 export interface CreateUserData {
   email: string;
@@ -27,7 +29,7 @@ export interface UserClaims {
  */
 export async function createUser(data: CreateUserData) {
   try {
-    const userRecord = await auth.createUser({
+    const userRecord = await auth().createUser({
       email: data.email,
       password: data.password,
       displayName: data.displayName,
@@ -58,7 +60,7 @@ export async function createUser(data: CreateUserData) {
  */
 export async function verifyIdToken(idToken: string) {
   try {
-    const decodedToken = await auth.verifyIdToken(idToken);
+    const decodedToken = await auth().verifyIdToken(idToken);
     return decodedToken;
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -73,7 +75,7 @@ export async function verifyIdToken(idToken: string) {
  */
 export async function getUserByUid(uid: string) {
   try {
-    const userRecord = await auth.getUser(uid);
+    const userRecord = await auth().getUser(uid);
     return {
       uid: userRecord.uid,
       email: userRecord.email,
@@ -98,7 +100,7 @@ export async function getUserByUid(uid: string) {
  */
 export async function getUserByEmail(email: string) {
   try {
-    const userRecord = await auth.getUserByEmail(email);
+    const userRecord = await auth().getUserByEmail(email);
     return {
       uid: userRecord.uid,
       email: userRecord.email,
@@ -123,7 +125,7 @@ export async function getUserByEmail(email: string) {
  */
 export async function getUserByPhone(phoneNumber: string) {
   try {
-    const userRecord = await auth.getUserByPhoneNumber(phoneNumber);
+    const userRecord = await auth().getUserByPhoneNumber(phoneNumber);
     return {
       uid: userRecord.uid,
       email: userRecord.email,
@@ -157,7 +159,7 @@ export async function updateUser(
   }
 ) {
   try {
-    await auth.updateUser(uid, updates);
+    await auth().updateUser(uid, updates);
     return await getUserByUid(uid);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -172,7 +174,7 @@ export async function updateUser(
  */
 export async function deleteUser(uid: string) {
   try {
-    await auth.deleteUser(uid);
+    await auth().deleteUser(uid);
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`failed to delete user: ${error.message}`);
@@ -186,7 +188,7 @@ export async function deleteUser(uid: string) {
  */
 export async function setUserClaims(uid: string, claims: UserClaims) {
   try {
-    await auth.setCustomUserClaims(uid, claims);
+    await auth().setCustomUserClaims(uid, claims);
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(`failed to set claims: ${error.message}`);
@@ -200,7 +202,7 @@ export async function setUserClaims(uid: string, claims: UserClaims) {
  */
 export async function createCustomToken(uid: string, claims?: UserClaims) {
   try {
-    const customToken = await auth.createCustomToken(uid, claims);
+    const customToken = await auth().createCustomToken(uid, claims);
     return customToken;
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -215,7 +217,7 @@ export async function createCustomToken(uid: string, claims?: UserClaims) {
  */
 export async function listUsers(maxResults: number = 1000, pageToken?: string) {
   try {
-    const listUsersResult = await auth.listUsers(maxResults, pageToken);
+    const listUsersResult = await auth().listUsers(maxResults, pageToken);
     return {
       users: listUsersResult.users.map((user) => ({
         uid: user.uid,
@@ -241,7 +243,7 @@ export async function listUsers(maxResults: number = 1000, pageToken?: string) {
  */
 export async function generateEmailVerificationLink(email: string) {
   try {
-    const link = await auth.generateEmailVerificationLink(email);
+    const link = await auth().generateEmailVerificationLink(email);
     return link;
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -256,7 +258,7 @@ export async function generateEmailVerificationLink(email: string) {
  */
 export async function generatePasswordResetLink(email: string) {
   try {
-    const link = await auth.generatePasswordResetLink(email);
+    const link = await auth().generatePasswordResetLink(email);
     return link;
   } catch (error: unknown) {
     if (error instanceof Error) {

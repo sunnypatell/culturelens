@@ -2,7 +2,7 @@
 // These functions can be used in Next.js API routes (server-side)
 // IMPORTANT: Uses Firebase Admin SDK which bypasses all security rules
 
-import { adminDb, adminStorage } from "./firebase-admin";
+import { getAdminDb, getAdminStorage } from "./firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
 
 // Firestore utility functions for server-side use with Admin SDK
@@ -10,11 +10,13 @@ export const createDocument = async (
   collectionName: string,
   data: Record<string, unknown>
 ) => {
-  const docRef = await adminDb.collection(collectionName).add({
-    ...data,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  });
+  const docRef = await getAdminDb()
+    .collection(collectionName)
+    .add({
+      ...data,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    });
   return docRef.id;
 };
 
@@ -23,7 +25,7 @@ export const createDocumentWithId = async (
   docId: string,
   data: Record<string, unknown>
 ) => {
-  await adminDb
+  await getAdminDb()
     .collection(collectionName)
     .doc(docId)
     .set({
@@ -39,7 +41,7 @@ export const updateDocument = async (
   docId: string,
   data: Record<string, unknown>
 ) => {
-  await adminDb
+  await getAdminDb()
     .collection(collectionName)
     .doc(docId)
     .update({
@@ -49,11 +51,14 @@ export const updateDocument = async (
 };
 
 export const deleteDocument = async (collectionName: string, docId: string) => {
-  await adminDb.collection(collectionName).doc(docId).delete();
+  await getAdminDb().collection(collectionName).doc(docId).delete();
 };
 
 export const getDocument = async (collectionName: string, docId: string) => {
-  const docSnap = await adminDb.collection(collectionName).doc(docId).get();
+  const docSnap = await getAdminDb()
+    .collection(collectionName)
+    .doc(docId)
+    .get();
   return docSnap.exists ? { id: docSnap.id, ...docSnap.data() } : null;
 };
 
@@ -61,7 +66,7 @@ export const getDocuments = async (
   collectionName: string,
   constraints: Array<Record<string, unknown>> = []
 ) => {
-  let query: FirebaseFirestore.Query = adminDb.collection(collectionName);
+  let query: FirebaseFirestore.Query = getAdminDb().collection(collectionName);
 
   // apply constraints
   for (const constraint of constraints) {
@@ -119,7 +124,7 @@ export const uploadFile = async (
   file: File,
   path: string
 ): Promise<{ downloadURL: string; path: string }> => {
-  const bucket = adminStorage.bucket();
+  const bucket = getAdminStorage().bucket();
   const fileBuffer = Buffer.from(await file.arrayBuffer());
 
   const fileRef = bucket.file(path);
@@ -138,12 +143,12 @@ export const uploadFile = async (
 };
 
 export const deleteFile = async (path: string): Promise<void> => {
-  const bucket = adminStorage.bucket();
+  const bucket = getAdminStorage().bucket();
   await bucket.file(path).delete();
 };
 
 export const getFileURL = async (path: string): Promise<string> => {
-  const bucket = adminStorage.bucket();
+  const bucket = getAdminStorage().bucket();
   const [url] = await bucket.file(path).getSignedUrl({
     action: "read",
     expires: Date.now() + 60 * 60 * 1000, // 1 hour
