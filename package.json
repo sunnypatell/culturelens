@@ -19,6 +19,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "format": "npm run format:frontend && npm run format:backend",
+    "validate": "npm run typecheck && npm run lint:frontend && npm run test && npm run build",
     "prepare": "husky"
   },
   "dependencies": {
