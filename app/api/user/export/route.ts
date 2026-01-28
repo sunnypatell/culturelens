@@ -1,6 +1,6 @@
 // user data export API
 
-import { NextResponse } from "next/server";
+import { AuthenticationError, DatabaseError } from "@/lib/api";
 import { verifyIdToken } from "@/lib/auth-server";
 import {
   getDocument,
@@ -21,10 +21,7 @@ export async function POST(request: Request) {
     // authenticate user
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
-      return NextResponse.json(
-        { error: "missing authorization header" },
-        { status: 401 }
-      );
+      throw new AuthenticationError("missing authorization header");
     }
 
     const token = authHeader.replace("Bearer ", "");
@@ -32,12 +29,20 @@ export async function POST(request: Request) {
     const userId = generateUserIdFromUid(decodedToken.uid);
 
     // fetch all user data
-    const [profile, sessions] = await Promise.all([
-      getDocument(COLLECTIONS.USERS, userId),
-      getDocuments(COLLECTIONS.SESSIONS, [
-        whereEqual("userId", decodedToken.uid),
-      ]),
-    ]);
+    let profile, sessions;
+    try {
+      [profile, sessions] = await Promise.all([
+        getDocument(COLLECTIONS.USERS, userId),
+        getDocuments(COLLECTIONS.SESSIONS, [
+          whereEqual("userId", decodedToken.uid),
+        ]),
+      ]);
+    } catch (error) {
+      throw new DatabaseError(
+        "data export",
+        error instanceof Error ? error.message : undefined
+      );
+    }
 
     const exportData = {
       profile,
@@ -58,9 +63,36 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    // use standard error envelope for API errors
+    if (error instanceof AuthenticationError) {
+      return Response.json(
+        {
+          success: false,
+          error: { code: error.code, message: error.message },
+        },
+        { status: error.status }
+      );
+    }
+    if (error instanceof DatabaseError) {
+      return Response.json(
+        {
+          success: false,
+          error: {
+            code: error.code,
+            message: error.message,
+            hint: error.hint,
+          },
+        },
+        { status: error.status }
+      );
+    }
+
     logger.error({ data: error }, "[API_EXPORT_POST] Export error:");
-    return NextResponse.json(
-      { error: "failed to export data" },
+    return Response.json(
+      {
+        success: false,
+        error: { code: "INTERNAL_ERROR", message: "failed to export data" },
+      },
       { status: 500 }
     );
   }
