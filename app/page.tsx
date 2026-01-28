@@ -11,6 +11,7 @@ import { InsightsView } from "@/components/dashboard/insights-view";
 import { SettingsView } from "@/components/dashboard/settings-view";
 import { Loader2 } from "lucide-react";
 import { CommandPalette } from "@/components/command-palette";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -47,45 +48,47 @@ export default function Home() {
     <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
       <main className="flex-1 overflow-auto">
-        {activeView === "home" && (
-          <DashboardHome
-            onNavigate={setActiveView}
-            onViewInsights={(sessionId) => {
-              setSelectedSessionId(sessionId);
-              setActiveView("insights");
-            }}
-          />
-        )}
-        {activeView === "record" && (
-          <RecordingStudio
-            onNavigate={setActiveView}
-            onViewInsights={(sessionId) => {
-              setSelectedSessionId(sessionId);
-              setActiveView("insights");
-            }}
-          />
-        )}
-        {activeView === "library" && (
-          <AnalysisLibrary
-            onViewInsights={(sessionId) => {
-              setSelectedSessionId(sessionId);
-              setActiveView("insights");
-            }}
-            onNavigate={setActiveView}
-          />
-        )}
-        {activeView === "insights" && (
-          <InsightsView
-            sessionId={selectedSessionId}
-            onNavigate={(view) => {
-              if (view === "library") {
-                setSelectedSessionId(null);
-              }
-              setActiveView(view as typeof activeView);
-            }}
-          />
-        )}
-        {activeView === "settings" && <SettingsView />}
+        <ErrorBoundary>
+          {activeView === "home" && (
+            <DashboardHome
+              onNavigate={setActiveView}
+              onViewInsights={(sessionId) => {
+                setSelectedSessionId(sessionId);
+                setActiveView("insights");
+              }}
+            />
+          )}
+          {activeView === "record" && (
+            <RecordingStudio
+              onNavigate={setActiveView}
+              onViewInsights={(sessionId) => {
+                setSelectedSessionId(sessionId);
+                setActiveView("insights");
+              }}
+            />
+          )}
+          {activeView === "library" && (
+            <AnalysisLibrary
+              onViewInsights={(sessionId) => {
+                setSelectedSessionId(sessionId);
+                setActiveView("insights");
+              }}
+              onNavigate={setActiveView}
+            />
+          )}
+          {activeView === "insights" && (
+            <InsightsView
+              sessionId={selectedSessionId}
+              onNavigate={(view) => {
+                if (view === "library") {
+                  setSelectedSessionId(null);
+                }
+                setActiveView(view as typeof activeView);
+              }}
+            />
+          )}
+          {activeView === "settings" && <SettingsView />}
+        </ErrorBoundary>
       </main>
       <CommandPalette onNavigate={setActiveView} />
     </div>
