@@ -5,6 +5,12 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  formatRelativeDate,
+  formatDuration,
+  parseCreatedAt,
+} from "@/lib/format";
+import { SESSION_GRADIENTS } from "@/lib/constants";
 import { Footer } from "./footer";
 import { useAuth } from "@/components/auth/auth-provider";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
@@ -113,49 +119,16 @@ export function DashboardHome({
 
       if (response.ok && data.data) {
         const sessions = data.data.slice(0, 4);
-        const gradients = [
-          ["#6366f1", "#8b5cf6"],
-          ["#8b5cf6", "#d946ef"],
-          ["#f43f5e", "#fb923c"],
-          ["#10b981", "#06b6d4"],
-        ];
 
         const transformedSessions = sessions.map(
           (session: ApiSession, index: number) => {
             const duration = session.settings?.durationMs
-              ? `${Math.floor(session.settings.durationMs / 60000)}:${String(Math.floor((session.settings.durationMs % 60000) / 1000)).padStart(2, "0")}`
+              ? formatDuration(session.settings.durationMs)
               : "0:00";
             const insights = session.analysisResult?.insights?.length || 0;
             const participants = session.settings?.participantCount || 2;
-
-            let createdDate: Date;
-            const createdAt = session.createdAt;
-            if (
-              typeof createdAt === "object" &&
-              createdAt !== null &&
-              "_seconds" in createdAt
-            ) {
-              createdDate = new Date(createdAt._seconds * 1000);
-            } else if (createdAt) {
-              createdDate = new Date(createdAt);
-            } else {
-              createdDate = new Date();
-            }
-
-            if (isNaN(createdDate.getTime())) {
-              createdDate = new Date();
-            }
-
-            const now = new Date();
-            const diffMs = now.getTime() - createdDate.getTime();
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffHours / 24);
-
-            let dateStr = "";
-            if (diffHours < 1) dateStr = "just now";
-            else if (diffHours < 24) dateStr = `${diffHours}h ago`;
-            else if (diffDays === 1) dateStr = "yesterday";
-            else dateStr = `${diffDays}d ago`;
+            const createdDate = parseCreatedAt(session.createdAt);
+            const dateStr = formatRelativeDate(createdDate, { short: true });
 
             return {
               id: session.id,
@@ -165,7 +138,7 @@ export function DashboardHome({
               duration,
               participants,
               insights,
-              gradient: gradients[index % gradients.length],
+              gradient: SESSION_GRADIENTS[index % SESSION_GRADIENTS.length],
             };
           }
         );
