@@ -9,6 +9,9 @@ on:
       - "tests/**"
       - "vitest.config.ts"
       - "package.json"
+      - "eslint.config.mjs"
+      - "tsconfig.json"
+      - "tailwind.config.ts"
   push:
     branches: [main]
     paths:
@@ -18,6 +21,9 @@ on:
       - "tests/**"
       - "vitest.config.ts"
       - "package.json"
+      - "eslint.config.mjs"
+      - "tsconfig.json"
+      - "tailwind.config.ts"
 
 jobs:
   test:
