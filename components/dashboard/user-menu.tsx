@@ -39,9 +39,33 @@ export function UserMenu({ children, onNavigate }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <div className="px-2 py-1.5">
-          <p className="text-sm font-medium">{user?.displayName || "user"}</p>
-          <p className="text-xs text-muted-foreground">{user?.email}</p>
+        <div className="flex items-center gap-3 px-2 py-1.5">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary via-accent to-primary shadow-sm overflow-hidden flex-shrink-0">
+            {user?.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt={user.displayName || "Profile"}
+                className="w-full h-full object-cover rounded-full"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <span className="w-full h-full flex items-center justify-center text-xs font-bold text-primary-foreground">
+                {(
+                  user?.displayName?.[0] ||
+                  user?.email?.[0] ||
+                  "U"
+                ).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium truncate">
+              {user?.displayName || "user"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email}
+            </p>
+          </div>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onNavigate?.("settings")}>
