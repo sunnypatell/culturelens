@@ -9,6 +9,8 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 ### added
 
+- **API docs**: interactive Scalar API explorer at `/api/docs` with OpenAPI 3.1.0 spec, try-it-out, code samples, and Bearer auth (`a8e1524`)
+- **branch protection**: setup script (`scripts/setup-branch-protection.sh`) enforcing required PRs, approvals, status checks, and push restrictions (`9a64276`)
 - **testing**: vitest test suite with 71 tests across 8 files (api-client, api-errors, rate-limiter, pdf-export, format, logger, error-boundary, client-logger)
 - **CI**: frontend-test.yml workflow running vitest + next build verification on PRs
 - **CI**: `validate.yml` workflow running full `npm run validate` (typecheck + lint + test + build) on all PRs and main pushes
@@ -36,6 +38,7 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 ### fixed
 
+- **dead code**: removed unused `_mounted` state variable from dashboard-home component (`3cf0bcf`)
 - **CI**: labeler.yml paths corrected from `src/app/**` to `app/**` to match actual repo structure
 - **CI**: `.gitignore` scoped `/transcripts/` to root-level only, preventing `app/api/transcripts/` from being ignored
 - **CI**: standardized node 20 across all 5 workflows, Dockerfile, and `.nvmrc` — Next.js 16.1 requires >=20.9.0 (`a43566d`)
