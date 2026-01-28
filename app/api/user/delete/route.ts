@@ -35,18 +35,38 @@ export async function DELETE(request: Request) {
     const userId = generateUserIdFromUid(decodedToken.uid);
 
     try {
-      // delete all user sessions
-      const sessions = await getDocuments(COLLECTIONS.SESSIONS, [
-        whereEqual("userId", decodedToken.uid),
+      // fetch all user sessions and transcripts
+      const [sessions, transcripts] = await Promise.all([
+        getDocuments(COLLECTIONS.SESSIONS, [
+          whereEqual("userId", decodedToken.uid),
+        ]),
+        getDocuments(COLLECTIONS.TRANSCRIPTS, [
+          whereEqual("userId", decodedToken.uid),
+        ]),
       ]);
 
-      logger.info(`[API_DELETE_USER] Deleting ${sessions.length} sessions`);
-
-      await Promise.all(
-        sessions.map((session) =>
-          deleteDocument(COLLECTIONS.SESSIONS, session.id as string)
-        )
+      logger.info(
+        `[API_DELETE_USER] Deleting ${sessions.length} sessions, ${transcripts.length} transcripts`
       );
+
+      // delete sessions and transcripts — use allSettled so partial failures
+      // don't prevent profile + auth deletion
+      const deleteResults = await Promise.allSettled([
+        ...sessions.map((session) =>
+          deleteDocument(COLLECTIONS.SESSIONS, session.id as string)
+        ),
+        ...transcripts.map((transcript) =>
+          deleteDocument(COLLECTIONS.TRANSCRIPTS, transcript.id as string)
+        ),
+      ]);
+
+      const failed = deleteResults.filter((r) => r.status === "rejected");
+      if (failed.length > 0) {
+        logger.warn(
+          { failedCount: failed.length },
+          `[API_DELETE_USER] ${failed.length} document deletions failed, proceeding with account deletion`
+        );
+      }
 
       // delete user profile
       await deleteDocument(COLLECTIONS.USERS, userId);
