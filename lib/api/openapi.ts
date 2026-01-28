@@ -1,5 +1,5 @@
 // OpenAPI 3.1.0 specification for CultureLens API
-// auto-serves at /api/docs via Scalar interactive explorer
+// auto-serves at /docs/api via Scalar interactive explorer
 
 const API_VERSION = "0.2.0";
 

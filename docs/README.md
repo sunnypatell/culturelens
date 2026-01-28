@@ -9,7 +9,7 @@ reference documentation for CultureLens development and integration.
 | doc                      | description                                                                         |
 | ------------------------ | ----------------------------------------------------------------------------------- |
 | [api.md](api.md)         | comprehensive Next.js API route reference (23 endpoints across 8 resource groups)   |
-| [`/api/docs`](/api/docs) | interactive Scalar API explorer with OpenAPI 3.1 spec, try-it-out, and code samples |
+| [`/docs/api`](/docs/api) | interactive Scalar API explorer with OpenAPI 3.1 spec, try-it-out, and code samples |
 
 ---
 
