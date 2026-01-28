@@ -62,6 +62,21 @@ export const ElevenLabsSchemas = {
 };
 
 /**
+ * sync-profile API schemas
+ */
+export const SyncProfileSchemas = {
+  // POST /api/user/sync-profile
+  update: z.object({
+    email: z.string().email().optional(),
+    displayName: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    photoURL: z.string().url().optional(),
+    emailVerified: z.boolean().optional(),
+    linkedProviders: z.array(z.string()).optional(),
+  }),
+};
+
+/**
  * common parameter schemas
  */
 export const CommonSchemas = {

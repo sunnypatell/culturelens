@@ -5,7 +5,9 @@ import {
   apiSuccess,
   AuthenticationError,
   DatabaseError,
+  validateRequest,
 } from "@/lib/api";
+import { SyncProfileSchemas } from "@/lib/api/schemas";
 import { verifyIdToken } from "@/lib/auth-server";
 import {
   getDocument,
@@ -33,8 +35,7 @@ export async function POST(request: Request) {
     const decodedToken = await verifyIdToken(token);
     const userId = generateUserIdFromUid(decodedToken.uid);
 
-    // get user data from request body
-    const body = await request.json();
+    // validate and parse request body
     const {
       email,
       displayName,
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
       photoURL,
       emailVerified,
       linkedProviders,
-    } = body;
+    } = await validateRequest(request, SyncProfileSchemas.update);
 
     try {
       // filter out undefined values
