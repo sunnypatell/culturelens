@@ -14,6 +14,7 @@ import {
 } from "@/lib/firebase-server-utils";
 import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
 import { getAuth } from "firebase-admin/auth";
+import { logger } from "@/lib/logger";
 
 /**
  * DELETE /api/user/delete
@@ -21,7 +22,7 @@ import { getAuth } from "firebase-admin/auth";
  */
 export async function DELETE(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_DELETE_USER] Deleting user account`);
+    logger.info(`[API_DELETE_USER] Deleting user account`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -39,7 +40,7 @@ export async function DELETE(request: Request) {
         whereEqual("userId", decodedToken.uid),
       ]);
 
-      console.log(`[API_DELETE_USER] Deleting ${sessions.length} sessions`);
+      logger.info(`[API_DELETE_USER] Deleting ${sessions.length} sessions`);
 
       await Promise.all(
         sessions.map((session: any) =>
@@ -54,7 +55,7 @@ export async function DELETE(request: Request) {
       const auth = getAuth();
       await auth.deleteUser(decodedToken.uid);
 
-      console.log(`[API_DELETE_USER] Account deleted for user ${userId}`);
+      logger.info(`[API_DELETE_USER] Account deleted for user ${userId}`);
 
       return apiSuccess({ message: "account deleted" });
     } catch (error) {

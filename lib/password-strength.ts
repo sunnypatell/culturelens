@@ -1,3 +1,5 @@
+import { logger } from "@/lib/logger";
+
 // password strength validation utilities
 
 export interface PasswordRequirement {
@@ -73,13 +75,16 @@ export function checkPasswordStrength(password: string): PasswordStrength {
   // password is valid only if ALL requirements are met
   const isValid = metCount === requirements.length;
 
-  console.log(`[PASSWORD_STRENGTH] Password strength check:`, {
-    score,
-    strength,
-    metRequirements: metCount,
-    totalRequirements: requirements.length,
-    isValid,
-  });
+  logger.info(
+    {
+      score,
+      strength,
+      metRequirements: metCount,
+      totalRequirements: requirements.length,
+      isValid,
+    },
+    `[PASSWORD_STRENGTH] Password strength check:`
+  );
 
   return {
     score,

@@ -1,6 +1,7 @@
 // unified API response handlers for consistent response formatting
 
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 /**
  * standard success response envelope
@@ -65,10 +66,13 @@ export function apiError(
 
   // log error for debugging (development only)
   if (process.env.NODE_ENV !== "production") {
-    console.error(`[API Error ${status}] ${code}: ${message}`, {
-      details,
-      hint,
-    });
+    logger.error(
+      {
+        details,
+        hint,
+      },
+      `[API Error ${status}] ${code}: ${message}`
+    );
   }
 
   return NextResponse.json(

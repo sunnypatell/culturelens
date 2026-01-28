@@ -11,6 +11,7 @@ import { verifyIdToken } from "@/lib/auth-server";
 import { getDocument, updateDocument } from "@/lib/firebase-server-utils";
 import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const ProfileUpdateSchema = z.object({
   displayName: z.string().min(1).optional(),
@@ -24,7 +25,7 @@ const ProfileUpdateSchema = z.object({
  */
 export async function PATCH(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_PROFILE_PATCH] Updating profile`);
+    logger.info(`[API_PROFILE_PATCH] Updating profile`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -64,7 +65,7 @@ export async function PATCH(request: Request) {
 
       await updateDocument(COLLECTIONS.USERS, userId, updateData);
 
-      console.log(`[API_PROFILE_PATCH] Profile updated for user ${userId}`);
+      logger.info(`[API_PROFILE_PATCH] Profile updated for user ${userId}`);
 
       return apiSuccess({ message: "profile updated" });
     } catch (error) {

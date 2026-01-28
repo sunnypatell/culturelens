@@ -15,10 +15,11 @@ import {
   ExternalServiceError,
 } from "@/lib/api";
 import { verifyIdToken } from "@/lib/auth-server";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SIGNED_URL] Requesting signed URL`);
+    logger.info(`[API_SIGNED_URL] Requesting signed URL`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_SIGNED_URL] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_SIGNED_URL] Authenticated user:`);
 
     const apiKey = process.env.ELEVENLABS_API_KEY;
     const agentId = process.env.ELEVENLABS_AGENT_ID;

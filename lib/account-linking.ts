@@ -6,6 +6,7 @@ import {
   fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth } from "./firebase";
+import { logger } from "@/lib/logger";
 
 export interface UserProfile {
   id: string;
@@ -27,11 +28,14 @@ export interface UserProfile {
 export async function createOrUpdateUserProfile(
   user: User
 ): Promise<UserProfile> {
-  console.log(`[ACCOUNT_LINKING] Creating or updating user profile:`, {
-    uid: user.uid,
-    email: user.email,
-    providers: user.providerData.map((p) => p.providerId),
-  });
+  logger.info(
+    {
+      uid: user.uid,
+      email: user.email,
+      providers: user.providerData.map((p) => p.providerId),
+    },
+    `[ACCOUNT_LINKING] Creating or updating user profile:`
+  );
 
   // extract linked providers from providerData
   const linkedProviders = user.providerData.map((p) => p.providerId);
@@ -64,10 +68,13 @@ export async function createOrUpdateUserProfile(
       try {
         errorData = JSON.parse(responseText);
       } catch {
-        console.error(`[ACCOUNT_LINKING] Received HTML instead of JSON:`, {
-          status: response.status,
-          responsePreview: responseText.substring(0, 200),
-        });
+        logger.error(
+          {
+            status: response.status,
+            responsePreview: responseText.substring(0, 200),
+          },
+          `[ACCOUNT_LINKING] Received HTML instead of JSON:`
+        );
       }
       throw new Error(
         errorData?.error?.message || "failed to sync user profile"
@@ -79,20 +86,23 @@ export async function createOrUpdateUserProfile(
     try {
       result = JSON.parse(responseText);
     } catch (parseError) {
-      console.error(`[ACCOUNT_LINKING] Failed to parse response:`, {
-        parseError,
-        responsePreview: responseText.substring(0, 200),
-      });
+      logger.error(
+        {
+          parseError,
+          responsePreview: responseText.substring(0, 200),
+        },
+        `[ACCOUNT_LINKING] Failed to parse response:`
+      );
       throw new Error("invalid response format from server");
     }
 
-    console.log(`[ACCOUNT_LINKING] User profile synced successfully`);
+    logger.info(`[ACCOUNT_LINKING] User profile synced successfully`);
 
     return result.data as UserProfile;
   } catch (error) {
-    console.error(
-      `[ACCOUNT_LINKING] Failed to create/update user profile:`,
-      error
+    logger.error(
+      { data: error },
+      `[ACCOUNT_LINKING] Failed to create/update user profile:`
     );
     throw error;
   }
@@ -104,21 +114,24 @@ export async function createOrUpdateUserProfile(
  * @returns array of provider IDs (e.g., ['password', 'google.com'])
  */
 export async function checkExistingProviders(email: string): Promise<string[]> {
-  console.log(
-    `[ACCOUNT_LINKING] Checking existing providers for email:`,
-    email
+  logger.info(
+    { data: email },
+    `[ACCOUNT_LINKING] Checking existing providers for email:`
   );
 
   try {
     const methods = await fetchSignInMethodsForEmail(auth, email);
 
-    console.log(`[ACCOUNT_LINKING] Found existing providers:`, methods);
+    logger.info(
+      { data: methods },
+      `[ACCOUNT_LINKING] Found existing providers:`
+    );
 
     return methods;
   } catch (error) {
-    console.error(
-      `[ACCOUNT_LINKING] Failed to check existing providers:`,
-      error
+    logger.error(
+      { data: error },
+      `[ACCOUNT_LINKING] Failed to check existing providers:`
     );
     return [];
   }
@@ -133,24 +146,27 @@ export async function linkPhoneToAccount(
   user: User,
   phoneCredential: any
 ): Promise<void> {
-  console.log(`[ACCOUNT_LINKING] Linking phone to account:`, {
-    uid: user.uid,
-    email: user.email,
-  });
+  logger.info(
+    {
+      uid: user.uid,
+      email: user.email,
+    },
+    `[ACCOUNT_LINKING] Linking phone to account:`
+  );
 
   try {
     await linkWithCredential(user, phoneCredential);
 
-    console.log(`[ACCOUNT_LINKING] Phone linked successfully`);
+    logger.info(`[ACCOUNT_LINKING] Phone linked successfully`);
 
     // update user profile in Firestore
     await createOrUpdateUserProfile(user);
   } catch (error: any) {
-    console.error(`[ACCOUNT_LINKING] Failed to link phone:`, error);
+    logger.error({ data: error }, `[ACCOUNT_LINKING] Failed to link phone:`);
 
     // handle account-exists-with-different-credential error
     if (error.code === "auth/credential-already-in-use") {
-      console.warn(
+      logger.warn(
         `[ACCOUNT_LINKING] Phone number already in use by another account`
       );
       throw new Error(
@@ -171,23 +187,26 @@ export async function linkGoogleToAccount(
   user: User,
   googleCredential: any
 ): Promise<void> {
-  console.log(`[ACCOUNT_LINKING] Linking Google to account:`, {
-    uid: user.uid,
-    email: user.email,
-  });
+  logger.info(
+    {
+      uid: user.uid,
+      email: user.email,
+    },
+    `[ACCOUNT_LINKING] Linking Google to account:`
+  );
 
   try {
     await linkWithCredential(user, googleCredential);
 
-    console.log(`[ACCOUNT_LINKING] Google linked successfully`);
+    logger.info(`[ACCOUNT_LINKING] Google linked successfully`);
 
     // update user profile in Firestore
     await createOrUpdateUserProfile(user);
   } catch (error: any) {
-    console.error(`[ACCOUNT_LINKING] Failed to link Google:`, error);
+    logger.error({ data: error }, `[ACCOUNT_LINKING] Failed to link Google:`);
 
     if (error.code === "auth/credential-already-in-use") {
-      console.warn(
+      logger.warn(
         `[ACCOUNT_LINKING] Google account already in use by another account`
       );
       throw new Error(
@@ -213,15 +232,18 @@ export async function handleAccountLinking(
   existingProviders: string[];
   message?: string;
 }> {
-  console.log(`[ACCOUNT_LINKING] Checking if account linking needed:`, {
-    email,
-    currentProviderId,
-  });
+  logger.info(
+    {
+      email,
+      currentProviderId,
+    },
+    `[ACCOUNT_LINKING] Checking if account linking needed:`
+  );
 
   const existingProviders = await checkExistingProviders(email);
 
   if (existingProviders.length === 0) {
-    console.log(
+    logger.info(
       `[ACCOUNT_LINKING] No existing providers, creating new account`
     );
     return {
@@ -231,7 +253,7 @@ export async function handleAccountLinking(
   }
 
   if (existingProviders.includes(currentProviderId)) {
-    console.log(
+    logger.info(
       `[ACCOUNT_LINKING] Provider already linked, proceeding with sign-in`
     );
     return {
@@ -240,11 +262,14 @@ export async function handleAccountLinking(
     };
   }
 
-  console.log(`[ACCOUNT_LINKING] Account linking recommended:`, {
-    email,
-    existingProviders,
-    newProvider: currentProviderId,
-  });
+  logger.info(
+    {
+      email,
+      existingProviders,
+      newProvider: currentProviderId,
+    },
+    `[ACCOUNT_LINKING] Account linking recommended:`
+  );
 
   return {
     shouldLink: true,
@@ -262,7 +287,10 @@ export async function getUserProfile(
   uid: string,
   token: string
 ): Promise<UserProfile | null> {
-  console.log(`[ACCOUNT_LINKING] Fetching user profile for UID:`, uid);
+  logger.info(
+    { data: uid },
+    `[ACCOUNT_LINKING] Fetching user profile for UID:`
+  );
 
   try {
     const response = await fetch("/api/user/sync-profile", {
@@ -273,7 +301,10 @@ export async function getUserProfile(
     });
 
     if (!response.ok) {
-      console.warn(`[ACCOUNT_LINKING] User profile not found for UID:`, uid);
+      logger.warn(
+        { data: uid },
+        `[ACCOUNT_LINKING] User profile not found for UID:`
+      );
       return null;
     }
 
@@ -284,23 +315,32 @@ export async function getUserProfile(
     try {
       result = JSON.parse(responseText);
     } catch (parseError) {
-      console.error(`[ACCOUNT_LINKING] Failed to parse GET response:`, {
-        parseError,
-        responsePreview: responseText.substring(0, 200),
-      });
+      logger.error(
+        {
+          parseError,
+          responsePreview: responseText.substring(0, 200),
+        },
+        `[ACCOUNT_LINKING] Failed to parse GET response:`
+      );
       return null;
     }
 
     if (!result.data) {
-      console.warn(`[ACCOUNT_LINKING] User profile not found for UID:`, uid);
+      logger.warn(
+        { data: uid },
+        `[ACCOUNT_LINKING] User profile not found for UID:`
+      );
       return null;
     }
 
-    console.log(`[ACCOUNT_LINKING] User profile retrieved successfully`);
+    logger.info(`[ACCOUNT_LINKING] User profile retrieved successfully`);
 
     return result.data as UserProfile;
   } catch (error) {
-    console.error(`[ACCOUNT_LINKING] Failed to get user profile:`, error);
+    logger.error(
+      { data: error },
+      `[ACCOUNT_LINKING] Failed to get user profile:`
+    );
     return null;
   }
 }

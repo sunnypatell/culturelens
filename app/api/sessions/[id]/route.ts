@@ -19,6 +19,7 @@ import {
 import { COLLECTIONS } from "@/lib/firestore-constants";
 import { SessionSchemas } from "@/lib/api/schemas";
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const UpdateSessionSchema = z.object({
   status: z
@@ -38,7 +39,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_SESSION_GET] Fetching session`);
+    logger.info(`[API_SESSION_GET] Fetching session`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -73,7 +74,7 @@ export async function GET(
       throw new AuthorizationError("not authorized to access this session");
     }
 
-    console.log(`[API_SESSION_GET] Session ${id} retrieved successfully`);
+    logger.info(`[API_SESSION_GET] Session ${id} retrieved successfully`);
 
     return apiSuccess(session);
   });
@@ -88,7 +89,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_SESSION_PATCH] Updating session`);
+    logger.info(`[API_SESSION_PATCH] Updating session`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -139,7 +140,7 @@ export async function PATCH(
       );
     }
 
-    console.log(`[API_SESSION_PATCH] Session ${id} updated successfully`);
+    logger.info(`[API_SESSION_PATCH] Session ${id} updated successfully`);
 
     return apiSuccess({ message: "session updated successfully" });
   });
@@ -154,7 +155,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_SESSION_DELETE] Deleting session`);
+    logger.info(`[API_SESSION_DELETE] Deleting session`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -199,7 +200,7 @@ export async function DELETE(
       );
     }
 
-    console.log(`[API_SESSION_DELETE] Session ${id} deleted successfully`);
+    logger.info(`[API_SESSION_DELETE] Session ${id} deleted successfully`);
 
     return apiSuccess({ message: "session deleted successfully" });
   });

@@ -10,12 +10,13 @@ import {
   base64ToBuffer,
 } from "@/lib/audio-storage-server";
 import { verifyIdToken } from "@/lib/auth-server";
+import { logger } from "@/lib/logger";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log(`[API_AUDIO_GET] Received audio request`);
+  logger.info(`[API_AUDIO_GET] Received audio request`);
 
   const { id } = await params;
 
@@ -35,7 +36,7 @@ export async function GET(
   // authenticate user
   const authHeader = request.headers.get("authorization");
   if (!authHeader) {
-    console.error(`[API_AUDIO_GET] Missing authorization header`);
+    logger.error(`[API_AUDIO_GET] Missing authorization header`);
     return NextResponse.json(
       {
         success: false,
@@ -53,9 +54,9 @@ export async function GET(
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     userId = decodedToken.uid;
-    console.log(`[API_AUDIO_GET] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_AUDIO_GET] Authenticated user:`);
   } catch (error) {
-    console.error(`[API_AUDIO_GET] Invalid token:`, error);
+    logger.error({ data: error }, `[API_AUDIO_GET] Invalid token:`);
     return NextResponse.json(
       {
         success: false,
@@ -101,7 +102,7 @@ export async function GET(
 
   // verify ownership
   if (audioData.userId !== userId) {
-    console.error(
+    logger.error(
       `[API_AUDIO_GET] Authorization failed: audio ${id} belongs to ${audioData.userId}, not ${userId}`
     );
     return NextResponse.json(

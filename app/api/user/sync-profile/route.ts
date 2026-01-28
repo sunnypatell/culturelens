@@ -13,6 +13,7 @@ import {
   updateDocument,
 } from "@/lib/firebase-server-utils";
 import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/user/sync-profile
@@ -20,7 +21,7 @@ import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
  */
 export async function POST(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SYNC_PROFILE] Syncing user profile`);
+    logger.info(`[API_SYNC_PROFILE] Syncing user profile`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -62,12 +63,18 @@ export async function POST(request: Request) {
       const existingProfile = await getDocument(COLLECTIONS.USERS, userId);
 
       if (existingProfile) {
-        console.log(`[API_SYNC_PROFILE] Updating existing profile:`, userId);
+        logger.info(
+          { data: userId },
+          `[API_SYNC_PROFILE] Updating existing profile:`
+        );
 
         // update existing profile (only defined fields)
         await updateDocument(COLLECTIONS.USERS, userId, profileData);
       } else {
-        console.log(`[API_SYNC_PROFILE] Creating new profile:`, userId);
+        logger.info(
+          { data: userId },
+          `[API_SYNC_PROFILE] Creating new profile:`
+        );
 
         // create new profile
         await createDocumentWithId(COLLECTIONS.USERS, userId, {
@@ -77,7 +84,7 @@ export async function POST(request: Request) {
         });
       }
 
-      console.log(`[API_SYNC_PROFILE] Profile synced successfully`);
+      logger.info(`[API_SYNC_PROFILE] Profile synced successfully`);
 
       return apiSuccess(
         {
@@ -109,7 +116,7 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_GET_PROFILE] Fetching user profile`);
+    logger.info(`[API_GET_PROFILE] Fetching user profile`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -125,11 +132,14 @@ export async function GET(request: Request) {
       const profile = await getDocument(COLLECTIONS.USERS, userId);
 
       if (!profile) {
-        console.warn(`[API_GET_PROFILE] Profile not found for:`, userId);
+        logger.warn(
+          { data: userId },
+          `[API_GET_PROFILE] Profile not found for:`
+        );
         return apiSuccess(null, { message: "profile not found" });
       }
 
-      console.log(`[API_GET_PROFILE] Profile retrieved successfully`);
+      logger.info(`[API_GET_PROFILE] Profile retrieved successfully`);
 
       return apiSuccess(profile);
     } catch (error) {

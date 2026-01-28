@@ -15,6 +15,7 @@ import {
 } from "@/lib/firebase-server-utils";
 import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const SettingsSchema = z.object({
   notifications: z.boolean().optional(),
@@ -32,7 +33,7 @@ const SettingsSchema = z.object({
  */
 export async function GET(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SETTINGS_GET] Fetching settings`);
+    logger.info(`[API_SETTINGS_GET] Fetching settings`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
  */
 export async function PUT(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SETTINGS_PUT] Updating settings`);
+    logger.info(`[API_SETTINGS_PUT] Updating settings`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -114,7 +115,7 @@ export async function PUT(request: Request) {
         });
       }
 
-      console.log(`[API_SETTINGS_PUT] Settings updated for user ${userId}`);
+      logger.info(`[API_SETTINGS_PUT] Settings updated for user ${userId}`);
 
       return apiSuccess({ message: "settings saved" });
     } catch (error) {

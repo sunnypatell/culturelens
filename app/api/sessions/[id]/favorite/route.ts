@@ -13,6 +13,7 @@ import { SessionSchemas } from "@/lib/api/schemas";
 import { verifyIdToken } from "@/lib/auth-server";
 import { getDocument, updateDocument } from "@/lib/firebase-server-utils";
 import { COLLECTIONS } from "@/lib/firestore-constants";
+import { logger } from "@/lib/logger";
 
 /**
  * PATCH /api/sessions/[id]/favorite
@@ -23,7 +24,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_FAVORITE_PATCH] Toggling favorite status`);
+    logger.info(`[API_FAVORITE_PATCH] Toggling favorite status`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -55,7 +56,7 @@ export async function PATCH(
 
     // verify ownership
     if (session.userId !== userId) {
-      console.error(
+      logger.error(
         `[API_FAVORITE_PATCH] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
       );
       throw new AuthorizationError("not authorized to access this session");
@@ -75,7 +76,7 @@ export async function PATCH(
       );
     }
 
-    console.log(
+    logger.info(
       `[API_FAVORITE_PATCH] Toggled favorite for session ${id}: ${newFavoriteStatus}`
     );
 

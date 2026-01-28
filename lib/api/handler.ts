@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { ApiError } from "./errors";
 import { apiError, ApiSuccessResponse, ApiErrorResponse } from "./responses";
+import { logger } from "@/lib/logger";
 
 /**
  * wraps API route handlers with unified error handling
@@ -27,7 +28,7 @@ export function apiHandler<T = unknown>(
 
     // log unexpected errors (development only)
     if (process.env.NODE_ENV !== "production") {
-      console.error("[Unexpected API Error]", error);
+      logger.error({ data: error }, "[Unexpected API Error]");
     }
 
     return apiError("INTERNAL_ERROR", "an unexpected error occurred", {

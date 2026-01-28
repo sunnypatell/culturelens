@@ -19,6 +19,7 @@ import {
 import { SessionSchemas } from "@/lib/api/schemas";
 import { verifyIdToken } from "@/lib/auth-server";
 import { COLLECTIONS } from "@/lib/firestore-constants";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/sessions/[id]/upload
@@ -29,7 +30,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_UPLOAD_POST] Received upload request`);
+    logger.info(`[API_UPLOAD_POST] Received upload request`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -40,7 +41,7 @@ export async function POST(
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_UPLOAD_POST] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_UPLOAD_POST] Authenticated user:`);
 
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
@@ -62,7 +63,7 @@ export async function POST(
 
     // verify ownership
     if (session.userId !== userId) {
-      console.error(
+      logger.error(
         `[API_UPLOAD_POST] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
       );
       throw new AuthorizationError("not authorized to access this session");

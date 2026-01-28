@@ -24,6 +24,7 @@ import {
   SESSION_STATUS,
 } from "@/lib/firestore-constants";
 import { verifyIdToken } from "@/lib/auth-server";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/sessions
@@ -31,7 +32,7 @@ import { verifyIdToken } from "@/lib/auth-server";
  */
 export async function POST(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SESSIONS_POST] Received session creation request`);
+    logger.info(`[API_SESSIONS_POST] Received session creation request`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -42,21 +43,24 @@ export async function POST(request: Request) {
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_SESSIONS_POST] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_SESSIONS_POST] Authenticated user:`);
 
     // validate request body
     const body = await validateRequest(request, SessionSchemas.create);
-    console.log(`[API_SESSIONS_POST] Request validated:`, {
-      consentPersonA: body.consent.personA,
-      consentPersonB: body.consent.personB,
-      storageMode: body.settings.storageMode,
-    });
+    logger.info(
+      {
+        consentPersonA: body.consent.personA,
+        consentPersonB: body.consent.personB,
+        storageMode: body.settings.storageMode,
+      },
+      `[API_SESSIONS_POST] Request validated:`
+    );
 
     // validate dual consent
     if (!(body.consent.personA && body.consent.personB)) {
-      console.error(
-        `[API_SESSIONS_POST] Consent validation failed:`,
-        body.consent
+      logger.error(
+        { data: body.consent },
+        `[API_SESSIONS_POST] Consent validation failed:`
       );
       return ApiErrors.validationError(
         "both participants must consent",
@@ -66,7 +70,10 @@ export async function POST(request: Request) {
 
     // generate unique session id using standard format
     const sessionId = generateDocId(DOC_PREFIXES.SESSION);
-    console.log(`[API_SESSIONS_POST] Generated session ID:`, sessionId);
+    logger.info(
+      { data: sessionId },
+      `[API_SESSIONS_POST] Generated session ID:`
+    );
 
     const session: Session = {
       id: sessionId,
@@ -83,14 +90,17 @@ export async function POST(request: Request) {
 
     // store in firestore with specific document ID
     try {
-      console.log(`[API_SESSIONS_POST] Storing session in Firestore...`);
+      logger.info(`[API_SESSIONS_POST] Storing session in Firestore...`);
       await createDocumentWithId(COLLECTIONS.SESSIONS, sessionId, session);
-      console.log(
-        `[API_SESSIONS_POST] Session created successfully:`,
-        sessionId
+      logger.info(
+        { data: sessionId },
+        `[API_SESSIONS_POST] Session created successfully:`
       );
     } catch (error) {
-      console.error(`[API_SESSIONS_POST] Failed to create session:`, error);
+      logger.error(
+        { data: error },
+        `[API_SESSIONS_POST] Failed to create session:`
+      );
       throw new DatabaseError(
         "session creation",
         error instanceof Error ? error.message : undefined
@@ -110,7 +120,7 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_SESSIONS_GET] Fetching sessions...`);
+    logger.info(`[API_SESSIONS_GET] Fetching sessions...`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -121,7 +131,7 @@ export async function GET(request: Request) {
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_SESSIONS_GET] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_SESSIONS_GET] Authenticated user:`);
 
     try {
       const sessions = await getDocuments(COLLECTIONS.SESSIONS, [
@@ -129,7 +139,7 @@ export async function GET(request: Request) {
         orderByField(FIELDS.CREATED_AT, "desc"),
       ]);
 
-      console.log(
+      logger.info(
         `[API_SESSIONS_GET] Retrieved ${sessions.length} sessions for user ${userId}`
       );
 
@@ -137,7 +147,10 @@ export async function GET(request: Request) {
         meta: { total: sessions.length },
       });
     } catch (error) {
-      console.error(`[API_SESSIONS_GET] Failed to retrieve sessions:`, error);
+      logger.error(
+        { data: error },
+        `[API_SESSIONS_GET] Failed to retrieve sessions:`
+      );
       throw new DatabaseError(
         "session retrieval",
         error instanceof Error ? error.message : undefined

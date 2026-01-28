@@ -1,6 +1,7 @@
 // API middleware utilities for logging, auth, etc.
 
 import { NextRequest } from "next/server";
+import { logger } from "@/lib/logger";
 
 /**
  * request ID for tracking requests across logs
@@ -23,17 +24,20 @@ export function logRequest(
     const { requestId, userId } = options || {};
     const { method, url } = request;
 
-    console.log(`[API Request]`, {
-      requestId,
-      method,
-      url,
-      userId,
-      timestamp: new Date().toISOString(),
-      userAgent: request.headers.get("user-agent"),
-      ip:
-        request.headers.get("x-forwarded-for") ||
-        request.headers.get("x-real-ip"),
-    });
+    logger.info(
+      {
+        requestId,
+        method,
+        url,
+        userId,
+        timestamp: new Date().toISOString(),
+        userAgent: request.headers.get("user-agent"),
+        ip:
+          request.headers.get("x-forwarded-for") ||
+          request.headers.get("x-real-ip"),
+      },
+      `[API Request]`
+    );
   }
 }
 
@@ -55,15 +59,18 @@ export function logResponse(
     const { requestId, durationMs } = options || {};
     const { method, url } = request;
 
-    console.log(`[API Response]`, {
-      requestId,
-      method,
-      url,
-      status: response.status,
-      success: response.success,
-      durationMs,
-      timestamp: new Date().toISOString(),
-    });
+    logger.info(
+      {
+        requestId,
+        method,
+        url,
+        status: response.status,
+        success: response.success,
+        durationMs,
+        timestamp: new Date().toISOString(),
+      },
+      `[API Response]`
+    );
   }
 }
 

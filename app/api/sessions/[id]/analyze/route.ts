@@ -27,6 +27,7 @@ import {
 import { SessionSchemas } from "@/lib/api/schemas";
 import { verifyIdToken } from "@/lib/auth-server";
 import { COLLECTIONS } from "@/lib/firestore-constants";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/sessions/[id]/analyze
@@ -37,7 +38,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_ANALYZE_POST] Received analysis request`);
+    logger.info(`[API_ANALYZE_POST] Received analysis request`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -48,7 +49,7 @@ export async function POST(
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_ANALYZE_POST] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_ANALYZE_POST] Authenticated user:`);
 
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
@@ -70,7 +71,7 @@ export async function POST(
 
     // verify ownership
     if (session.userId !== userId) {
-      console.error(
+      logger.error(
         `[API_ANALYZE_POST] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
       );
       throw new AuthorizationError("not authorized to access this session");
@@ -79,7 +80,7 @@ export async function POST(
     // allow analysis for sessions that haven't been analyzed yet
     // or are in processing state - skip only if already "ready" with results
     if (session.status === "ready" && session.analysisResult) {
-      console.log(
+      logger.info(
         `[API_ANALYZE_POST] Session ${id} already analyzed, returning existing results`
       );
       return apiSuccess(session.analysisResult, {
@@ -100,12 +101,15 @@ export async function POST(
       ]);
       transcript = transcripts[0];
     } catch (error) {
-      console.error(`[API_ANALYZE_POST] Failed to fetch transcript:`, error);
+      logger.error(
+        { data: error },
+        `[API_ANALYZE_POST] Failed to fetch transcript:`
+      );
     }
 
     // if no transcript, create basic mock data
     if (!transcript || !transcript.transcript) {
-      console.warn(
+      logger.warn(
         `[API_ANALYZE_POST] No transcript found for session ${id}, using mock data`
       );
 
@@ -261,7 +265,7 @@ export async function POST(
     // Gemini Project Number: 119358341094
     // ============================================================================
 
-    console.log(`[API_ANALYZE_POST] Running Gemini AI analysis...`);
+    logger.info(`[API_ANALYZE_POST] Running Gemini AI analysis...`);
 
     // prepare segments for Gemini analysis
     const geminiSegments = segments.map((seg) => ({
@@ -277,13 +281,16 @@ export async function POST(
       geminiSegments
     );
 
-    console.log(`[API_ANALYZE_POST] Gemini analysis complete:`, {
-      summaryLength: geminiAnalysis.summary.length,
-      keyPointsCount: geminiAnalysis.keyPoints.length,
-      culturalObservationsCount: geminiAnalysis.culturalObservations.length,
-      communicationPatternsCount: geminiAnalysis.communicationPatterns.length,
-      recommendationsCount: geminiAnalysis.recommendations.length,
-    });
+    logger.info(
+      {
+        summaryLength: geminiAnalysis.summary.length,
+        keyPointsCount: geminiAnalysis.keyPoints.length,
+        culturalObservationsCount: geminiAnalysis.culturalObservations.length,
+        communicationPatternsCount: geminiAnalysis.communicationPatterns.length,
+        recommendationsCount: geminiAnalysis.recommendations.length,
+      },
+      `[API_ANALYZE_POST] Gemini analysis complete:`
+    );
 
     // convert Gemini analysis to insights format
     const insights: Insight[] = [];
@@ -415,7 +422,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return apiHandler(async () => {
-    console.log(`[API_ANALYZE_GET] Fetching analysis results`);
+    logger.info(`[API_ANALYZE_GET] Fetching analysis results`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -426,7 +433,7 @@ export async function GET(
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_ANALYZE_GET] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_ANALYZE_GET] Authenticated user:`);
 
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
@@ -447,7 +454,7 @@ export async function GET(
 
     // verify ownership
     if (session.userId !== userId) {
-      console.error(
+      logger.error(
         `[API_ANALYZE_GET] Authorization failed: session ${id} belongs to ${session.userId}, not ${userId}`
       );
       throw new AuthorizationError("not authorized to access this session");

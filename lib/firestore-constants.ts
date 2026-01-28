@@ -1,3 +1,5 @@
+import { logger } from "@/lib/logger";
+
 // Firestore collection names and document ID conventions
 // ensures consistent, human-readable naming across the application
 
@@ -48,12 +50,15 @@ export function generateDocId(prefix: string): string {
   const random = Math.random().toString(36).substring(2, 10); // 8 char random
   const docId = `${prefix}_${timestamp}_${random}`;
 
-  console.log(`[FIRESTORE_ID] Generated document ID:`, {
-    prefix,
-    timestamp,
-    random,
-    fullId: docId,
-  });
+  logger.info(
+    {
+      prefix,
+      timestamp,
+      random,
+      fullId: docId,
+    },
+    `[FIRESTORE_ID] Generated document ID:`
+  );
 
   return docId;
 }
@@ -73,10 +78,13 @@ export function generateUserId(email: string): string {
 
   const userId = `${DOC_PREFIXES.USER}_${sanitized}`;
 
-  console.log(`[FIRESTORE_ID] Generated user ID from email:`, {
-    email,
-    userId,
-  });
+  logger.info(
+    {
+      email,
+      userId,
+    },
+    `[FIRESTORE_ID] Generated user ID from email:`
+  );
 
   return userId;
 }
@@ -89,10 +97,13 @@ export function generateUserId(email: string): string {
 export function generateUserIdFromUid(uid: string): string {
   const userId = `${DOC_PREFIXES.USER}_${uid}`;
 
-  console.log(`[FIRESTORE_ID] Generated user ID from UID:`, {
-    uid,
-    userId,
-  });
+  logger.info(
+    {
+      uid,
+      userId,
+    },
+    `[FIRESTORE_ID] Generated user ID from UID:`
+  );
 
   return userId;
 }

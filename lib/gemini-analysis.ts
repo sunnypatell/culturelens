@@ -6,6 +6,7 @@
  */
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { logger } from "@/lib/logger";
 
 // Gemini configuration
 const GEMINI_PROJECT_ID = "gen-lang-client-0985823799";
@@ -41,7 +42,7 @@ export async function analyzeTranscriptWithGemini(
   const apiKey = process.env.GOOGLE_AI_API_KEY;
 
   if (!apiKey) {
-    console.warn("[GEMINI] API key not configured - using fallback analysis");
+    logger.warn("[GEMINI] API key not configured - using fallback analysis");
     return generateFallbackAnalysis(transcript, segments);
   }
 
@@ -53,7 +54,7 @@ export async function analyzeTranscriptWithGemini(
     const prompt = buildAnalysisPrompt(transcript, segments);
 
     // Generate analysis
-    console.log(`[GEMINI] Analyzing transcript with ${GEMINI_MODEL}...`);
+    logger.info(`[GEMINI] Analyzing transcript with ${GEMINI_MODEL}...`);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const analysisText = response.text();
@@ -61,13 +62,13 @@ export async function analyzeTranscriptWithGemini(
     // Parse structured response
     const analysis = parseGeminiResponse(analysisText);
 
-    console.log(
+    logger.info(
       `[GEMINI] Analysis complete - ${analysis.keyPoints.length} key points identified`
     );
 
     return analysis;
   } catch (error) {
-    console.error(`[GEMINI] Analysis failed:`, error);
+    logger.error({ data: error }, `[GEMINI] Analysis failed:`);
     return generateFallbackAnalysis(transcript, segments);
   }
 }

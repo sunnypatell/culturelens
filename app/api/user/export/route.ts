@@ -8,6 +8,7 @@ import {
   whereEqual,
 } from "@/lib/firebase-server-utils";
 import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/user/export
@@ -15,7 +16,7 @@ import { COLLECTIONS, generateUserIdFromUid } from "@/lib/firestore-constants";
  */
 export async function POST(request: Request) {
   try {
-    console.log(`[API_EXPORT_POST] Exporting user data`);
+    logger.info(`[API_EXPORT_POST] Exporting user data`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
       version: "1.0.0",
     };
 
-    console.log(
+    logger.info(
       `[API_EXPORT_POST] Exported ${sessions.length} sessions for user ${userId}`
     );
 
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("[API_EXPORT_POST] Export error:", error);
+    logger.error({ data: error }, "[API_EXPORT_POST] Export error:");
     return NextResponse.json(
       { error: "failed to export data" },
       { status: 500 }

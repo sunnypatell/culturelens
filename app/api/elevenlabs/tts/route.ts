@@ -19,10 +19,11 @@ import { ElevenLabsSchemas } from "@/lib/api/schemas";
 import { storeAudioInFirestore } from "@/lib/audio-storage-server";
 import { verifyIdToken } from "@/lib/auth-server";
 import { checkRateLimit } from "@/lib/rate-limiter";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: Request) {
   return apiHandler(async () => {
-    console.log(`[API_TTS_POST] Received TTS request`);
+    logger.info(`[API_TTS_POST] Received TTS request`);
 
     // authenticate user
     const authHeader = request.headers.get("authorization");
@@ -33,13 +34,13 @@ export async function POST(request: Request) {
     const token = authHeader.replace("Bearer ", "");
     const decodedToken = await verifyIdToken(token);
     const userId = decodedToken.uid;
-    console.log(`[API_TTS_POST] Authenticated user:`, userId);
+    logger.info({ data: userId }, `[API_TTS_POST] Authenticated user:`);
 
     // rate limiting: 10 requests per minute per user
     try {
       checkRateLimit(userId, 10, 60000);
     } catch (error) {
-      console.warn(`[API_TTS_POST] Rate limit exceeded for user ${userId}`);
+      logger.warn(`[API_TTS_POST] Rate limit exceeded for user ${userId}`);
       throw new ExternalServiceError(
         "rate limit",
         error instanceof Error ? error.message : "too many requests"
