@@ -27,6 +27,7 @@ import {
   getStrengthColor,
   getStrengthTextColor,
 } from "@/lib/password-strength";
+import { clientLogger } from "@/lib/client-logger";
 
 // delay before redirecting to onboarding after successful signup
 const SUCCESS_REDIRECT_DELAY_MS = 2000;
@@ -53,7 +54,7 @@ export function Signup() {
     };
     setFormData(newFormData);
 
-    console.log(`[SIGNUP_FORM] Field changed:`, {
+    clientLogger.info(`[SIGNUP_FORM] Field changed:`, {
       field: e.target.id,
       value: e.target.id === "password" ? "***" : e.target.value,
     });
@@ -71,22 +72,24 @@ export function Signup() {
   }, [formData.password, formData.confirmPassword]);
 
   const validateForm = () => {
-    console.log(`[SIGNUP_VALIDATION] Starting form validation`);
+    clientLogger.info(`[SIGNUP_VALIDATION] Starting form validation`);
 
     if (!formData.displayName.trim()) {
-      console.error(
+      clientLogger.error(
         `[SIGNUP_VALIDATION] Validation failed: missing display name`
       );
       setError("Please enter your display name");
       return false;
     }
     if (!formData.email.trim()) {
-      console.error(`[SIGNUP_VALIDATION] Validation failed: missing email`);
+      clientLogger.error(
+        `[SIGNUP_VALIDATION] Validation failed: missing email`
+      );
       setError("Please enter your email");
       return false;
     }
     if (!passwordStrength.isValid) {
-      console.error(
+      clientLogger.error(
         `[SIGNUP_VALIDATION] Validation failed: password does not meet requirements`,
         {
           strength: passwordStrength.strength,
@@ -100,19 +103,21 @@ export function Signup() {
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      console.error(
+      clientLogger.error(
         `[SIGNUP_VALIDATION] Validation failed: passwords do not match`
       );
       setError("Passwords do not match");
       return false;
     }
     if (!agreedToTerms) {
-      console.error(`[SIGNUP_VALIDATION] Validation failed: terms not agreed`);
+      clientLogger.error(
+        `[SIGNUP_VALIDATION] Validation failed: terms not agreed`
+      );
       setError("Please agree to the Terms and Conditions");
       return false;
     }
 
-    console.log(`[SIGNUP_VALIDATION] Form validation successful`);
+    clientLogger.info(`[SIGNUP_VALIDATION] Form validation successful`);
     return true;
   };
 
@@ -121,7 +126,7 @@ export function Signup() {
     setError("");
     setSuccess(false);
 
-    console.log(`[SIGNUP_SUBMIT] Form submission started`, {
+    clientLogger.info(`[SIGNUP_SUBMIT] Form submission started`, {
       displayName: formData.displayName,
       email: formData.email,
       passwordStrength: passwordStrength.strength,
@@ -129,32 +134,32 @@ export function Signup() {
     });
 
     if (!validateForm()) {
-      console.error(
+      clientLogger.error(
         `[SIGNUP_SUBMIT] Form validation failed, aborting submission`
       );
       return;
     }
 
     setLoading(true);
-    console.log(`[SIGNUP_SUBMIT] Calling Firebase signUp...`);
+    clientLogger.info(`[SIGNUP_SUBMIT] Calling Firebase signUp...`);
 
     try {
       await signUp(formData.email, formData.password, formData.displayName);
-      console.log(
+      clientLogger.info(
         `[SIGNUP_SUBMIT] Successfully created account for:`,
         formData.email
       );
       setSuccess(true);
 
       // redirect to onboarding to complete profile
-      console.log(
+      clientLogger.info(
         `[SIGNUP_SUBMIT] Redirecting to onboarding in ${SUCCESS_REDIRECT_DELAY_MS}ms`
       );
       setTimeout(() => {
         router.push("/onboarding");
       }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: unknown) {
-      console.error(`[SIGNUP_SUBMIT] Failed to create account:`, err);
+      clientLogger.error(`[SIGNUP_SUBMIT] Failed to create account:`, err);
       if (err instanceof Error) {
         setError(err.message);
       } else {

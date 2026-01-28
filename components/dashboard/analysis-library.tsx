@@ -17,6 +17,7 @@ import { Footer } from "./footer";
 import { useUserStats } from "@/lib/hooks/useUserStats";
 import { useAuth } from "@/components/auth/auth-provider";
 import { toast } from "sonner";
+import { clientLogger } from "@/lib/client-logger";
 import { GradientCard } from "@/components/ui/glass-card";
 import {
   Clock,
@@ -143,7 +144,7 @@ export function AnalysisLibrary({
     try {
       const token = await getIdToken();
       if (!token) {
-        console.error("no auth token available");
+        clientLogger.error("no auth token available");
         return;
       }
 
@@ -193,7 +194,7 @@ export function AnalysisLibrary({
         setSessions(transformedSessions);
       }
     } catch (error) {
-      console.error("failed to fetch sessions:", error);
+      clientLogger.error("failed to fetch sessions:", error);
     } finally {
       setLoading(false);
     }

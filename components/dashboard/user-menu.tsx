@@ -11,6 +11,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
 import { toast } from "sonner";
+import { clientLogger } from "@/lib/client-logger";
 
 interface UserMenuProps {
   children: React.ReactNode;
@@ -29,7 +30,7 @@ export function UserMenu({ children, onNavigate }: UserMenuProps) {
       toast.success("signed out successfully");
       router.push("/auth/login");
     } catch (error) {
-      console.error("[UserMenu] Sign out error:", error);
+      clientLogger.error("[UserMenu] Sign out error:", error);
       toast.error("failed to sign out");
     }
   };

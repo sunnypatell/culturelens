@@ -23,6 +23,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { clientLogger } from "@/lib/client-logger";
 
 export function SettingsView() {
   const { user, getIdToken, signOut } = useAuth();
@@ -87,7 +88,7 @@ export function SettingsView() {
             setSelectedFocusAreas(settings.focusAreas);
         }
       } catch (error) {
-        console.error("[SettingsView] Failed to load settings:", error);
+        clientLogger.error("[SettingsView] Failed to load settings:", error);
       }
     };
 
@@ -123,7 +124,7 @@ export function SettingsView() {
 
       toast.success("profile updated successfully");
     } catch (error) {
-      console.error("[SettingsView] Profile update error:", error);
+      clientLogger.error("[SettingsView] Profile update error:", error);
       toast.error("failed to update profile");
     } finally {
       setLoading(false);
@@ -158,7 +159,7 @@ export function SettingsView() {
 
       toast.success("settings saved successfully");
     } catch (error) {
-      console.error("[SettingsView] Settings save error:", error);
+      clientLogger.error("[SettingsView] Settings save error:", error);
       toast.error("failed to save settings");
     } finally {
       setLoading(false);
@@ -193,7 +194,7 @@ export function SettingsView() {
 
       toast.success("data exported successfully");
     } catch (error) {
-      console.error("[SettingsView] Export error:", error);
+      clientLogger.error("[SettingsView] Export error:", error);
       toast.error("failed to export data");
     } finally {
       setLoading(false);
@@ -228,7 +229,7 @@ export function SettingsView() {
       await signOut();
       router.push("/auth/login");
     } catch (error) {
-      console.error("[SettingsView] Delete account error:", error);
+      clientLogger.error("[SettingsView] Delete account error:", error);
       toast.error("failed to delete account");
     } finally {
       setLoading(false);

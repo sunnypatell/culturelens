@@ -17,6 +17,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import * as authClient from "@/lib/auth-client";
 import { createOrUpdateUserProfile } from "@/lib/account-linking";
+import { clientLogger } from "@/lib/client-logger";
 
 interface AuthContextType {
   user: User | null;
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log(`[AUTH_PROVIDER] Auth state changed:`, {
+      clientLogger.info(`[AUTH_PROVIDER] Auth state changed:`, {
         isAuthenticated: !!user,
         uid: user?.uid,
         email: user?.email,
@@ -72,9 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const token = await user.getIdToken();
           // Set cookie with secure flags (expires in 7 days)
           document.cookie = `session=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-          console.log(`[AUTH_PROVIDER] Session cookie set`);
+          clientLogger.info(`[AUTH_PROVIDER] Session cookie set`);
         } catch (error) {
-          console.error(`[AUTH_PROVIDER] Failed to set session cookie:`, error);
+          clientLogger.error(
+            `[AUTH_PROVIDER] Failed to set session cookie:`,
+            error
+          );
         }
 
         // only sync profile if this is a new user or we haven't synced yet
@@ -83,9 +87,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             await createOrUpdateUserProfile(user);
             syncedUserRef.current = user.uid;
-            console.log(`[AUTH_PROVIDER] User profile synchronized`);
+            clientLogger.info(`[AUTH_PROVIDER] User profile synchronized`);
           } catch (error) {
-            console.error(
+            clientLogger.error(
               `[AUTH_PROVIDER] Failed to sync user profile:`,
               error
             );
@@ -96,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // user signed out, reset sync tracker and clear cookie
         syncedUserRef.current = null;
         document.cookie = "session=; path=/; max-age=0";
-        console.log(`[AUTH_PROVIDER] Session cookie cleared`);
+        clientLogger.info(`[AUTH_PROVIDER] Session cookie cleared`);
       }
 
       setUser(user);
@@ -111,23 +115,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
     displayName?: string
   ) => {
-    console.log(`[AUTH_PROVIDER] Sign up started:`, { email, displayName });
+    clientLogger.info(`[AUTH_PROVIDER] Sign up started:`, {
+      email,
+      displayName,
+    });
     const user = await authClient.signUp(email, password, displayName);
-    console.log(`[AUTH_PROVIDER] Sign up successful:`, user.uid);
+    clientLogger.info(`[AUTH_PROVIDER] Sign up successful:`, user.uid);
     return user;
   };
 
   const handleSignIn = async (email: string, password: string) => {
-    console.log(`[AUTH_PROVIDER] Sign in started:`, { email });
+    clientLogger.info(`[AUTH_PROVIDER] Sign in started:`, { email });
     const user = await authClient.signIn(email, password);
-    console.log(`[AUTH_PROVIDER] Sign in successful:`, user.uid);
+    clientLogger.info(`[AUTH_PROVIDER] Sign in successful:`, user.uid);
     return user;
   };
 
   const handleSignInWithGoogle = async () => {
-    console.log(`[AUTH_PROVIDER] Google sign in started`);
+    clientLogger.info(`[AUTH_PROVIDER] Google sign in started`);
     const user = await authClient.signInWithGoogle();
-    console.log(`[AUTH_PROVIDER] Google sign in successful:`, {
+    clientLogger.info(`[AUTH_PROVIDER] Google sign in successful:`, {
       uid: user.uid,
       email: user.email,
     });

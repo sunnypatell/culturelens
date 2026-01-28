@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Orb, type AgentState } from "@/components/ui/orb";
 import { motion, AnimatePresence } from "framer-motion";
+import { clientLogger } from "@/lib/client-logger";
 
 // Public agent ID — exposed to browser via NEXT_PUBLIC_ prefix.
 // For public agents, no signed URL is needed — connects directly.
@@ -74,7 +75,7 @@ export function VoiceAgent({
   // sync sessionId when providedSessionId changes (important for proper transcript saving)
   useEffect(() => {
     if (providedSessionId && providedSessionId !== sessionId) {
-      console.log(
+      clientLogger.info(
         `[VoiceAgent] Syncing sessionId: ${sessionId} -> ${providedSessionId}`
       );
       setSessionId(providedSessionId);
@@ -100,7 +101,7 @@ export function VoiceAgent({
 
   const conversation = useConversation({
     onConnect: (props: { conversationId: string }) => {
-      console.log("[VoiceAgent] Connected to ElevenLabs", {
+      clientLogger.info("[VoiceAgent] Connected to ElevenLabs", {
         conversationId: props.conversationId,
         timestamp: new Date().toISOString(),
       });
@@ -108,7 +109,7 @@ export function VoiceAgent({
     },
     onDisconnect: (details: { reason?: "user" | "agent" | "error" }) => {
       const reason = details?.reason || "unknown";
-      console.log("[VoiceAgent] Disconnected from ElevenLabs", {
+      clientLogger.info("[VoiceAgent] Disconnected from ElevenLabs", {
         reason,
         reasonExplanation:
           reason === "user"
@@ -129,7 +130,7 @@ export function VoiceAgent({
     onError: (e: string | Error) => {
       const errorMsg =
         typeof e === "string" ? e : ((e as Error)?.message ?? "Unknown error");
-      console.error("[VoiceAgent] Error from ElevenLabs:", {
+      clientLogger.error("[VoiceAgent] Error from ElevenLabs:", {
         error: errorMsg,
         fullError: e,
         timestamp: new Date().toISOString(),
@@ -138,7 +139,7 @@ export function VoiceAgent({
       setStatus("idle");
     },
     onModeChange: (mode: { mode: "listening" | "speaking" }) => {
-      console.log("[VoiceAgent] Mode changed:", {
+      clientLogger.info("[VoiceAgent] Mode changed:", {
         mode: mode.mode,
         timestamp: new Date().toISOString(),
       });
@@ -146,7 +147,7 @@ export function VoiceAgent({
     onStatusChange: (prop: {
       status: "connected" | "disconnected" | "connecting" | "disconnecting";
     }) => {
-      console.log("[VoiceAgent] Status changed:", {
+      clientLogger.info("[VoiceAgent] Status changed:", {
         status: prop.status,
         timestamp: new Date().toISOString(),
       });
@@ -156,7 +157,7 @@ export function VoiceAgent({
       const speaker = props.source === "user" ? "A" : "B";
       const messageText = props.message;
 
-      console.log("[VoiceAgent] Message received:", {
+      clientLogger.info("[VoiceAgent] Message received:", {
         source: props.source,
         speaker,
         messageLength: messageText.length,
@@ -186,7 +187,7 @@ export function VoiceAgent({
     try {
       const token = await getIdToken();
       if (!token) {
-        console.error("no auth token available for transcript save");
+        clientLogger.error("no auth token available for transcript save");
         return;
       }
 
@@ -227,11 +228,11 @@ export function VoiceAgent({
         throw new Error(`status update failed: ${statusResponse.status}`);
       }
 
-      console.log(
+      clientLogger.info(
         `[VoiceAgent] Transcript saved and session ${sessionId} marked as processing`
       );
     } catch (error) {
-      console.error("[VoiceAgent] Failed to save transcript:", error);
+      clientLogger.error("[VoiceAgent] Failed to save transcript:", error);
       // silently fail - transcript saving is not critical to user experience
     }
   }, [sessionId, getIdToken]);
@@ -242,16 +243,19 @@ export function VoiceAgent({
 
     try {
       // Request microphone permission first
-      console.log("[VoiceAgent] Requesting microphone permission...");
+      clientLogger.info("[VoiceAgent] Requesting microphone permission...");
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         });
-        console.log("[VoiceAgent] Microphone permission granted");
+        clientLogger.info("[VoiceAgent] Microphone permission granted");
         // Stop the test stream immediately - ElevenLabs will create its own
         stream.getTracks().forEach((track) => track.stop());
       } catch (micError) {
-        console.error("[VoiceAgent] Microphone permission denied:", micError);
+        clientLogger.error(
+          "[VoiceAgent] Microphone permission denied:",
+          micError
+        );
         throw new Error(
           "Microphone permission denied. Please allow microphone access to use the voice agent."
         );
@@ -275,12 +279,12 @@ export function VoiceAgent({
           }),
         };
 
-        console.log(
+        clientLogger.info(
           "[VoiceAgent] Starting session with config:",
           sessionConfig
         );
         await conversation.startSession(sessionConfig);
-        console.log("[VoiceAgent] Session started successfully");
+        clientLogger.info("[VoiceAgent] Session started successfully");
         return;
       }
 

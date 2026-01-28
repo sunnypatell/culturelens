@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { clientLogger } from "@/lib/client-logger";
 import { useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -75,7 +76,9 @@ export function Orb({
           const canvas = gl.domElement;
           const handleContextLost = (event: Event) => {
             event.preventDefault();
-            console.warn("[Orb] WebGL context lost, attempting recovery...");
+            clientLogger.warn(
+              "[Orb] WebGL context lost, attempting recovery..."
+            );
             setTimeout(() => {
               try {
                 gl.forceContextRestore();
@@ -86,7 +89,7 @@ export function Orb({
             }, 100);
           };
           const handleContextRestored = () => {
-            console.log("[Orb] WebGL context restored");
+            clientLogger.info("[Orb] WebGL context restored");
           };
           canvas.addEventListener("webglcontextlost", handleContextLost);
           canvas.addEventListener(
@@ -95,7 +98,7 @@ export function Orb({
           );
         }}
         onError={() => {
-          console.error("[Orb] Canvas error, falling back to CSS");
+          clientLogger.error("[Orb] Canvas error, falling back to CSS");
           setWebglError(true);
         }}
       >

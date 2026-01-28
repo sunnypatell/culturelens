@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, Phone, Lock, Sparkles } from "lucide-react";
 import { FlipWords } from "@/components/ui/flip-words";
 import { motion } from "framer-motion";
+import { clientLogger } from "@/lib/client-logger";
 
 export function Login() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export function Login() {
         // also check for sessionId that may have been preserved
         const sessionId = searchParams.get("sessionId");
 
-        console.log("[Login] Session cookie set, redirecting...", {
+        clientLogger.info("[Login] Session cookie set, redirecting...", {
           redirectUrl,
           redirectPath,
           sessionId,

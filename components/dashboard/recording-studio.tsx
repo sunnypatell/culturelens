@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { AnalysisLoader } from "@/components/ui/analysis-loader";
 import { motion } from "framer-motion";
+import { clientLogger } from "@/lib/client-logger";
 
 type RecordingState =
   | "setup"
@@ -167,12 +168,12 @@ export function RecordingStudio({
       const result = await response.json();
       setCurrentSessionId(result.data.id);
 
-      console.log("[RecordingStudio] Session created:", result.data.id);
+      clientLogger.info("[RecordingStudio] Session created:", result.data.id);
       toast.success("session created successfully");
 
       setState("agent");
     } catch (error) {
-      console.error("[RecordingStudio] Session creation error:", error);
+      clientLogger.error("[RecordingStudio] Session creation error:", error);
       toast.error("failed to create session");
     } finally {
       setCreating(false);
