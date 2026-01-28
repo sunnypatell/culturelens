@@ -88,7 +88,12 @@ actor APIClient {
 
         switch httpResponse.statusCode {
         case 200...299:
-            return try decoder.decode(T.self, from: data)
+            // unwrap { success, data } response envelope (lib/api/responses.ts)
+            let envelope = try decoder.decode(APIResponse<T>.self, from: data)
+            guard let result = envelope.data else {
+                throw APIError.noData
+            }
+            return result
         case 401:
             throw APIError.unauthorized
         case 403:
@@ -98,11 +103,12 @@ actor APIClient {
         case 429:
             throw APIError.rateLimited
         case 400...499:
-            let message = try? decoder.decode(APIResponse<String>.self, from: data).error
-            throw APIError.serverError(httpResponse.statusCode, message)
+            // parse backend ApiErrorResponse envelope (lib/api/responses.ts)
+            let errorResponse = try? decoder.decode(APIErrorResponse.self, from: data)
+            throw APIError.serverError(httpResponse.statusCode, errorResponse?.error?.message)
         case 500...599:
-            let message = try? decoder.decode(APIResponse<String>.self, from: data).error
-            throw APIError.serverError(httpResponse.statusCode, message)
+            let errorResponse = try? decoder.decode(APIErrorResponse.self, from: data)
+            throw APIError.serverError(httpResponse.statusCode, errorResponse?.error?.message)
         default:
             throw APIError.unknown
         }
@@ -115,17 +121,59 @@ actor APIClient {
         body: (any Encodable)? = nil,
         requiresAuth: Bool = true
     ) async throws {
-        let _: EmptyResponse = try await request(
-            endpoint: endpoint,
-            method: method,
-            body: body,
-            requiresAuth: requiresAuth
-        )
+        let url = baseURL.appendingPathComponent(endpoint)
+        var request = URLRequest(url: url)
+        request.httpMethod = method.rawValue
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        if requiresAuth {
+            guard let token = await tokenProvider?() else {
+                throw APIError.unauthorized
+            }
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        if let body = body {
+            request.httpBody = try encoder.encode(body)
+        }
+
+        #if DEBUG
+        print("[API] \(method.rawValue) \(url.absoluteString)")
+        #endif
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.unknown
+        }
+
+        #if DEBUG
+        print("[API] Response: \(httpResponse.statusCode)")
+        #endif
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            return // success, no data to unwrap
+        case 401:
+            throw APIError.unauthorized
+        case 403:
+            throw APIError.forbidden
+        case 404:
+            throw APIError.notFound
+        case 429:
+            throw APIError.rateLimited
+        case 400...499:
+            let errorResponse = try? decoder.decode(APIErrorResponse.self, from: data)
+            throw APIError.serverError(httpResponse.statusCode, errorResponse?.error?.message)
+        case 500...599:
+            let errorResponse = try? decoder.decode(APIErrorResponse.self, from: data)
+            throw APIError.serverError(httpResponse.statusCode, errorResponse?.error?.message)
+        default:
+            throw APIError.unknown
+        }
     }
 }
-
-// MARK: - Empty Response
-private struct EmptyResponse: Decodable {}
 
 // MARK: - Session Endpoints
 extension APIClient {

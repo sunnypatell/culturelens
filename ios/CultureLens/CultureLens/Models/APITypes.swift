@@ -8,14 +8,25 @@
 import Foundation
 
 // MARK: - API Response Wrapper
+// matches backend ApiSuccessResponse envelope from lib/api/responses.ts
 struct APIResponse<T: Decodable>: Decodable {
+    let success: Bool
     let data: T?
-    let error: String?
     let message: String?
+}
 
-    var isSuccess: Bool {
-        error == nil
-    }
+// MARK: - API Error Response
+// matches backend ApiErrorResponse envelope from lib/api/responses.ts
+struct APIErrorResponse: Decodable {
+    let success: Bool
+    let error: APIErrorDetail?
+}
+
+struct APIErrorDetail: Decodable {
+    let code: String?
+    let message: String?
+    let details: String?
+    let hint: String?
 }
 
 // MARK: - Paginated Response

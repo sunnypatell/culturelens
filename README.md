@@ -24,6 +24,14 @@ _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-Fir
 
 ---
 
+## 🎬 Demo
+
+> full walkthrough of the web app and native iOS app running side-by-side
+
+https://github.com/sunnypatell/culturelens/releases/download/v1.1.1-ios/CultureLens.mp4
+
+---
+
 ## 📖 Overview
 
 CultureLens is a **production-grade conversation analytics platform** that provides real-time, culturally-aware insights into communication patterns. Built during **MLH HackHive 2026**, it combines cutting-edge voice AI with sophisticated analysis pipelines to deliver neutral, non-judgmental feedback on conversational dynamics.

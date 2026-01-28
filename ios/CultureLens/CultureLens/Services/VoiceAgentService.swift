@@ -102,7 +102,10 @@ final class VoiceAgentService: NSObject, ObservableObject {
             try setupAudioSession()
 
             // Connect WebSocket
-            try await connectWebSocket(url: URL(string: signedURLResponse.signedUrl)!)
+            guard let wsURL = URL(string: signedURLResponse.signedUrl) else {
+                throw VoiceAgentError.connectionFailed
+            }
+            try await connectWebSocket(url: wsURL)
 
             connectionState = .connected
             agentState = .listening

@@ -115,7 +115,7 @@ final class NetworkMonitor: ObservableObject {
 
             let (_, response) = try await URLSession.shared.data(for: request)
             if let httpResponse = response as? HTTPURLResponse {
-                firebaseReachable = (200...499).contains(httpResponse.statusCode)
+                firebaseReachable = (200...299).contains(httpResponse.statusCode)
             }
         } catch {
             if errorMessage == nil {

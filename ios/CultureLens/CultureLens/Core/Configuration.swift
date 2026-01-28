@@ -36,7 +36,7 @@ struct Configuration {
 
     // MARK: - ElevenLabs Configuration
     /// Agent ID matching NEXT_PUBLIC_ELEVENLABS_AGENT_ID from web app
-    static let elevenLabsAgentId = "agent_5401kfq4a552e61962kx44qcbcrn"
+    static let elevenLabsAgentId = "agent_9601kfska8vef67v3tbz4bva9ynq"
 
     static var elevenLabsWebSocketURL: URL {
         URL(string: "wss://api.elevenlabs.io/v1/convai/conversation")!
