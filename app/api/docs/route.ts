@@ -1,0 +1,11 @@
+import { ApiReference } from "@scalar/nextjs-api-reference";
+
+export const GET = ApiReference({
+  url: "/api/docs/openapi.json",
+  theme: "kepler",
+  pageTitle: "CultureLens API Reference",
+  defaultHttpClient: {
+    targetKey: "js",
+    clientKey: "fetch",
+  },
+});

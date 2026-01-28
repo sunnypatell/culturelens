@@ -2,6 +2,8 @@
 
 comprehensive documentation for all Next.js API routes.
 
+> **💡 interactive explorer**: visit [`/api/docs`](/api/docs) for a full interactive API reference powered by [Scalar](https://scalar.com) with try-it-out functionality, code samples, and OpenAPI 3.1 spec.
+
 ---
 
 ## 📖 overview
