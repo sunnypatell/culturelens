@@ -29,6 +29,8 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 ### changed
 
+- **CI**: upgraded `actions/checkout` v4→v6 and `actions/setup-node` v4→v6 across all 10 workflows (`5183a85`)
+
 - **eslint**: strengthened config with `@typescript-eslint/no-explicit-any`, `react-hooks`, `jsx-a11y` rules, `no-console` error in server code
 - **type safety**: eliminated 35+ explicit `any` types across codebase with proper TypeScript types
 - **logging**: replaced all `console.log` statements with structured pino logger (server) and clientLogger (client) — zero raw console calls remain
@@ -38,6 +40,10 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 ### fixed
 
+- **security**: added session ownership validation to transcript POST endpoint — prevents cross-user transcript injection via Admin SDK (`e9fb9c3`)
+- **resilience**: replaced `Promise.all` with `Promise.allSettled` in user account deletion — partial failures no longer orphan data (`7fb8936`)
+- **dead code**: removed 4 unused stub files (cultural-lens, linguistic-markers, metrics, debrief-generator) and 3 unused packages (wavesurfer.js, @tsparticles/react, @tsparticles/slim) (`e2bc206`)
+- **CI**: lazy-initialized Firebase Admin SDK so build succeeds without credentials in CI (`5a2a912`)
 - **dead code**: removed unused `_mounted` state variable from dashboard-home component (`3cf0bcf`)
 - **CI**: labeler.yml paths corrected from `src/app/**` to `app/**` to match actual repo structure
 - **CI**: `.gitignore` scoped `/transcripts/` to root-level only, preventing `app/api/transcripts/` from being ignored
