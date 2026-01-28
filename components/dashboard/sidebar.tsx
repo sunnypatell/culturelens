@@ -139,7 +139,10 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 relative z-10">
+      <nav
+        aria-label="Main navigation"
+        className="flex-1 p-4 space-y-2 relative z-10"
+      >
         {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = activeView === item.id;
@@ -164,6 +167,8 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               onMouseLeave={() => setHoveredItem(null)}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
+              aria-current={isActive ? "page" : undefined}
+              aria-label={item.label}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 relative overflow-hidden group",
                 isActive
@@ -299,6 +304,7 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            aria-label="User menu"
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/20 backdrop-blur-sm transition-all duration-300 group relative overflow-hidden"
           >
             {/* Glassmorphic hover effect */}

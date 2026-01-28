@@ -47,7 +47,7 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
-      <main className="flex-1 overflow-auto">
+      <main id="main-content" className="flex-1 overflow-auto">
         <ErrorBoundary>
           {activeView === "home" && (
             <DashboardHome

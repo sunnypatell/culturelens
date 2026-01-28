@@ -304,6 +304,7 @@ export function Login() {
                   <form
                     onSubmit={handleEmailPasswordSignIn}
                     className="space-y-4"
+                    aria-describedby={error ? "auth-error" : undefined}
                   >
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
@@ -435,7 +436,12 @@ export function Login() {
 
               {/* Error/Success Messages */}
               {error && (
-                <Alert variant="destructive" className="mt-4">
+                <Alert
+                  variant="destructive"
+                  className="mt-4"
+                  id="auth-error"
+                  role="alert"
+                >
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
