@@ -1,14 +1,17 @@
 // transcript management API endpoint
 
-import { createDocument } from "@/lib/firebase-server-utils";
+import { createDocument, getDocument } from "@/lib/firebase-server-utils";
 import {
   apiHandler,
   apiSuccess,
   DatabaseError,
   AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
   validateRequest,
 } from "@/lib/api";
 import { TranscriptSchemas } from "@/lib/api/schemas";
+import { COLLECTIONS } from "@/lib/firestore-constants";
 import { verifyIdToken } from "@/lib/auth-server";
 import { createRequestLogger } from "@/lib/logger";
 
@@ -35,10 +38,24 @@ export async function POST(request: Request) {
     // validate request body
     const body = await validateRequest(request, TranscriptSchemas.create);
 
+    // verify the authenticated user owns the session (Admin SDK bypasses firestore.rules)
+    const session = (await getDocument(
+      COLLECTIONS.SESSIONS,
+      body.sessionId
+    )) as { id: string; userId?: string } | null;
+    if (!session) {
+      throw new NotFoundError("session", body.sessionId);
+    }
+    if (session.userId !== decodedToken.uid) {
+      throw new AuthorizationError(
+        "you do not have permission to add transcripts to this session"
+      );
+    }
+
     // store transcript in firestore with user ownership
     let transcriptId: string;
     try {
-      transcriptId = await createDocument("transcripts", {
+      transcriptId = await createDocument(COLLECTIONS.TRANSCRIPTS, {
         userId, // add user ownership
         sessionId: body.sessionId,
         transcript: body.transcript,
