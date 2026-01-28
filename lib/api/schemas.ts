@@ -66,13 +66,14 @@ export const ElevenLabsSchemas = {
  */
 export const SyncProfileSchemas = {
   // POST /api/user/sync-profile
+  // Firebase User properties are string | null, so allow nulls
   update: z.object({
-    email: z.string().email().optional(),
-    displayName: z.string().optional(),
-    phoneNumber: z.string().optional(),
-    photoURL: z.string().url().optional(),
-    emailVerified: z.boolean().optional(),
-    linkedProviders: z.array(z.string()).optional(),
+    email: z.string().email().nullish(),
+    displayName: z.string().nullish(),
+    phoneNumber: z.string().nullish(),
+    photoURL: z.string().url().nullish(),
+    emailVerified: z.boolean().nullish(),
+    linkedProviders: z.array(z.string()).nullish(),
   }),
 };
 
