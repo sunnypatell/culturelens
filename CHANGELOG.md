@@ -40,6 +40,9 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 ### fixed
 
+- **API consistency**: migrated user export route to standard error envelope pattern with `AuthenticationError`/`DatabaseError` classes (`fc2cb91`)
+- **validation**: added Zod schema validation to sync-profile POST endpoint — was the only route missing input validation (`8e0d0c5`)
+- **dead code**: removed dead state variables (`_waveformData`, `_agentSessionId`) from recording-studio, unused exports from gemini-analysis, unused collection constants (`545124b`)
 - **security**: added session ownership validation to transcript POST endpoint — prevents cross-user transcript injection via Admin SDK (`e9fb9c3`)
 - **resilience**: replaced `Promise.all` with `Promise.allSettled` in user account deletion — partial failures no longer orphan data (`7fb8936`)
 - **dead code**: removed 4 unused stub files (cultural-lens, linguistic-markers, metrics, debrief-generator) and 3 unused packages (wavesurfer.js, @tsparticles/react, @tsparticles/slim) (`e2bc206`)
