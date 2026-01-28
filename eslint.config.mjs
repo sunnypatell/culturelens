@@ -13,6 +13,7 @@ export default [
       "build/**",
       "backend/**",
       "ios/**",
+      "scripts/**",
     ],
   },
   // typescript + react files
