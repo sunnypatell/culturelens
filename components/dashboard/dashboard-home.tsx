@@ -64,7 +64,6 @@ export function DashboardHome({
   onViewInsights,
 }: DashboardHomeProps) {
   const { getIdToken } = useAuth();
-  const [_mounted, setMounted] = useState(false);
   const [recentSessions, setRecentSessions] = useState<TransformedSession[]>(
     []
   );
@@ -97,8 +96,6 @@ export function DashboardHome({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-
     const fetchSessions = async () => {
       try {
         const token = await getIdToken();
