@@ -262,19 +262,18 @@ export function VoiceAgent({
       // Override voice settings for natural conversation
       // Docs: https://elevenlabs.io/docs/agents-platform/libraries/react#startSession
       if (AGENT_ID) {
-        const sessionConfig: any = {
+        const sessionConfig = {
           agentId: AGENT_ID,
-        };
-
-        // Only override voice if not using agent's preset voice
-        if (!useAgentVoice) {
-          sessionConfig.overrides = {
-            tts: {
-              voiceId: selectedVoice,
-              ...getVoiceSettings(),
+          connectionType: "webrtc" as const,
+          ...(!useAgentVoice && {
+            overrides: {
+              tts: {
+                voiceId: selectedVoice,
+                ...getVoiceSettings(),
+              },
             },
-          };
-        }
+          }),
+        };
 
         console.log(
           "[VoiceAgent] Starting session with config:",

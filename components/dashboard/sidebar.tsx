@@ -150,7 +150,16 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1, duration: 0.3 }}
-              onClick={() => onViewChange(item.id as any)}
+              onClick={() =>
+                onViewChange(
+                  item.id as
+                    | "home"
+                    | "record"
+                    | "library"
+                    | "insights"
+                    | "settings"
+                )
+              }
               onMouseEnter={() => setHoveredItem(item.id)}
               onMouseLeave={() => setHoveredItem(null)}
               whileHover={{ x: 4 }}

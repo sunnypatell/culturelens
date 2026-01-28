@@ -6,7 +6,10 @@ import { adminDb, adminStorage } from "./firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
 
 // Firestore utility functions for server-side use with Admin SDK
-export const createDocument = async (collectionName: string, data: any) => {
+export const createDocument = async (
+  collectionName: string,
+  data: Record<string, unknown>
+) => {
   const docRef = await adminDb.collection(collectionName).add({
     ...data,
     createdAt: Timestamp.now(),
@@ -18,7 +21,7 @@ export const createDocument = async (collectionName: string, data: any) => {
 export const createDocumentWithId = async (
   collectionName: string,
   docId: string,
-  data: any
+  data: Record<string, unknown>
 ) => {
   await adminDb
     .collection(collectionName)
@@ -34,7 +37,7 @@ export const createDocumentWithId = async (
 export const updateDocument = async (
   collectionName: string,
   docId: string,
-  data: any
+  data: Record<string, unknown>
 ) => {
   await adminDb
     .collection(collectionName)
@@ -56,34 +59,41 @@ export const getDocument = async (collectionName: string, docId: string) => {
 
 export const getDocuments = async (
   collectionName: string,
-  constraints: any[] = []
+  constraints: Array<Record<string, unknown>> = []
 ) => {
-  let query = adminDb.collection(collectionName) as any;
+  let query: FirebaseFirestore.Query = adminDb.collection(collectionName);
 
   // apply constraints
   for (const constraint of constraints) {
     if (constraint.type === "where") {
-      query = query.where(constraint.field, constraint.op, constraint.value);
+      query = query.where(
+        constraint.field as string,
+        constraint.op as FirebaseFirestore.WhereFilterOp,
+        constraint.value
+      );
     } else if (constraint.type === "orderBy") {
-      query = query.orderBy(constraint.field, constraint.direction);
+      query = query.orderBy(
+        constraint.field as string,
+        constraint.direction as FirebaseFirestore.OrderByDirection
+      );
     } else if (constraint.type === "limit") {
-      query = query.limit(constraint.count);
+      query = query.limit(constraint.count as number);
     }
   }
 
   const querySnapshot = await query.get();
-  return querySnapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 // Common query constraints for Admin SDK
-export const whereEqual = (field: string, value: any) => ({
+export const whereEqual = (field: string, value: unknown) => ({
   type: "where",
   field,
   op: "==",
   value,
 });
 
-export const whereIn = (field: string, values: any[]) => ({
+export const whereIn = (field: string, values: unknown[]) => ({
   type: "where",
   field,
   op: "in",

@@ -23,6 +23,36 @@ import {
 } from "lucide-react";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
+// API response session shape (may contain Firestore timestamps)
+interface ApiSession {
+  id: string;
+  settings?: {
+    title?: string;
+    durationMs?: number;
+    participantCount?: number;
+    sessionType?: string;
+    culturalContext?: string[];
+  };
+  analysisResult?: {
+    insights?: unknown[];
+  };
+  createdAt?: string | { _seconds: number };
+  isFavorite?: boolean;
+}
+
+interface TransformedSession {
+  id: string;
+  title: string;
+  date: string;
+  timeAgo: string;
+  duration: string;
+  participants: number;
+  insights: number;
+  type: string;
+  gradientColors: string[];
+  isFavorite: boolean;
+}
+
 interface AnalysisLibraryProps {
   onViewInsights: (sessionId: string) => void;
   onNavigate?: (
@@ -41,7 +71,7 @@ export function AnalysisLibrary({
     "all"
   );
   const [hoveredSession, setHoveredSession] = useState<number | null>(null);
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<TransformedSession[]>([]);
   const [loading, setLoading] = useState(true);
   const { stats } = useUserStats();
 
@@ -131,7 +161,7 @@ export function AnalysisLibrary({
         ];
 
         const transformedSessions = data.data.map(
-          (session: any, index: number) => {
+          (session: ApiSession, index: number) => {
             const duration = session.settings?.durationMs
               ? `${Math.floor(session.settings.durationMs / 60000)}:${String(Math.floor((session.settings.durationMs % 60000) / 1000)).padStart(2, "0")}`
               : "0:00";
@@ -140,10 +170,15 @@ export function AnalysisLibrary({
 
             // handle firestore timestamp properly
             let createdDate: Date;
-            if (session.createdAt?._seconds) {
-              createdDate = new Date(session.createdAt._seconds * 1000);
-            } else if (session.createdAt) {
-              createdDate = new Date(session.createdAt);
+            const createdAt = session.createdAt;
+            if (
+              typeof createdAt === "object" &&
+              createdAt !== null &&
+              "_seconds" in createdAt
+            ) {
+              createdDate = new Date(createdAt._seconds * 1000);
+            } else if (createdAt) {
+              createdDate = new Date(createdAt);
             } else {
               createdDate = new Date();
             }

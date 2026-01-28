@@ -55,7 +55,7 @@ export async function GET(
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // fetch session
-    let session: any;
+    let session: Record<string, unknown> | null;
     try {
       session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {
@@ -105,7 +105,7 @@ export async function PATCH(
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // check if session exists
-    let session: any;
+    let session: Record<string, unknown> | null;
     try {
       session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {
@@ -171,7 +171,7 @@ export async function DELETE(
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // fetch session to verify ownership
-    let session: any;
+    let session: Record<string, unknown> | null;
     try {
       session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {

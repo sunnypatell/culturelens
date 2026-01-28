@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
-import type { AnalysisResult, Insight } from "@/lib/types";
+import type { AnalysisResult, Insight, Session } from "@/lib/types";
 
 interface CommunicationPattern {
   id: number;
@@ -194,7 +194,7 @@ function transformToKeyMoments(
 /**
  * formats session metadata for display
  */
-function formatSessionMetadata(session: any): SessionMetadata {
+function formatSessionMetadata(session: Session): SessionMetadata {
   const createdAt = new Date(session.createdAt);
   const now = new Date();
   const diffMs = now.getTime() - createdAt.getTime();
@@ -216,7 +216,7 @@ function formatSessionMetadata(session: any): SessionMetadata {
     : "Duration unknown";
 
   return {
-    title: session.settings?.title || session.title || "Untitled Session",
+    title: session.settings?.title || "Untitled Session",
     recordedAt,
     duration,
   };

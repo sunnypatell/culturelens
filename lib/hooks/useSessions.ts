@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import type { AnalysisResult } from "@/lib/types";
 
 export interface Session {
   id: string;
@@ -28,7 +29,7 @@ export interface Session {
   status: "recording" | "uploading" | "processing" | "ready" | "failed";
   audioUrl?: string;
   audioPath?: string;
-  analysisResult?: any;
+  analysisResult?: AnalysisResult;
   analyzedAt?: string;
   duration?: number;
   isFavorite?: boolean;

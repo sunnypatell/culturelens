@@ -40,7 +40,7 @@ export async function PATCH(
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // get session
-    let session: any;
+    let session: Record<string, unknown> | null;
     try {
       session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {

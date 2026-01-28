@@ -43,8 +43,8 @@ export async function DELETE(request: Request) {
       logger.info(`[API_DELETE_USER] Deleting ${sessions.length} sessions`);
 
       await Promise.all(
-        sessions.map((session: any) =>
-          deleteDocument(COLLECTIONS.SESSIONS, session.id)
+        sessions.map((session) =>
+          deleteDocument(COLLECTIONS.SESSIONS, session.id as string)
         )
       );
 

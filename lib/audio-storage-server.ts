@@ -70,7 +70,9 @@ export async function storeAudioInFirestore(
 export async function getAudioFromFirestore(
   audioId: string
 ): Promise<StoredAudio | null> {
-  const doc: any = await getDocument("audioFiles", audioId);
+  const doc = (await getDocument("audioFiles", audioId)) as
+    | (StoredAudio & { id: string })
+    | null;
 
   if (!doc) {
     return null;

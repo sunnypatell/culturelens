@@ -2,6 +2,7 @@
 
 import {
   User,
+  AuthCredential,
   linkWithCredential,
   fetchSignInMethodsForEmail,
 } from "firebase/auth";
@@ -64,7 +65,7 @@ export async function createOrUpdateUserProfile(
     const responseText = await response.text();
 
     if (!response.ok) {
-      let errorData: any = {};
+      let errorData: Record<string, unknown> = {};
       try {
         errorData = JSON.parse(responseText);
       } catch {
@@ -77,12 +78,13 @@ export async function createOrUpdateUserProfile(
         );
       }
       throw new Error(
-        errorData?.error?.message || "failed to sync user profile"
+        (errorData as { error?: { message?: string } })?.error?.message ||
+          "failed to sync user profile"
       );
     }
 
     // parse successful JSON response
-    let result: any;
+    let result: { data: UserProfile };
     try {
       result = JSON.parse(responseText);
     } catch (parseError) {
@@ -98,7 +100,7 @@ export async function createOrUpdateUserProfile(
 
     logger.info(`[ACCOUNT_LINKING] User profile synced successfully`);
 
-    return result.data as UserProfile;
+    return result.data;
   } catch (error) {
     logger.error(
       { data: error },
@@ -144,7 +146,7 @@ export async function checkExistingProviders(email: string): Promise<string[]> {
  */
 export async function linkPhoneToAccount(
   user: User,
-  phoneCredential: any
+  phoneCredential: AuthCredential
 ): Promise<void> {
   logger.info(
     {
@@ -161,11 +163,15 @@ export async function linkPhoneToAccount(
 
     // update user profile in Firestore
     await createOrUpdateUserProfile(user);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error({ data: error }, `[ACCOUNT_LINKING] Failed to link phone:`);
 
     // handle account-exists-with-different-credential error
-    if (error.code === "auth/credential-already-in-use") {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      (error as { code: string }).code === "auth/credential-already-in-use"
+    ) {
       logger.warn(
         `[ACCOUNT_LINKING] Phone number already in use by another account`
       );
@@ -185,7 +191,7 @@ export async function linkPhoneToAccount(
  */
 export async function linkGoogleToAccount(
   user: User,
-  googleCredential: any
+  googleCredential: AuthCredential
 ): Promise<void> {
   logger.info(
     {
@@ -202,10 +208,14 @@ export async function linkGoogleToAccount(
 
     // update user profile in Firestore
     await createOrUpdateUserProfile(user);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error({ data: error }, `[ACCOUNT_LINKING] Failed to link Google:`);
 
-    if (error.code === "auth/credential-already-in-use") {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      (error as { code: string }).code === "auth/credential-already-in-use"
+    ) {
       logger.warn(
         `[ACCOUNT_LINKING] Google account already in use by another account`
       );
@@ -311,7 +321,7 @@ export async function getUserProfile(
     // get response text first to handle both JSON and HTML responses
     const responseText = await response.text();
 
-    let result: any;
+    let result: { data?: UserProfile };
     try {
       result = JSON.parse(responseText);
     } catch (parseError) {
@@ -335,7 +345,7 @@ export async function getUserProfile(
 
     logger.info(`[ACCOUNT_LINKING] User profile retrieved successfully`);
 
-    return result.data as UserProfile;
+    return result.data ?? null;
   } catch (error) {
     logger.error(
       { data: error },

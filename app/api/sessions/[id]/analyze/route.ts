@@ -1,6 +1,7 @@
 // session analysis pipeline API endpoint
 
 import {
+  Session,
   AnalysisResult,
   Segment,
   Metrics,
@@ -55,9 +56,11 @@ export async function POST(
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // check if session exists
-    let session: any;
+    let session: (Session & { id: string }) | null;
     try {
-      session = await getDocument(COLLECTIONS.SESSIONS, id);
+      session = (await getDocument(COLLECTIONS.SESSIONS, id)) as
+        | (Session & { id: string })
+        | null;
     } catch (error) {
       throw new DatabaseError(
         "session retrieval",
@@ -94,12 +97,12 @@ export async function POST(
     });
 
     // fetch transcript for this session
-    let transcript: any = null;
+    let transcript: { transcript?: string; id: string } | null = null;
     try {
       const transcripts = await getDocuments(COLLECTIONS.TRANSCRIPTS, [
         whereEqual("sessionId", id),
       ]);
-      transcript = transcripts[0];
+      transcript = transcripts[0] as { transcript?: string; id: string };
     } catch (error) {
       logger.error(
         { data: error },
@@ -438,9 +441,11 @@ export async function GET(
     // validate params
     const { id } = validateParams(await params, SessionSchemas.params);
 
-    let session: any;
+    let session: (Session & { id: string }) | null;
     try {
-      session = await getDocument(COLLECTIONS.SESSIONS, id);
+      session = (await getDocument(COLLECTIONS.SESSIONS, id)) as
+        | (Session & { id: string })
+        | null;
     } catch (error) {
       throw new DatabaseError(
         "session retrieval",

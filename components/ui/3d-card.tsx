@@ -112,8 +112,10 @@ export const CardItem = ({
   rotateX?: number | string;
   rotateY?: number | string;
   rotateZ?: number | string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ref = useRef<any>(null);
   const [isMouseEntered] = useMouseEnter();
 
@@ -130,6 +132,7 @@ export const CardItem = ({
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Component = Tag as any;
 
   return (

@@ -22,6 +22,30 @@ import {
   MicIcon,
 } from "lucide-react";
 
+interface ApiSession {
+  id: string;
+  settings?: {
+    title?: string;
+    durationMs?: number;
+    participantCount?: number;
+    sessionType?: string;
+  };
+  analysisResult?: {
+    insights?: unknown[];
+  };
+  createdAt?: string | { _seconds: number };
+}
+
+interface TransformedSession {
+  id: string;
+  title: string;
+  date: string;
+  duration: string;
+  participants: number;
+  insights: number;
+  gradient: string[];
+}
+
 interface DashboardHomeProps {
   onNavigate: (
     view: "home" | "record" | "library" | "insights" | "settings"
@@ -35,7 +59,9 @@ export function DashboardHome({
 }: DashboardHomeProps) {
   const { getIdToken } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [recentSessions, setRecentSessions] = useState<any[]>([]);
+  const [recentSessions, setRecentSessions] = useState<TransformedSession[]>(
+    []
+  );
   const [stats, setStats] = useState([
     {
       label: "Total Sessions",
@@ -95,7 +121,7 @@ export function DashboardHome({
         ];
 
         const transformedSessions = sessions.map(
-          (session: any, index: number) => {
+          (session: ApiSession, index: number) => {
             const duration = session.settings?.durationMs
               ? `${Math.floor(session.settings.durationMs / 60000)}:${String(Math.floor((session.settings.durationMs % 60000) / 1000)).padStart(2, "0")}`
               : "0:00";
@@ -103,10 +129,15 @@ export function DashboardHome({
             const participants = session.settings?.participantCount || 2;
 
             let createdDate: Date;
-            if (session.createdAt?._seconds) {
-              createdDate = new Date(session.createdAt._seconds * 1000);
-            } else if (session.createdAt) {
-              createdDate = new Date(session.createdAt);
+            const createdAt = session.createdAt;
+            if (
+              typeof createdAt === "object" &&
+              createdAt !== null &&
+              "_seconds" in createdAt
+            ) {
+              createdDate = new Date(createdAt._seconds * 1000);
+            } else if (createdAt) {
+              createdDate = new Date(createdAt);
             } else {
               createdDate = new Date();
             }
@@ -143,12 +174,12 @@ export function DashboardHome({
 
         const totalSessions = data.meta?.total || 0;
         const totalMs = sessions.reduce(
-          (sum: number, s: any) => sum + (s.settings?.durationMs || 0),
+          (sum: number, s: ApiSession) => sum + (s.settings?.durationMs || 0),
           0
         );
         const totalHours = (totalMs / (1000 * 60 * 60)).toFixed(1);
         const totalInsights = sessions.reduce(
-          (sum: number, s: any) =>
+          (sum: number, s: ApiSession) =>
             sum + (s.analysisResult?.insights?.length || 0),
           0
         );

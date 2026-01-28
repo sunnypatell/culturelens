@@ -47,7 +47,7 @@ export async function POST(
     const { id } = validateParams(await params, SessionSchemas.params);
 
     // check if session exists
-    let session: any;
+    let session: Record<string, unknown> | null;
     try {
       session = await getDocument(COLLECTIONS.SESSIONS, id);
     } catch (error) {

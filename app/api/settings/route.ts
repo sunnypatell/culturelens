@@ -46,7 +46,10 @@ export async function GET(request: Request) {
     const userId = generateUserIdFromUid(decodedToken.uid);
 
     try {
-      const user = (await getDocument(COLLECTIONS.USERS, userId)) as any;
+      const user = (await getDocument(COLLECTIONS.USERS, userId)) as Record<
+        string,
+        unknown
+      > | null;
 
       return apiSuccess(user?.settings || {});
     } catch (error) {
@@ -80,7 +83,7 @@ export async function PUT(request: Request) {
     const body = await validateRequest(request, SettingsSchema);
 
     // filter out undefined values
-    const settingsData: Record<string, any> = {};
+    const settingsData: Record<string, unknown> = {};
     if (body.notifications !== undefined)
       settingsData.notifications = body.notifications;
     if (body.autoSave !== undefined) settingsData.autoSave = body.autoSave;

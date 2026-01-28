@@ -9,7 +9,13 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { collection, doc, query, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  query,
+  onSnapshot,
+  QueryConstraint,
+} from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { auth, db } from "./firebase";
 
@@ -73,9 +79,9 @@ export const logout = async () => {
 // Real-time listeners
 export const useCollection = (
   collectionName: string,
-  constraints: any[] = []
+  constraints: QueryConstraint[] = []
 ) => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -96,7 +102,7 @@ export const useCollection = (
 };
 
 export const useDocument = (collectionName: string, docId: string) => {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
