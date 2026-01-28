@@ -1,17 +1,12 @@
 /**
  * Google Gemini AI integration for transcript analysis
- * Project: CultureLens
- * Project ID: gen-lang-client-0985823799
- * Project Number: 119358341094
  */
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { logger } from "@/lib/logger";
 
 // Gemini configuration
-const GEMINI_PROJECT_ID = "gen-lang-client-0985823799";
-const GEMINI_PROJECT_NUMBER = "119358341094";
-const GEMINI_MODEL = "gemini-2.5-flash"; // Updated from deprecated gemini-pro
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 interface TranscriptSegment {
   speaker: string;
@@ -253,51 +248,3 @@ function generateFallbackAnalysis(
     ],
   };
 }
-
-/**
- * Calculates basic conversation metrics
- */
-export function calculateConversationMetrics(segments: TranscriptSegment[]): {
-  speakingTime: Record<string, number>;
-  turnCount: Record<string, number>;
-  averageTurnLength: Record<string, number>;
-} {
-  const metrics = {
-    speakingTime: {} as Record<string, number>,
-    turnCount: {} as Record<string, number>,
-    averageTurnLength: {} as Record<string, number>,
-  };
-
-  segments.forEach((segment) => {
-    const speaker = segment.speaker;
-    const duration = segment.endTime - segment.startTime;
-
-    // Initialize speaker metrics
-    if (!metrics.speakingTime[speaker]) {
-      metrics.speakingTime[speaker] = 0;
-      metrics.turnCount[speaker] = 0;
-    }
-
-    // Accumulate metrics
-    metrics.speakingTime[speaker] += duration;
-    metrics.turnCount[speaker] += 1;
-  });
-
-  // Calculate averages
-  Object.keys(metrics.turnCount).forEach((speaker) => {
-    metrics.averageTurnLength[speaker] =
-      metrics.speakingTime[speaker] / metrics.turnCount[speaker];
-  });
-
-  return metrics;
-}
-
-/**
- * Project metadata for Gemini integration
- */
-export const GEMINI_PROJECT_INFO = {
-  name: "CultureLens",
-  projectId: GEMINI_PROJECT_ID,
-  projectNumber: GEMINI_PROJECT_NUMBER,
-  model: GEMINI_MODEL,
-};

@@ -10,8 +10,6 @@ export const COLLECTIONS = {
   USERS: "users",
   SESSIONS: "sessions",
   TRANSCRIPTS: "transcripts",
-  AUDIO_FILES: "audio_files",
-  ANALYSIS_RESULTS: "analysis_results",
 } as const;
 
 /**

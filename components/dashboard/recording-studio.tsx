@@ -41,14 +41,10 @@ export function RecordingStudio({
   const { getIdToken } = useAuth();
   const [state, setState] = useState<RecordingState>("setup");
   const [duration, setDuration] = useState(0);
-  const [_waveformData, setWaveformData] = useState<number[]>(
-    Array(60).fill(0)
-  );
   const [mounted, setMounted] = useState(false);
   const [creating, setCreating] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const [_agentSessionId, _setAgentSessionId] = useState<string | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   // Session settings
@@ -69,10 +65,6 @@ export function RecordingStudio({
     if (state === "recording") {
       intervalRef.current = setInterval(() => {
         setDuration((prev) => prev + 1);
-        setWaveformData((prev) => {
-          const newData = [...prev.slice(1), Math.random() * 100];
-          return newData;
-        });
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -468,10 +460,7 @@ export function RecordingStudio({
           {/* Voice Agent */}
           <Card className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             <div className="space-y-4">
-              <VoiceAgent
-                sessionId={currentSessionId || undefined}
-                onSessionId={_setAgentSessionId}
-              />
+              <VoiceAgent sessionId={currentSessionId || undefined} />
             </div>
           </Card>
 
