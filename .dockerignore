@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+*.md
+ios
+backend
+tests
+e2e
+.env*
+.github
+CultureLens.mp4
+docs/demo.mp4
