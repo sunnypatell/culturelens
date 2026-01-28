@@ -306,7 +306,7 @@ export function VoiceAgent({
       setStatus("idle");
       setError(e instanceof Error ? e.message : "Failed to connect");
     }
-  }, [conversation, selectedVoice]);
+  }, [conversation, selectedVoice, useAgentVoice]);
 
   const disconnect = useCallback(async () => {
     setError(null);
@@ -325,7 +325,10 @@ export function VoiceAgent({
       {/* Voice Selection */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="use-agent-voice"
+            className="text-sm font-medium text-foreground"
+          >
             Voice Settings
           </label>
         </div>
@@ -352,10 +355,13 @@ export function VoiceAgent({
         {/* Custom Voice Selection */}
         {!useAgentVoice && (
           <>
-            <label className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="custom-voice-selection"
+              className="text-sm font-medium text-foreground"
+            >
               Select Custom Voice
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div id="custom-voice-selection" className="grid grid-cols-2 gap-2">
               {VOICES.map((voice) => (
                 <button
                   key={voice.id}
@@ -567,7 +573,10 @@ export function VoiceAgent({
       {transcript.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-foreground">
+            <label
+              htmlFor="conversation-transcript"
+              className="text-sm font-medium text-foreground"
+            >
               Conversation Transcript
             </label>
             <button
@@ -578,7 +587,10 @@ export function VoiceAgent({
               Save to File
             </button>
           </div>
-          <div className="max-h-40 overflow-y-auto bg-muted/50 rounded-lg p-3 text-xs font-mono">
+          <div
+            id="conversation-transcript"
+            className="max-h-40 overflow-y-auto bg-muted/50 rounded-lg p-3 text-xs font-mono"
+          >
             {transcript.map((line, index) => (
               <div key={index} className="mb-1 text-muted-foreground">
                 {line}

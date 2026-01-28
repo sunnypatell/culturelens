@@ -50,186 +50,189 @@ function ResultsContent() {
       return;
     }
 
-    fetchAnalysis(sessionId);
-  }, [sessionId, user]);
+    const fetchAnalysis = async (id: string) => {
+      try {
+        setLoading(true);
+        setError(null);
+        clientLogger.info("[Results] Fetching analysis for session:", id);
 
-  const fetchAnalysis = async (id: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      clientLogger.info("[Results] Fetching analysis for session:", id);
+        const token = await getIdToken();
+        if (!token) {
+          throw new Error("Not authenticated. Please sign in.");
+        }
 
-      const token = await getIdToken();
-      if (!token) {
-        throw new Error("Not authenticated. Please sign in.");
-      }
-
-      // Step 1: Check if analysis already exists
-      setAnalysisStep(1);
-      let response = await fetch(`/api/sessions/${id}/analyze`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      let data = await response.json();
-
-      // Step 2: If no analysis exists, trigger the analysis pipeline
-      if (!response.ok && data.error?.code === "BAD_REQUEST") {
-        clientLogger.info(
-          "[Results] No existing analysis, triggering pipeline..."
-        );
-        setAnalysisStep(2);
-
-        const triggerResponse = await fetch(`/api/sessions/${id}/analyze`, {
-          method: "POST",
+        // Step 1: Check if analysis already exists
+        setAnalysisStep(1);
+        let response = await fetch(`/api/sessions/${id}/analyze`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        let data = await response.json();
 
-        if (!triggerResponse.ok) {
-          const triggerData = await triggerResponse.json();
-          throw new Error(
-            triggerData.error?.message || "Failed to trigger analysis"
+        // Step 2: If no analysis exists, trigger the analysis pipeline
+        if (!response.ok && data.error?.code === "BAD_REQUEST") {
+          clientLogger.info(
+            "[Results] No existing analysis, triggering pipeline..."
           );
-        }
+          setAnalysisStep(2);
 
-        data = await triggerResponse.json();
-      } else if (!response.ok) {
-        throw new Error(data.error?.message || "Failed to load analysis");
-      }
+          const triggerResponse = await fetch(`/api/sessions/${id}/analyze`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-      // Step 3: Parse the analysis data
-      setAnalysisStep(3);
-      const analysisData = data.data;
-      clientLogger.info("[Results] Analysis data received:", analysisData);
-
-      // Step 4: Transform to UI format
-      setAnalysisStep(4);
-
-      // Extract transcript from segments
-      const transcript =
-        analysisData.segments
-          ?.map(
-            (seg: { speaker: string; text: string }) =>
-              `[${seg.speaker}] ${seg.text}`
-          )
-          .join("\n\n") || "No transcript available";
-
-      // Extract insights from the debrief and insights array
-      const insights: AnalysisInsights = {
-        summary: "",
-        keyPoints: [],
-        culturalObservations: [],
-        communicationPatterns: [],
-        recommendations: [],
-      };
-
-      // Parse debrief text to extract structured insights
-      if (analysisData.debrief?.text) {
-        const debriefText = analysisData.debrief.text;
-
-        // Extract summary (first paragraph before "Key Discussion Points")
-        const summaryMatch = debriefText.match(
-          /^([\s\S]*?)(?=\n\nKey Discussion Points:|$)/
-        );
-        if (summaryMatch) {
-          insights.summary = summaryMatch[1].trim();
-        }
-
-        // Extract key points
-        const keyPointsMatch = debriefText.match(
-          /Key Discussion Points:\n([\s\S]*?)(?=\n\nCultural Communication Insights:|$)/
-        );
-        if (keyPointsMatch) {
-          insights.keyPoints = keyPointsMatch[1]
-            .split("\n")
-            .filter((line: string) => line.trim().startsWith("•"))
-            .map((line: string) => line.replace(/^•\s*/, "").trim());
-        }
-
-        // Extract cultural observations
-        const culturalMatch = debriefText.match(
-          /Cultural Communication Insights:\n([\s\S]*?)(?=\n\nCommunication Patterns Identified:|$)/
-        );
-        if (culturalMatch) {
-          insights.culturalObservations = culturalMatch[1]
-            .split("\n")
-            .filter((line: string) => line.trim().startsWith("•"))
-            .map((line: string) => line.replace(/^•\s*/, "").trim());
-        }
-
-        // Extract communication patterns
-        const patternsMatch = debriefText.match(
-          /Communication Patterns Identified:\n([\s\S]*?)(?=\n\nRecommendations for Future Conversations:|$)/
-        );
-        if (patternsMatch) {
-          insights.communicationPatterns = patternsMatch[1]
-            .split("\n")
-            .filter((line: string) => line.trim().startsWith("•"))
-            .map((line: string) => line.replace(/^•\s*/, "").trim());
-        }
-
-        // Extract recommendations
-        const recommendationsMatch = debriefText.match(
-          /Recommendations for Future Conversations:\n([\s\S]*?)(?=\n\nParticipation Metrics:|$)/
-        );
-        if (recommendationsMatch) {
-          insights.recommendations = recommendationsMatch[1]
-            .split("\n")
-            .filter((line: string) => line.trim().startsWith("•"))
-            .map((line: string) => line.replace(/^•\s*/, "").trim());
-        }
-      }
-
-      // Also pull from insights array if available
-      if (analysisData.insights && Array.isArray(analysisData.insights)) {
-        analysisData.insights.forEach(
-          (insight: { category: string; summary: string }) => {
-            if (insight.category === "culturalLens") {
-              insights.culturalObservations.push(insight.summary);
-            } else if (insight.category === "turnTaking") {
-              insights.communicationPatterns.push(insight.summary);
-            }
+          if (!triggerResponse.ok) {
+            const triggerData = await triggerResponse.json();
+            throw new Error(
+              triggerData.error?.message || "Failed to trigger analysis"
+            );
           }
+
+          data = await triggerResponse.json();
+        } else if (!response.ok) {
+          throw new Error(data.error?.message || "Failed to load analysis");
+        }
+
+        // Step 3: Parse the analysis data
+        setAnalysisStep(3);
+        const analysisData = data.data;
+        clientLogger.info("[Results] Analysis data received:", analysisData);
+
+        // Step 4: Transform to UI format
+        setAnalysisStep(4);
+
+        // Extract transcript from segments
+        const transcript =
+          analysisData.segments
+            ?.map(
+              (seg: { speaker: string; text: string }) =>
+                `[${seg.speaker}] ${seg.text}`
+            )
+            .join("\n\n") || "No transcript available";
+
+        // Extract insights from the debrief and insights array
+        const insights: AnalysisInsights = {
+          summary: "",
+          keyPoints: [],
+          culturalObservations: [],
+          communicationPatterns: [],
+          recommendations: [],
+        };
+
+        // Parse debrief text to extract structured insights
+        if (analysisData.debrief?.text) {
+          const debriefText = analysisData.debrief.text;
+
+          // Extract summary (first paragraph before "Key Discussion Points")
+          const summaryMatch = debriefText.match(
+            /^([\s\S]*?)(?=\n\nKey Discussion Points:|$)/
+          );
+          if (summaryMatch) {
+            insights.summary = summaryMatch[1].trim();
+          }
+
+          // Extract key points
+          const keyPointsMatch = debriefText.match(
+            /Key Discussion Points:\n([\s\S]*?)(?=\n\nCultural Communication Insights:|$)/
+          );
+          if (keyPointsMatch) {
+            insights.keyPoints = keyPointsMatch[1]
+              .split("\n")
+              .filter((line: string) => line.trim().startsWith("•"))
+              .map((line: string) => line.replace(/^•\s*/, "").trim());
+          }
+
+          // Extract cultural observations
+          const culturalMatch = debriefText.match(
+            /Cultural Communication Insights:\n([\s\S]*?)(?=\n\nCommunication Patterns Identified:|$)/
+          );
+          if (culturalMatch) {
+            insights.culturalObservations = culturalMatch[1]
+              .split("\n")
+              .filter((line: string) => line.trim().startsWith("•"))
+              .map((line: string) => line.replace(/^•\s*/, "").trim());
+          }
+
+          // Extract communication patterns
+          const patternsMatch = debriefText.match(
+            /Communication Patterns Identified:\n([\s\S]*?)(?=\n\nRecommendations for Future Conversations:|$)/
+          );
+          if (patternsMatch) {
+            insights.communicationPatterns = patternsMatch[1]
+              .split("\n")
+              .filter((line: string) => line.trim().startsWith("•"))
+              .map((line: string) => line.replace(/^•\s*/, "").trim());
+          }
+
+          // Extract recommendations
+          const recommendationsMatch = debriefText.match(
+            /Recommendations for Future Conversations:\n([\s\S]*?)(?=\n\nParticipation Metrics:|$)/
+          );
+          if (recommendationsMatch) {
+            insights.recommendations = recommendationsMatch[1]
+              .split("\n")
+              .filter((line: string) => line.trim().startsWith("•"))
+              .map((line: string) => line.replace(/^•\s*/, "").trim());
+          }
+        }
+
+        // Also pull from insights array if available
+        if (analysisData.insights && Array.isArray(analysisData.insights)) {
+          analysisData.insights.forEach(
+            (insight: { category: string; summary: string }) => {
+              if (insight.category === "culturalLens") {
+                insights.culturalObservations.push(insight.summary);
+              } else if (insight.category === "turnTaking") {
+                insights.communicationPatterns.push(insight.summary);
+              }
+            }
+          );
+
+          // Deduplicate
+          insights.culturalObservations = [
+            ...new Set(insights.culturalObservations),
+          ];
+          insights.communicationPatterns = [
+            ...new Set(insights.communicationPatterns),
+          ];
+        }
+
+        // Extract mediator inputs from insights
+        const mediatorInputs =
+          analysisData.insights?.map((i: { summary: string }) => i.summary) ||
+          [];
+
+        // Step 5: Set final analysis
+        setAnalysisStep(5);
+        setAnalysis({
+          sessionId: id,
+          timestamp: Date.now(),
+          transcript,
+          mediatorInputs,
+          insights:
+            insights.summary ||
+            insights.keyPoints.length > 0 ||
+            insights.culturalObservations.length > 0
+              ? insights
+              : undefined,
+          status: "complete",
+        });
+
+        setLoading(false);
+      } catch (err) {
+        clientLogger.error("[Results] Analysis error:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load analysis"
         );
-
-        // Deduplicate
-        insights.culturalObservations = [
-          ...new Set(insights.culturalObservations),
-        ];
-        insights.communicationPatterns = [
-          ...new Set(insights.communicationPatterns),
-        ];
+        setLoading(false);
       }
+    };
 
-      // Extract mediator inputs from insights
-      const mediatorInputs =
-        analysisData.insights?.map((i: { summary: string }) => i.summary) || [];
-
-      // Step 5: Set final analysis
-      setAnalysisStep(5);
-      setAnalysis({
-        sessionId: id,
-        timestamp: Date.now(),
-        transcript,
-        mediatorInputs,
-        insights:
-          insights.summary ||
-          insights.keyPoints.length > 0 ||
-          insights.culturalObservations.length > 0
-            ? insights
-            : undefined,
-        status: "complete",
-      });
-
-      setLoading(false);
-    } catch (err) {
-      clientLogger.error("[Results] Analysis error:", err);
-      setError(err instanceof Error ? err.message : "Failed to load analysis");
-      setLoading(false);
-    }
-  };
+    fetchAnalysis(sessionId);
+  }, [sessionId, user, getIdToken]);
 
   if (loading) {
     return (

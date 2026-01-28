@@ -83,6 +83,7 @@ export const useCollection = (
 ) => {
   const [data, setData] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
+  const constraintsKey = JSON.stringify(constraints);
 
   useEffect(() => {
     const q = query(collection(db, collectionName), ...constraints);
@@ -96,7 +97,7 @@ export const useCollection = (
     });
 
     return unsubscribe;
-  }, [collectionName, JSON.stringify(constraints)]);
+  }, [collectionName, constraints, constraintsKey]);
 
   return { data, loading };
 };
