@@ -10,6 +10,7 @@ import { AnalysisLibrary } from "@/components/dashboard/analysis-library";
 import { InsightsView } from "@/components/dashboard/insights-view";
 import { SettingsView } from "@/components/dashboard/settings-view";
 import { Loader2 } from "lucide-react";
+import { CommandPalette } from "@/components/command-palette";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -86,6 +87,7 @@ export default function Home() {
         )}
         {activeView === "settings" && <SettingsView />}
       </main>
+      <CommandPalette onNavigate={setActiveView} />
     </div>
   );
 }
