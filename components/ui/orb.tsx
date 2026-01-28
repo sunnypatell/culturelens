@@ -145,7 +145,7 @@ function Scene({
   getInputVolume?: () => number;
   getOutputVolume?: () => number;
 }) {
-  const { gl } = useThree();
+  const { gl: _gl } = useThree();
   const circleRef =
     useRef<THREE.Mesh<THREE.CircleGeometry, THREE.ShaderMaterial>>(null);
   const initialColorsRef = useRef<[string, string]>(colors);

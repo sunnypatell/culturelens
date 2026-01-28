@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import {
   formatRelativeDate,
   formatDuration,
@@ -14,7 +12,7 @@ import { SESSION_GRADIENTS } from "@/lib/constants";
 import { Footer } from "./footer";
 import { useAuth } from "@/components/auth/auth-provider";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
-import { GlassCard, GradientCard } from "@/components/ui/glass-card";
+import { GradientCard } from "@/components/ui/glass-card";
 import { BackendStatus } from "@/components/backend-status";
 import {
   Mic,
@@ -66,7 +64,7 @@ export function DashboardHome({
   onViewInsights,
 }: DashboardHomeProps) {
   const { getIdToken } = useAuth();
-  const [mounted, setMounted] = useState(false);
+  const [_mounted, setMounted] = useState(false);
   const [recentSessions, setRecentSessions] = useState<TransformedSession[]>(
     []
   );
@@ -100,102 +98,104 @@ export function DashboardHome({
 
   useEffect(() => {
     setMounted(true);
+
+    const fetchSessions = async () => {
+      try {
+        const token = await getIdToken();
+        if (!token) {
+          clientLogger.error("no auth token available");
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch("/api/sessions", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+
+        if (response.ok && data.data) {
+          const sessions = data.data.slice(0, 4);
+
+          const transformedSessions = sessions.map(
+            (session: ApiSession, index: number) => {
+              const duration = session.settings?.durationMs
+                ? formatDuration(session.settings.durationMs)
+                : "0:00";
+              const insights = session.analysisResult?.insights?.length || 0;
+              const participants = session.settings?.participantCount || 2;
+              const createdDate = parseCreatedAt(session.createdAt);
+              const dateStr = formatRelativeDate(createdDate, { short: true });
+
+              return {
+                id: session.id,
+                title:
+                  session.settings?.title ||
+                  `Session ${sessions.length - index}`,
+                date: dateStr,
+                duration,
+                participants,
+                insights,
+                gradient: SESSION_GRADIENTS[index % SESSION_GRADIENTS.length],
+              };
+            }
+          );
+
+          setRecentSessions(transformedSessions);
+
+          const totalSessions = data.meta?.total || 0;
+          const totalMs = sessions.reduce(
+            (sum: number, s: ApiSession) => sum + (s.settings?.durationMs || 0),
+            0
+          );
+          const totalHours = (totalMs / (1000 * 60 * 60)).toFixed(1);
+          const totalInsights = sessions.reduce(
+            (sum: number, s: ApiSession) =>
+              sum + (s.analysisResult?.insights?.length || 0),
+            0
+          );
+          const avgDuration =
+            totalSessions > 0
+              ? Math.floor(totalMs / totalSessions / 1000 / 60)
+              : 0;
+
+          setStats([
+            {
+              label: "Total Sessions",
+              value: String(totalSessions),
+              icon: Library,
+              gradient: ["#6366f1", "#8b5cf6"],
+            },
+            {
+              label: "Hours Analyzed",
+              value: totalHours,
+              icon: Clock,
+              gradient: ["#8b5cf6", "#d946ef"],
+            },
+            {
+              label: "Insights Generated",
+              value: String(totalInsights),
+              icon: Sparkles,
+              gradient: ["#d946ef", "#f43f5e"],
+            },
+            {
+              label: "Avg. Session Length",
+              value: `${avgDuration}m`,
+              icon: TrendingUp,
+              gradient: ["#f43f5e", "#fb923c"],
+            },
+          ]);
+        }
+      } catch (error) {
+        clientLogger.error("failed to fetch sessions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSessions();
   }, [getIdToken]);
-
-  const fetchSessions = async () => {
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        clientLogger.error("no auth token available");
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("/api/sessions", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-
-      if (response.ok && data.data) {
-        const sessions = data.data.slice(0, 4);
-
-        const transformedSessions = sessions.map(
-          (session: ApiSession, index: number) => {
-            const duration = session.settings?.durationMs
-              ? formatDuration(session.settings.durationMs)
-              : "0:00";
-            const insights = session.analysisResult?.insights?.length || 0;
-            const participants = session.settings?.participantCount || 2;
-            const createdDate = parseCreatedAt(session.createdAt);
-            const dateStr = formatRelativeDate(createdDate, { short: true });
-
-            return {
-              id: session.id,
-              title:
-                session.settings?.title || `Session ${sessions.length - index}`,
-              date: dateStr,
-              duration,
-              participants,
-              insights,
-              gradient: SESSION_GRADIENTS[index % SESSION_GRADIENTS.length],
-            };
-          }
-        );
-
-        setRecentSessions(transformedSessions);
-
-        const totalSessions = data.meta?.total || 0;
-        const totalMs = sessions.reduce(
-          (sum: number, s: ApiSession) => sum + (s.settings?.durationMs || 0),
-          0
-        );
-        const totalHours = (totalMs / (1000 * 60 * 60)).toFixed(1);
-        const totalInsights = sessions.reduce(
-          (sum: number, s: ApiSession) =>
-            sum + (s.analysisResult?.insights?.length || 0),
-          0
-        );
-        const avgDuration =
-          totalSessions > 0
-            ? Math.floor(totalMs / totalSessions / 1000 / 60)
-            : 0;
-
-        setStats([
-          {
-            label: "Total Sessions",
-            value: String(totalSessions),
-            icon: Library,
-            gradient: ["#6366f1", "#8b5cf6"],
-          },
-          {
-            label: "Hours Analyzed",
-            value: totalHours,
-            icon: Clock,
-            gradient: ["#8b5cf6", "#d946ef"],
-          },
-          {
-            label: "Insights Generated",
-            value: String(totalInsights),
-            icon: Sparkles,
-            gradient: ["#d946ef", "#f43f5e"],
-          },
-          {
-            label: "Avg. Session Length",
-            value: `${avgDuration}m`,
-            icon: TrendingUp,
-            gradient: ["#f43f5e", "#fb923c"],
-          },
-        ]);
-      }
-    } catch (error) {
-      clientLogger.error("failed to fetch sessions:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const quickActions = [
     {
@@ -350,7 +350,14 @@ export function DashboardHome({
                   <CardContainer>
                     <CardBody className="w-full h-full">
                       <div
+                        role="button"
+                        tabIndex={0}
                         onClick={action.action}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            action.action();
+                          }
+                        }}
                         className="cursor-pointer rounded-2xl p-8 bg-gradient-to-br from-background/95 to-background/80 border border-white/10 hover:border-white/20 transition-all group"
                         style={{
                           background: `linear-gradient(135deg, ${action.gradient[0]}15, ${action.gradient[1]}15)`,

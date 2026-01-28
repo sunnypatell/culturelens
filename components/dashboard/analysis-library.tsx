@@ -77,13 +77,74 @@ export function AnalysisLibrary({
   const [filterType, setFilterType] = useState<"all" | "recent" | "favorites">(
     "all"
   );
-  const [hoveredSession, setHoveredSession] = useState<number | null>(null);
+  const [_hoveredSession, _setHoveredSession] = useState<number | null>(null);
   const [sessions, setSessions] = useState<TransformedSession[]>([]);
   const [loading, setLoading] = useState(true);
   const { stats } = useUserStats();
 
   useEffect(() => {
     setMounted(true);
+
+    const fetchSessions = async () => {
+      try {
+        const token = await getIdToken();
+        if (!token) {
+          clientLogger.error("no auth token available");
+          return;
+        }
+
+        const response = await fetch("/api/sessions", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+
+        if (response.ok && data.data) {
+          const transformedSessions = data.data.map(
+            (session: ApiSession, index: number) => {
+              const duration = session.settings?.durationMs
+                ? formatDuration(session.settings.durationMs)
+                : "0:00";
+              const insights = session.analysisResult?.insights?.length || 0;
+              const participants = session.settings?.participantCount || 2;
+              const createdDate = parseCreatedAt(session.createdAt);
+              const timeAgo = formatRelativeDate(createdDate);
+
+              return {
+                id: session.id,
+                title:
+                  session.settings?.title ||
+                  `Session ${data.data.length - index}`,
+                date: createdDate.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                }),
+                timeAgo,
+                duration,
+                participants,
+                insights,
+                type:
+                  session.settings?.sessionType ||
+                  session.settings?.culturalContext?.[0] ||
+                  "Personal",
+                gradientColors:
+                  SESSION_GRADIENTS[index % SESSION_GRADIENTS.length],
+                isFavorite: session.isFavorite || false,
+              };
+            }
+          );
+
+          setSessions(transformedSessions);
+        }
+      } catch (error) {
+        clientLogger.error("failed to fetch sessions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSessions();
   }, [getIdToken]);
 
@@ -128,76 +189,16 @@ export function AnalysisLibrary({
     }
   };
 
-  const handlePlayAudio = (sessionId: string, e: React.MouseEvent) => {
+  const _handlePlayAudio = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     toast.info("audio playback coming soon");
     // TODO: implement audio playback with session audio URL
   };
 
-  const handleMoreOptions = (sessionId: string, e: React.MouseEvent) => {
+  const _handleMoreOptions = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     toast.info("more options coming soon");
     // TODO: implement dropdown menu with delete, export, share options
-  };
-
-  const fetchSessions = async () => {
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        clientLogger.error("no auth token available");
-        return;
-      }
-
-      const response = await fetch("/api/sessions", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-
-      if (response.ok && data.data) {
-        const transformedSessions = data.data.map(
-          (session: ApiSession, index: number) => {
-            const duration = session.settings?.durationMs
-              ? formatDuration(session.settings.durationMs)
-              : "0:00";
-            const insights = session.analysisResult?.insights?.length || 0;
-            const participants = session.settings?.participantCount || 2;
-            const createdDate = parseCreatedAt(session.createdAt);
-            const timeAgo = formatRelativeDate(createdDate);
-
-            return {
-              id: session.id,
-              title:
-                session.settings?.title ||
-                `Session ${data.data.length - index}`,
-              date: createdDate.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              }),
-              timeAgo,
-              duration,
-              participants,
-              insights,
-              type:
-                session.settings?.sessionType ||
-                session.settings?.culturalContext?.[0] ||
-                "Personal",
-              gradientColors:
-                SESSION_GRADIENTS[index % SESSION_GRADIENTS.length],
-              isFavorite: session.isFavorite || false,
-            };
-          }
-        );
-
-        setSessions(transformedSessions);
-      }
-    } catch (error) {
-      clientLogger.error("failed to fetch sessions:", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   // filter and search sessions

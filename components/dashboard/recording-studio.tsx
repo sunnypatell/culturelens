@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +14,6 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { AnalysisLoader } from "@/components/ui/analysis-loader";
-import { motion } from "framer-motion";
 import { clientLogger } from "@/lib/client-logger";
 
 type RecordingState =
@@ -37,10 +35,9 @@ interface RecordingStudioProps {
 }
 
 export function RecordingStudio({
-  onNavigate,
-  onViewInsights,
+  onNavigate: _onNavigate,
+  onViewInsights: _onViewInsights,
 }: RecordingStudioProps = {}) {
-  const router = useRouter();
   const { getIdToken } = useAuth();
   const [state, setState] = useState<RecordingState>("setup");
   const [duration, setDuration] = useState(0);
@@ -311,6 +308,7 @@ export function RecordingStudio({
                 >
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <label
+                      htmlFor="quick"
                       className={cn(
                         "flex items-start space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all",
                         analysisMethod === "quick"
@@ -329,6 +327,7 @@ export function RecordingStudio({
                       </div>
                     </label>
                     <label
+                      htmlFor="standard"
                       className={cn(
                         "flex items-start space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all",
                         analysisMethod === "standard"
@@ -347,6 +346,7 @@ export function RecordingStudio({
                       </div>
                     </label>
                     <label
+                      htmlFor="deep"
                       className={cn(
                         "flex items-start space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all",
                         analysisMethod === "deep"
