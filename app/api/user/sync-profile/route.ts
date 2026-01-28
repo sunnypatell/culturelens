@@ -46,18 +46,17 @@ export async function POST(request: Request) {
     } = await validateRequest(request, SyncProfileSchemas.update);
 
     try {
-      // filter out undefined values
+      // filter out null and undefined values to avoid overwriting valid data
       const profileData: Record<string, unknown> = {
         updatedAt: new Date().toISOString(),
       };
 
-      if (email !== undefined) profileData.email = email;
-      if (displayName !== undefined) profileData.displayName = displayName;
-      if (phoneNumber !== undefined) profileData.phoneNumber = phoneNumber;
-      if (photoURL !== undefined) profileData.photoURL = photoURL;
-      if (emailVerified !== undefined)
-        profileData.emailVerified = emailVerified;
-      if (linkedProviders !== undefined)
+      if (email != null) profileData.email = email;
+      if (displayName != null) profileData.displayName = displayName;
+      if (phoneNumber != null) profileData.phoneNumber = phoneNumber;
+      if (photoURL != null) profileData.photoURL = photoURL;
+      if (emailVerified != null) profileData.emailVerified = emailVerified;
+      if (linkedProviders != null)
         profileData.linkedProviders = linkedProviders;
 
       // check if profile already exists
