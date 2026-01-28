@@ -75,6 +75,37 @@
   --sidebar-ring: oklch(0.65 0.2 264);
 }
 
+/* fumadocs theme overrides */
+:root {
+  --fd-primary: oklch(0.45 0.18 264);
+  --fd-primary-foreground: oklch(0.99 0 0);
+  --fd-background: oklch(0.99 0.002 264);
+  --fd-foreground: oklch(0.15 0.01 264);
+  --fd-muted: oklch(0.96 0.01 264);
+  --fd-muted-foreground: oklch(0.5 0.01 264);
+  --fd-card: oklch(1 0 0);
+  --fd-card-foreground: oklch(0.15 0.01 264);
+  --fd-border: oklch(0.9 0.01 264);
+  --fd-accent: oklch(0.96 0.01 264);
+  --fd-accent-foreground: oklch(0.15 0.01 264);
+  --fd-ring: oklch(0.45 0.18 264);
+}
+
+.dark {
+  --fd-primary: oklch(0.65 0.2 264);
+  --fd-primary-foreground: oklch(0.12 0.01 264);
+  --fd-background: oklch(0.12 0.01 264);
+  --fd-foreground: oklch(0.95 0.01 264);
+  --fd-muted: oklch(0.22 0.01 264);
+  --fd-muted-foreground: oklch(0.65 0.01 264);
+  --fd-card: oklch(0.16 0.01 264);
+  --fd-card-foreground: oklch(0.95 0.01 264);
+  --fd-border: oklch(0.25 0.01 264);
+  --fd-accent: oklch(0.22 0.01 264);
+  --fd-accent-foreground: oklch(0.95 0.01 264);
+  --fd-ring: oklch(0.65 0.2 264);
+}
+
 @theme inline {
   --font-sans: "Geist", "Geist Fallback";
   --font-mono: "Geist Mono", "Geist Mono Fallback";
