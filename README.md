@@ -477,18 +477,18 @@ npm run start
 
 GitHub Actions runs **10 workflows** on every pull request and push:
 
-| workflow | tool | what it checks |
-| --- | --- | --- |
-| **frontend test** | vitest | 31 unit tests (API client, error classes, rate limiter) |
-| **frontend build** | next build | verifies production build compiles without errors |
-| **frontend lint** | ESLint | TypeScript code quality rules |
-| **frontend typecheck** | tsc --noEmit | strict type checking |
-| **frontend format** | Prettier | consistent code formatting |
-| **backend lint** | Ruff | Python linting (100x faster than Pylint) |
-| **backend format** | Ruff Format | Python formatting |
-| **backend test** | Pytest | FastAPI endpoint tests |
-| **iOS lint** | SwiftLint | Swift code style |
-| **iOS build & test** | Xcode + XCTest | 45 unit tests + simulator build |
+| workflow               | tool           | what it checks                                          |
+| ---------------------- | -------------- | ------------------------------------------------------- |
+| **frontend test**      | vitest         | 31 unit tests (API client, error classes, rate limiter) |
+| **frontend build**     | next build     | verifies production build compiles without errors       |
+| **frontend lint**      | ESLint         | TypeScript code quality rules                           |
+| **frontend typecheck** | tsc --noEmit   | strict type checking                                    |
+| **frontend format**    | Prettier       | consistent code formatting                              |
+| **backend lint**       | Ruff           | Python linting (100x faster than Pylint)                |
+| **backend format**     | Ruff Format    | Python formatting                                       |
+| **backend test**       | Pytest         | FastAPI endpoint tests                                  |
+| **iOS lint**           | SwiftLint      | Swift code style                                        |
+| **iOS build & test**   | Xcode + XCTest | 45 unit tests + simulator build                         |
 
 ### local testing
 
@@ -516,11 +516,11 @@ xcodebuild test -project CultureLens.xcodeproj -scheme CultureLens \
 
 ### test coverage
 
-| layer | framework | tests | coverage areas |
-| --- | --- | --- | --- |
-| **frontend** | vitest + testing-library | 31 | API client, error handling, rate limiting |
-| **backend** | pytest | 5 | health checks, session CRUD |
-| **iOS** | XCTest | 45 | models, enums, codable conformance, UI layout |
+| layer        | framework                | tests | coverage areas                                |
+| ------------ | ------------------------ | ----- | --------------------------------------------- |
+| **frontend** | vitest + testing-library | 31    | API client, error handling, rate limiting     |
+| **backend**  | pytest                   | 5     | health checks, session CRUD                   |
+| **iOS**      | XCTest                   | 45    | models, enums, codable conformance, UI layout |
 
 ### code quality
 
@@ -661,15 +661,16 @@ firebase deploy --only storage
 
 ## 📚 Documentation
 
-| document | description |
-| --- | --- |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | setup, branch conventions, PR process, code style |
-| **[ios/README.md](ios/README.md)** | iOS app architecture, setup, and deployment |
-| **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)** | Firebase project configuration guide |
-| **[AGENT_PROMPT.md](AGENT_PROMPT.md)** | ElevenLabs voice agent system prompt |
-| **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)** | ElevenLabs integration walkthrough |
-| **[docs/VOICE_SELECTION.md](docs/VOICE_SELECTION.md)** | voice selection and customization guide |
-| **[docs/VOICE_SETTINGS_CHEATSHEET.md](docs/VOICE_SETTINGS_CHEATSHEET.md)** | quick reference for voice settings |
+| document                                                                   | description                                              |
+| -------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)**                                     | setup, branch conventions, PR process, code style        |
+| **[ios/README.md](ios/README.md)**                                         | iOS app architecture, setup, and deployment              |
+| **[FIREBASE_SETUP.md](FIREBASE_SETUP.md)**                                 | Firebase project configuration guide                     |
+| **[AGENT_PROMPT.md](AGENT_PROMPT.md)**                                     | ElevenLabs voice agent system prompt                     |
+| **[docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)**                   | ElevenLabs integration walkthrough                       |
+| **[docs/VOICE_SELECTION.md](docs/VOICE_SELECTION.md)**                     | voice selection and customization guide                  |
+| **[docs/VOICE_SETTINGS_CHEATSHEET.md](docs/VOICE_SETTINGS_CHEATSHEET.md)** | quick reference for voice settings                       |
+| **[docs/api.md](docs/api.md)**                                             | comprehensive Next.js API route reference (23 endpoints) |
 
 ### API reference
 
