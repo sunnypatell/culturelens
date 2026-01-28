@@ -1,8 +1,10 @@
-# Voice Settings Cheat Sheet
+# 🎙️ Voice Settings Cheat Sheet
 
 Copy these exact settings into your ElevenLabs agent:
 
-## Quick Copy-Paste Settings
+---
+
+## 📋 Quick Copy-Paste Settings
 
 ### Voice
 
@@ -37,7 +39,7 @@ Hey there. I'm here to help you think through conversations - how they flow, whe
 
 ---
 
-## One-Minute Setup
+## ⚡ One-Minute Setup
 
 1. [Open Agent Settings](https://elevenlabs.io/app/conversational-ai) → Find your agent
 2. Voice → Select **Rachel (Conversational)**
@@ -50,7 +52,7 @@ Done! 🎉
 
 ---
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 | Problem                  | Fix                              |
 | ------------------------ | -------------------------------- |

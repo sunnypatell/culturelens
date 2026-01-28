@@ -1,10 +1,10 @@
-# culturelens API reference
+# 📡 culturelens API reference
 
 comprehensive documentation for all Next.js API routes.
 
 ---
 
-## overview
+## 📖 overview
 
 ### base URL
 
@@ -77,7 +77,7 @@ all responses follow a standard envelope format.
 
 ---
 
-## sessions
+## 📋 sessions
 
 ### `POST /api/sessions`
 
@@ -259,7 +259,7 @@ toggles the favorite status of a session. verifies ownership.
 
 ---
 
-## analysis
+## 🔬 analysis
 
 ### `POST /api/sessions/:id/analyze`
 
@@ -328,7 +328,7 @@ retrieves existing analysis results for a session. returns `400` if analysis is 
 
 ---
 
-## audio
+## 🎵 audio
 
 ### `POST /api/sessions/:id/upload`
 
@@ -382,7 +382,7 @@ serves an audio file stored in firestore as base64. returns raw audio bytes with
 
 ---
 
-## elevenlabs
+## 🎙️ elevenlabs
 
 ### `POST /api/elevenlabs/tts`
 
@@ -446,7 +446,7 @@ generates a signed URL for connecting to a private ElevenLabs conversational AI 
 
 ---
 
-## user
+## 👤 user
 
 ### `PATCH /api/user/profile`
 
@@ -570,7 +570,7 @@ permanently deletes the user account and all associated data: sessions, profile 
 
 ---
 
-## auth
+## 🔑 auth
 
 ### `GET /api/auth/user`
 
@@ -641,7 +641,7 @@ curl -X POST /api/auth/admin/roles \
 
 ---
 
-## settings
+## ⚙️ settings
 
 ### `GET /api/settings`
 
@@ -699,7 +699,7 @@ updates user settings. creates the user document if it does not exist.
 
 ---
 
-## transcripts
+## 📝 transcripts
 
 ### `POST /api/transcripts`
 
@@ -733,7 +733,7 @@ saves a conversation transcript linked to a session.
 
 ---
 
-## health
+## 💚 health
 
 ### `GET /api/health`
 
@@ -767,7 +767,7 @@ returns the health status of the API and its dependent services. **no authentica
 
 ---
 
-## endpoint summary
+## 📊 endpoint summary
 
 | method   | path                         | auth  | description              |
 | -------- | ---------------------------- | ----- | ------------------------ |

@@ -1,8 +1,10 @@
-# firebase authentication implementation
+# 🔐 firebase authentication implementation
 
 complete authentication system for culturelens with multiple signin methods and role-based access control.
 
-## authentication methods implemented
+---
+
+## 🔑 authentication methods implemented
 
 ### 1. email/password authentication
 
@@ -35,7 +37,9 @@ complete authentication system for culturelens with multiple signin methods and 
 - onboarding flow collects phone number for email signups
 - signin with any linked method accesses same account
 
-## project structure
+---
+
+## 📁 project structure
 
 ```
 lib/
@@ -60,7 +64,9 @@ app/api/auth/
 middleware.ts                # route protection middleware
 ```
 
-## features
+---
+
+## ⚙️ features
 
 ### user management
 
@@ -79,11 +85,13 @@ middleware.ts                # route protection middleware
 
 ### role-based access control (RBAC)
 
-- three roles: admin, user, moderator
-- three plans: free, pro, enterprise
-- custom claims stored in JWT
-- role checking functions: `hasRole()`, `hasPlan()`
-- admin-only API routes for role management
+| concept          | values                                    |
+| ---------------- | ----------------------------------------- |
+| **roles**        | `admin`, `user`, `moderator`              |
+| **plans**        | `free`, `pro`, `enterprise`               |
+| **storage**      | custom claims stored in JWT               |
+| **helpers**      | `hasRole()`, `hasPlan()`                  |
+| **admin routes** | admin-only API routes for role management |
 
 ### email services
 
@@ -92,7 +100,9 @@ middleware.ts                # route protection middleware
 - passwordless signin links
 - automated email sending via Firebase
 
-## usage
+---
+
+## 📋 usage
 
 ### client-side authentication
 
@@ -130,11 +140,13 @@ const isAdmin = await hasRole(decodedToken.uid, "admin");
 
 routes protected by middleware:
 
-- `/dashboard` - requires authentication
-- `/results` - requires authentication
-- `/settings` - requires authentication
-- `/profile` - requires authentication
-- `/onboarding` - requires authentication
+| route         | auth required |
+| ------------- | ------------- |
+| `/dashboard`  | yes           |
+| `/results`    | yes           |
+| `/settings`   | yes           |
+| `/profile`    | yes           |
+| `/onboarding` | yes           |
 
 unauthenticated users are redirected to `/auth/login` with return URL.
 
@@ -161,7 +173,9 @@ export async function GET(request: Request) {
 }
 ```
 
-## firestore security rules
+---
+
+## 🛡️ firestore security rules
 
 authentication is enforced via firestore security rules:
 
@@ -182,7 +196,9 @@ service cloud.firestore {
 }
 ```
 
-## environment setup
+---
+
+## 🔧 environment setup
 
 ### required environment variables
 
@@ -203,7 +219,9 @@ FIREBASE_CLIENT_EMAIL=<contact maintainer>
 FIREBASE_PRIVATE_KEY=<contact maintainer>
 ```
 
-## testing authentication
+---
+
+## 🧪 testing authentication
 
 1. **start development server**:
 
@@ -222,7 +240,9 @@ FIREBASE_PRIVATE_KEY=<contact maintainer>
    - sign in with google → redirect flow
    - link phone to existing email account
 
-## troubleshooting
+---
+
+## 🐛 troubleshooting
 
 ### "firebase not initialized" error
 
@@ -250,17 +270,23 @@ ensure authorization header format: `Bearer <token>`
 - check recaptcha container exists in DOM
 - ensure firebase phone auth is enabled in console
 
-## security best practices
+---
 
-1. **never expose private keys** - already in `.gitignore`
-2. **use HTTPS in production** - vercel handles this
-3. **validate tokens server-side** - all API routes verify tokens
-4. **rate limit auth endpoints** - consider implementing
-5. **monitor failed login attempts** - firebase auth logs this
-6. **regular security audits** - review firestore rules
-7. **MFA for admins** - implement next
+## ✅ security best practices
 
-## support
+| #   | practice                                                       |
+| --- | -------------------------------------------------------------- |
+| 1   | **never expose private keys** - already in `.gitignore`        |
+| 2   | **use HTTPS in production** - vercel handles this              |
+| 3   | **validate tokens server-side** - all API routes verify tokens |
+| 4   | **rate limit auth endpoints** - consider implementing          |
+| 5   | **monitor failed login attempts** - firebase auth logs this    |
+| 6   | **regular security audits** - review firestore rules           |
+| 7   | **MFA for admins** - implement next                            |
+
+---
+
+## 📚 support
 
 for issues or questions:
 

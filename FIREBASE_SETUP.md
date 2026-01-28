@@ -1,16 +1,20 @@
-# firebase setup (shared project)
+# 🔥 firebase setup (shared project)
 
 culturelens uses a **shared firebase project** for all team members and contributors.
 
-## important notes
+---
 
-⚠️ **do NOT create your own firebase project**
+## ⚠️ important notes
+
+**do NOT create your own firebase project**
 
 - this project uses a single shared firebase instance
 - all team members connect to the same project: `culturelens-2dd38`
 - creating your own project will break integration with the team
 
-## for contributors
+---
+
+## 👥 for contributors
 
 ### required environment variables
 
@@ -24,29 +28,30 @@ cp .env.example .env
 
 ### what you need
 
-1. **client SDK config** (public, safe to share)
-   - these are the `NEXT_PUBLIC_FIREBASE_*` variables
-   - used for client-side firebase operations
-   - limited by security rules
-
-2. **admin SDK credentials** (private, contact maintainer)
-   - `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY`
-   - used for server-side operations with elevated privileges
-   - required for authentication, user management, and admin APIs
+| credential type           | variables                                       | visibility                  | access                                                                        |
+| ------------------------- | ----------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------- |
+| **client SDK config**     | `NEXT_PUBLIC_FIREBASE_*`                        | public, safe to share       | client-side firebase operations, limited by security rules                    |
+| **admin SDK credentials** | `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | private, contact maintainer | server-side operations with elevated privileges (auth, user mgmt, admin APIs) |
 
 ### services enabled
 
-- ✅ firebase authentication (email, phone, google oauth)
-- ✅ firestore database (sessions, users, data)
-- ✅ firebase storage (audio files, uploads)
-- ✅ firebase analytics
+| service                 | status     | purpose                    |
+| ----------------------- | ---------- | -------------------------- |
+| firebase authentication | ✅ enabled | email, phone, google oauth |
+| firestore database      | ✅ enabled | sessions, users, data      |
+| firebase storage        | ✅ enabled | audio files, uploads       |
+| firebase analytics      | ✅ enabled | usage tracking             |
 
-## for project maintainers
+---
+
+## 🔧 for project maintainers
 
 ### firebase console access
 
-- **project console:** https://console.firebase.google.com/project/culturelens-2dd38
-- **project ID:** culturelens-2dd38
+| field               | value                                                         |
+| ------------------- | ------------------------------------------------------------- |
+| **project console** | https://console.firebase.google.com/project/culturelens-2dd38 |
+| **project ID**      | `culturelens-2dd38`                                           |
 
 ### admin SDK management
 
@@ -85,7 +90,9 @@ security rules are **automatically deployed** via github actions when changes ar
 
 see the relevant GitHub Actions workflow (`.github/workflows/`) for details.
 
-## troubleshooting
+---
+
+## 🐛 troubleshooting
 
 ### "permission denied" errors
 
@@ -103,7 +110,9 @@ ensure `AuthProvider` wraps your app in `app/layout.tsx`
 
 verify authorization header format: `Bearer <token>`
 
-## documentation
+---
+
+## 📚 documentation
 
 - firebase auth implementation: [AUTHENTICATION_SETUP.md](AUTHENTICATION_SETUP.md)
 - firebase deploy setup: see `.github/workflows/` for CI/CD workflows

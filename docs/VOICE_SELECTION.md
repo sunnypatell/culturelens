@@ -1,10 +1,12 @@
-# Voice Selection Feature
+# 🎤 Voice Selection Feature
 
-## Overview
+## 📖 Overview
 
 CultureLens now includes in-app voice selection! Users can choose from 4 natural-sounding voices without needing to configure anything in the ElevenLabs dashboard.
 
-## How It Works
+---
+
+## 🔊 How It Works
 
 ### Built-in Natural Voices
 
@@ -38,7 +40,9 @@ All voices are automatically configured with optimal settings for natural conver
 4. Clicks "Connect to Agent"
 5. Agent uses selected voice with natural settings automatically
 
-## Technical Implementation
+---
+
+## 🛠️ Technical Implementation
 
 ### Voice Override
 
@@ -69,31 +73,32 @@ The `VoiceAgent` component now includes:
 - Voice selection UI (grid of buttons)
 - Automatic settings override on connection
 
-## Why This Matters
+---
 
-### Before
+## 💡 Why This Matters
 
-- Users had to manually configure voice in ElevenLabs dashboard
-- Default voice often sounded robotic
-- Required technical knowledge to change settings
-- No in-app customization
+| Aspect                | Before                                                        | After                                          |
+| --------------------- | ------------------------------------------------------------- | ---------------------------------------------- |
+| **Voice config**      | Users had to manually configure voice in ElevenLabs dashboard | ✅ One-click voice selection in the app        |
+| **Default quality**   | Default voice often sounded robotic                           | ✅ All voices pre-configured for natural sound |
+| **Technical barrier** | Required technical knowledge to change settings               | ✅ No dashboard configuration needed           |
+| **Customization**     | No in-app customization                                       | ✅ Better user experience                      |
 
-### After
+---
 
-- ✅ One-click voice selection in the app
-- ✅ All voices pre-configured for natural sound
-- ✅ No dashboard configuration needed
-- ✅ Better user experience
-
-## Free Tier Compatibility
+## 💰 Free Tier Compatibility
 
 All 4 voices are available on ElevenLabs free tier:
 
-- **Free Credits**: 10,000 characters/month (~3-4 minutes of audio)
-- **Startup Grant**: Apply for 33M free credits (worth $4,000+)
-- **Pricing**: After free tier, ~10 cents per minute
+| Tier              | Details                                         |
+| ----------------- | ----------------------------------------------- |
+| **Free Credits**  | 10,000 characters/month (~3-4 minutes of audio) |
+| **Startup Grant** | Apply for 33M free credits (worth $4,000+)      |
+| **Pricing**       | After free tier, ~10 cents per minute           |
 
-## Adding More Voices
+---
+
+## ➕ Adding More Voices
 
 To add more voices, update the `VOICES` array in [voice-agent.tsx](../components/voice-agent.tsx):
 
@@ -109,7 +114,9 @@ const VOICES = [
 ];
 ```
 
-## Sources
+---
+
+## 📚 Sources
 
 - [ElevenLabs React SDK Documentation](https://elevenlabs.io/docs/agents-platform/libraries/react)
 - [ElevenLabs Conversational AI Overview](https://elevenlabs.io/docs/conversational-ai/overview)

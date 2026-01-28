@@ -1,10 +1,12 @@
-# Quick Voice Setup Guide - Make Agent Sound Natural
+# ⚡ Quick Voice Setup Guide - Make Agent Sound Natural
 
-## The Problem
+## ❌ The Problem
 
 Your agent sounds robotic because it's using the default voice with default settings.
 
-## The Fix (2 Minutes)
+---
+
+## ✅ The Fix (2 Minutes)
 
 ### Step 1: Open Your Agent Settings
 
@@ -18,20 +20,11 @@ In the agent settings, find **Voice** section:
 
 **Best FREE Natural Voices:**
 
-1. **Rachel** (Female, Conversational) - **RECOMMENDED** ⭐
-   - Sounds very natural and friendly
-   - Great for casual conversation
-   - Free tier available
-
-2. **Drew** (Male, Conversational)
-   - Warm and approachable
-   - Natural pacing
-   - Free tier available
-
-3. **Clyde** (Male, Warm)
-   - Calm and thoughtful
-   - Good for analysis
-   - Free tier available
+| #   | Voice         | Gender                 | Notes                                                            | Tier |
+| --- | ------------- | ---------------------- | ---------------------------------------------------------------- | ---- |
+| 1   | **Rachel** ⭐ | Female, Conversational | Sounds very natural and friendly. Great for casual conversation. | Free |
+| 2   | **Drew**      | Male, Conversational   | Warm and approachable. Natural pacing.                           | Free |
+| 3   | **Clyde**     | Male, Warm             | Calm and thoughtful. Good for analysis.                          | Free |
 
 **Select one of these voices** instead of whatever is currently selected.
 
@@ -64,28 +57,28 @@ Turn detection: Sensitivity - Medium
 3. Click "Connect to Agent"
 4. Test it - it should sound MUCH more natural now
 
-## Before vs After
+---
 
-**Before (Default settings):**
+## 🔀 Before vs After
 
-- Monotone, robotic speech
-- No variation in pacing
-- Sounds like reading from a script
+| Aspect     | Before (Default settings)         | After (Rachel + these settings)      |
+| ---------- | --------------------------------- | ------------------------------------ |
+| **Tone**   | Monotone, robotic speech          | Natural conversational tone          |
+| **Pacing** | No variation in pacing            | Varied pacing and emphasis           |
+| **Feel**   | Sounds like reading from a script | Sounds like talking to a real person |
 
-**After (Rachel + these settings):**
+---
 
-- Natural conversational tone
-- Varied pacing and emphasis
-- Sounds like talking to a real person
-
-## Still Sounds Robotic?
+## 🔧 Still Sounds Robotic?
 
 1. **Make sure you saved the agent** - changes don't apply until you click Save
 2. **Disconnect and reconnect** - old settings might be cached
 3. **Try a different voice** - Rachel and Drew are usually the most natural
 4. **Lower stability more** - try 0.4 instead of 0.5 for even more variation
 
-## Pro Tip
+---
+
+## 💡 Pro Tip
 
 If you want it to sound REALLY natural:
 

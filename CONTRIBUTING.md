@@ -1,10 +1,10 @@
-# contributing to CultureLens
+# 🤝 contributing to CultureLens
 
 thanks for your interest in contributing. this guide covers setup, conventions, and the PR process.
 
 ---
 
-## getting started
+## 🚀 getting started
 
 ### prerequisites
 
@@ -50,18 +50,18 @@ culturelens/
 
 ---
 
-## development workflow
+## 🔄 development workflow
 
 ### branch naming
 
-```
-feat/short-description     # new feature
-fix/short-description      # bug fix
-docs/short-description     # documentation
-refactor/short-description # code restructuring
-test/short-description     # adding tests
-chore/short-description    # maintenance
-```
+| prefix      | purpose            |
+| ----------- | ------------------ |
+| `feat/`     | new feature        |
+| `fix/`      | bug fix            |
+| `docs/`     | documentation      |
+| `refactor/` | code restructuring |
+| `test/`     | adding tests       |
+| `chore/`    | maintenance        |
 
 ### commit messages
 
@@ -115,7 +115,7 @@ ref: https://firebase.google.com/docs/reference/swift/firebaseauth/api/reference
 
 ---
 
-## code style
+## 🎨 code style
 
 ### TypeScript / React
 
@@ -142,7 +142,7 @@ ref: https://firebase.google.com/docs/reference/swift/firebaseauth/api/reference
 
 ---
 
-## testing
+## 🧪 testing
 
 ### frontend (vitest)
 
@@ -182,7 +182,7 @@ xcodebuild test -project CultureLens.xcodeproj -scheme CultureLens \
 
 ---
 
-## architecture decisions
+## 🏛️ architecture decisions
 
 ### why Next.js API routes instead of a separate backend?
 
@@ -208,7 +208,7 @@ the FastAPI backend exists for heavy compute (audio processing), but most CRUD o
 
 ---
 
-## need help?
+## ❓ need help?
 
 - open an [issue](https://github.com/sunnypatell/culturelens/issues) for bugs or feature requests
 - check existing [discussions](https://github.com/sunnypatell/culturelens/discussions) for Q&A

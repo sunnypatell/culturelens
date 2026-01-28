@@ -1,6 +1,6 @@
-# ElevenLabs Agent Setup Guide
+# 🎙️ ElevenLabs Agent Setup Guide
 
-## Updating Your Agent to Sound More Natural
+## 🔧 Updating Your Agent to Sound More Natural
 
 ### Step 1: Access Your ElevenLabs Dashboard
 
@@ -22,16 +22,20 @@ While you're in the agent settings, update these:
 
 **Voice Settings:**
 
-- **Stability**: 0.5-0.6 (allows natural variation in speech)
-- **Similarity**: 0.7-0.8 (keeps voice consistent)
-- **Style Exaggeration**: 0.4-0.5 (conversational, not dramatic)
-- **Speaker Boost**: ✅ Enabled
+| Setting                | Value      | Notes                              |
+| ---------------------- | ---------- | ---------------------------------- |
+| **Stability**          | 0.5-0.6    | Allows natural variation in speech |
+| **Similarity**         | 0.7-0.8    | Keeps voice consistent             |
+| **Style Exaggeration** | 0.4-0.5    | Conversational, not dramatic       |
+| **Speaker Boost**      | ✅ Enabled | —                                  |
 
 **Conversation Settings:**
 
-- **Mode**: Conversational (not formal/professional)
-- **Response Length**: Medium (60-90 seconds)
-- **Enable Interruptions**: Yes (more natural flow)
+| Setting                  | Value          | Notes                   |
+| ------------------------ | -------------- | ----------------------- |
+| **Mode**                 | Conversational | Not formal/professional |
+| **Response Length**      | Medium         | 60-90 seconds           |
+| **Enable Interruptions** | Yes            | More natural flow       |
 
 ### Step 4: Test the Changes
 
@@ -45,7 +49,9 @@ While you're in the agent settings, update these:
    - Neutral observations vs prescriptive advice
    - Conversational tone vs robotic analysis
 
-### What You Should Hear
+---
+
+## 🗣️ What You Should Hear
 
 **Before (Robotic):**
 
@@ -55,7 +61,9 @@ While you're in the agent settings, update these:
 
 > "Mm, so listening to that... I noticed something about the pacing. When you brought up the weekend plans, the response came really quick - like, almost before you finished your sentence. And that happened a few times around certain topics. Did that feel different to you than the slower back-and-forth about work stuff?"
 
-## Key Improvements
+---
+
+## ✅ Key Improvements
 
 ✅ **Natural Speech Patterns**
 
@@ -81,24 +89,18 @@ While you're in the agent settings, update these:
 - Uses "some styles do X" instead of "you are X"
 - Invites reflection vs asserting truth
 
-## Troubleshooting
+---
 
-**Agent still sounds robotic:**
+## 🔧 Troubleshooting
 
-- Make sure you copied the ENTIRE prompt (it's long!)
-- Check that voice settings match recommendations above
-- Try regenerating the response if it sounds off
+| Problem                          | Solution                                                                                                                                                    |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Agent still sounds robotic**   | Make sure you copied the ENTIRE prompt (it's long!). Check that voice settings match recommendations above. Try regenerating the response if it sounds off. |
+| **Agent giving disclaimers**     | Double-check the system prompt was fully replaced. Old prompts might have cached - disconnect and reconnect.                                                |
+| **Agent not using filler words** | Adjust Stability setting lower (0.4-0.5). Enable "Natural Speech" if available in settings.                                                                 |
 
-**Agent giving disclaimers:**
+---
 
-- Double-check the system prompt was fully replaced
-- Old prompts might have cached - disconnect and reconnect
-
-**Agent not using filler words:**
-
-- Adjust Stability setting lower (0.4-0.5)
-- Enable "Natural Speech" if available in settings
-
-## Need Help?
+## 💬 Need Help?
 
 Check the main agent prompt file for detailed examples and guidelines: [`/AGENT_PROMPT.md`](../AGENT_PROMPT.md)

@@ -1,19 +1,25 @@
-# Google Gemini AI Integration
+# 🤖 Google Gemini AI Integration
 
-## Overview
+## 📖 Overview
 
 CultureLens integrates with Google Gemini AI for advanced transcript analysis and cultural communication pattern detection. This document outlines the integration architecture and usage.
 
-## Project Configuration
+---
+
+## ⚙️ Project Configuration
 
 **Project Details:**
 
-- **Project Name:** CultureLens
-- **Project ID:** `gen-lang-client-0985823799`
-- **Project Number:** `119358341094`
-- **Model:** `gemini-2.5-flash` (upgraded from deprecated gemini-pro)
+| Field              | Value                                                    |
+| ------------------ | -------------------------------------------------------- |
+| **Project Name**   | CultureLens                                              |
+| **Project ID**     | `gen-lang-client-0985823799`                             |
+| **Project Number** | `119358341094`                                           |
+| **Model**          | `gemini-2.5-flash` (upgraded from deprecated gemini-pro) |
 
-## Architecture
+---
+
+## 🏗️ Architecture
 
 ### Integration Points
 
@@ -45,7 +51,9 @@ Structured Insights
 User Dashboard
 ```
 
-## Features
+---
+
+## ✨ Features
 
 ### 1. Cultural Communication Analysis
 
@@ -65,7 +73,9 @@ User Dashboard
 - **Turn Count:** Number of conversational turns per participant
 - **Average Turn Length:** Typical response length per speaker
 
-## Implementation
+---
+
+## 🛠️ Implementation
 
 ### Environment Setup
 
@@ -113,7 +123,9 @@ interface AnalysisResult {
 }
 ```
 
-## Prompt Engineering
+---
+
+## 🧠 Prompt Engineering
 
 The Gemini integration uses a structured prompt that includes:
 
@@ -134,7 +146,9 @@ The Gemini integration uses a structured prompt that includes:
    - Active listening
    - Conflict resolution approaches
 
-## Fallback Mechanism
+---
+
+## 🔄 Fallback Mechanism
 
 If Gemini is unavailable (no API key, rate limits, errors), the system automatically falls back to deterministic analysis:
 
@@ -148,21 +162,29 @@ function generateFallbackAnalysis(
 }
 ```
 
-## Performance
+---
 
-- **Typical Response Time:** 2-5 seconds
-- **Token Usage:** ~1000-3000 tokens per analysis
-- **Rate Limits:** Respects Gemini API quotas
-- **Caching:** Not implemented (future optimization)
+## ⚡ Performance
 
-## Security
+| Metric                    | Value                                 |
+| ------------------------- | ------------------------------------- |
+| **Typical Response Time** | 2-5 seconds                           |
+| **Token Usage**           | ~1000-3000 tokens per analysis        |
+| **Rate Limits**           | Respects Gemini API quotas            |
+| **Caching**               | Not implemented (future optimization) |
+
+---
+
+## 🔒 Security
 
 - **API Key Storage:** Environment variables only, never committed
 - **Request Validation:** All inputs sanitized before Gemini API calls
 - **Error Handling:** Graceful degradation without exposing internal errors
 - **Data Privacy:** Transcripts processed per user consent
 
-## Future Enhancements
+---
+
+## 🗺️ Future Enhancements
 
 ### Phase 1 (Current)
 
@@ -184,7 +206,9 @@ function generateFallbackAnalysis(
 - [ ] Recommendation personalization
 - [ ] Integration with Gemini Vision for video analysis
 
-## Testing
+---
+
+## 🧪 Testing
 
 ### Unit Tests
 
@@ -203,35 +227,29 @@ npm run test:gemini:fallback
 npm run test:analysis:e2e
 ```
 
-## Troubleshooting
+---
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-**Issue:** "API key not configured"
+| Issue                    | Solution                                                                                                       |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| "API key not configured" | Ensure `GOOGLE_AI_API_KEY` is set in `.env`                                                                    |
+| "Rate limit exceeded"    | Implement exponential backoff or reduce request frequency                                                      |
+| "Model not found"        | Verify `gemini-2.5-flash` is available in your project region. The old `gemini-pro` model has been deprecated. |
 
-```
-Solution: Ensure GOOGLE_AI_API_KEY is set in .env
-```
+---
 
-**Issue:** "Rate limit exceeded"
-
-```
-Solution: Implement exponential backoff or reduce request frequency
-```
-
-**Issue:** "Model not found"
-
-```
-Solution: Verify gemini-2.5-flash is available in your project region. The old gemini-pro model has been deprecated.
-```
-
-## Resources
+## 📚 Resources
 
 - [Google Gemini API Docs](https://ai.google.dev/docs)
 - [Generative AI SDK](https://www.npmjs.com/package/@google/generative-ai)
 - [CultureLens Analysis Library](/lib/gemini-analysis.ts)
 
-## Support
+---
+
+## 💬 Support
 
 For Gemini integration questions:
 
