@@ -49,7 +49,7 @@ export async function PATCH(request: Request) {
       }
 
       // update firestore profile (filter out undefined values)
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, unknown> = {
         updatedAt: new Date().toISOString(),
       };
 

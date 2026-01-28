@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     try {
       // filter out undefined values
-      const profileData: Record<string, any> = {
+      const profileData: Record<string, unknown> = {
         updatedAt: new Date().toISOString(),
       };
 
