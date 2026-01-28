@@ -20,7 +20,7 @@
 
 _Real-Time Conversational AI • Cultural Communication Analysis • Privacy-First Architecture_
 
-[Live Demo](https://culturelens.vercel.app) • [API Docs](/api/docs) • [Documentation](#-architecture) • [Quick Start](#-quick-start)
+[Live Demo](https://culturelens.vercel.app) • [Docs](/docs) • [API Reference](/docs/api) • [Quick Start](#-quick-start)
 
 </div>
 

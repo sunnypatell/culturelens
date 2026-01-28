@@ -9,7 +9,8 @@ format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/), versio
 
 ### added
 
-- **API docs**: interactive Scalar API explorer at `/api/docs` with OpenAPI 3.1.0 spec, try-it-out, code samples, and Bearer auth (`a8e1524`)
+- **docs site**: full documentation site at `/docs` powered by Fumadocs (MDX, sidebar navigation, search) with all existing markdown docs migrated (`590a446`)
+- **API docs**: interactive Scalar API explorer moved to `/docs/api` (was `/api/docs`) with OpenAPI 3.1.0 spec, try-it-out, code samples, and Bearer auth (`a8e1524`, `25115c2`)
 - **branch protection**: setup script (`scripts/setup-branch-protection.sh`) enforcing required PRs, approvals, status checks, and push restrictions (`9a64276`)
 - **testing**: vitest test suite with 71 tests across 8 files (api-client, api-errors, rate-limiter, pdf-export, format, logger, error-boundary, client-logger)
 - **CI**: frontend-test.yml workflow running vitest + next build verification on PRs
