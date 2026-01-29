@@ -23,11 +23,11 @@ user hears response ← browser audio ← WebSocket ← audio stream
 
 there are two ElevenLabs integration points in the codebase:
 
-| integration | file | description |
-| --- | --- | --- |
-| conversational agent | `components/voice-agent.tsx` | real-time WebSocket voice sessions via `@11labs/react` SDK |
-| text-to-speech | `app/api/elevenlabs/tts/route.ts` | generates audio debriefs from analysis text, stores in Firestore |
-| signed URL | `app/api/elevenlabs/signed-url/route.ts` | creates authenticated WebSocket URLs for the voice agent |
+| integration          | file                                     | description                                                      |
+| -------------------- | ---------------------------------------- | ---------------------------------------------------------------- |
+| conversational agent | `components/voice-agent.tsx`             | real-time WebSocket voice sessions via `@11labs/react` SDK       |
+| text-to-speech       | `app/api/elevenlabs/tts/route.ts`        | generates audio debriefs from analysis text, stores in Firestore |
+| signed URL           | `app/api/elevenlabs/signed-url/route.ts` | creates authenticated WebSocket URLs for the voice agent         |
 
 ## environment variables
 
@@ -56,21 +56,21 @@ get your API key from [elevenlabs.io/app/settings](https://elevenlabs.io/app/set
 
 ### step 3: configure voice settings
 
-| setting | recommended value | effect |
-| --- | --- | --- |
-| stability | 0.5–0.6 | lower = more natural variation; higher = more consistent but monotone |
-| similarity boost | 0.7–0.8 | how closely output matches the base voice |
-| style exaggeration | 0.4–0.5 | conversational delivery without being dramatic |
-| speaker boost | enabled | improves clarity and presence |
+| setting            | recommended value | effect                                                                |
+| ------------------ | ----------------- | --------------------------------------------------------------------- |
+| stability          | 0.5–0.6           | lower = more natural variation; higher = more consistent but monotone |
+| similarity boost   | 0.7–0.8           | how closely output matches the base voice                             |
+| style exaggeration | 0.4–0.5           | conversational delivery without being dramatic                        |
+| speaker boost      | enabled           | improves clarity and presence                                         |
 
 ### step 4: configure conversation settings
 
-| setting | recommended value | effect |
-| --- | --- | --- |
-| mode | conversational | casual tone rather than formal/professional |
-| response length | medium | 60–90 second responses |
-| enable interruptions | yes | allows natural back-and-forth |
-| turn detection sensitivity | medium | balanced between too eager and too slow |
+| setting                    | recommended value | effect                                      |
+| -------------------------- | ----------------- | ------------------------------------------- |
+| mode                       | conversational    | casual tone rather than formal/professional |
+| response length            | medium            | 60–90 second responses                      |
+| enable interruptions       | yes               | allows natural back-and-forth               |
+| turn detection sensitivity | medium            | balanced between too eager and too slow     |
 
 ### step 5: test
 
@@ -82,9 +82,11 @@ get your API key from [elevenlabs.io/app/settings](https://elevenlabs.io/app/set
 ## before vs. after
 
 **before (default settings):**
+
 > "I have identified several communication patterns in your conversation. Person A interrupted Person B five times during the discussion."
 
 **after (tuned settings):**
+
 > "Mm, so listening to that... I noticed something about the pacing. When you brought up the weekend plans, the response came really quick — like, almost before you finished your sentence. Did that feel different to you?"
 
 ## what natural sounds like
@@ -98,14 +100,14 @@ get your API key from [elevenlabs.io/app/settings](https://elevenlabs.io/app/set
 
 ## troubleshooting
 
-| problem | solution |
-| --- | --- |
-| agent sounds robotic | verify the full system prompt was pasted, lower stability to 0.4–0.5 |
-| agent gives disclaimers | old prompt may be cached — disconnect and reconnect |
-| no filler words | lower stability further, enable "Natural Speech" if available |
-| connection fails | check `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` in `.env` |
-| WebSocket errors | verify signed URL endpoint is returning valid URLs, check browser console |
-| rate limit errors on TTS | TTS is limited to 10 requests per 60 seconds per user |
+| problem                  | solution                                                                  |
+| ------------------------ | ------------------------------------------------------------------------- |
+| agent sounds robotic     | verify the full system prompt was pasted, lower stability to 0.4–0.5      |
+| agent gives disclaimers  | old prompt may be cached — disconnect and reconnect                       |
+| no filler words          | lower stability further, enable "Natural Speech" if available             |
+| connection fails         | check `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` in `.env`            |
+| WebSocket errors         | verify signed URL endpoint is returning valid URLs, check browser console |
+| rate limit errors on TTS | TTS is limited to 10 requests per 60 seconds per user                     |
 
 ## related
 
