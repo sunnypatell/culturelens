@@ -64,7 +64,7 @@ jobs:
         run: gem install xcpretty
 
       - name: cache swift packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ios/CultureLens/.build
@@ -139,7 +139,7 @@ jobs:
         run: gem install xcpretty
 
       - name: cache swift packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ios/CultureLens/.build
@@ -229,7 +229,7 @@ jobs:
         run: gem install xcpretty
 
       - name: cache swift packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ios/CultureLens/.build
